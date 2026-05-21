@@ -1,0 +1,59 @@
+{
+  "essays": [
+    {
+      "essay_id": "EE01",
+      "question": "Negative source-control fixture.",
+      "title": "Negative Source Control",
+      "subtitle": "Expected DOCX linter failure",
+      "unit_key": "fixture_unit",
+      "lecture_anchors": [
+        {
+          "file": "fixture_lecture_slides.pdf",
+          "slide_or_page_range": "slides 1-2"
+        }
+      ],
+      "paragraphs": [
+        {
+          "paragraph_id": "TITLE",
+          "function": "title",
+          "is_title": true,
+          "lecture_anchors": [],
+          "text_runs": [
+            {
+              "text": "Negative Source Control",
+              "source_type": "question_framing",
+              "source_anchor": null,
+              "highlight": "none"
+            }
+          ]
+        },
+        {
+          "paragraph_id": "P1",
+          "function": "body_without_anchor",
+          "lecture_anchors": [],
+          "text_runs": [
+            {
+              "text": "This paragraph has no lecture anchor and therefore must fail source grounding. ",
+              "source_type": "student_visible_transition",
+              "source_anchor": null,
+              "highlight": "none"
+            },
+            {
+              "text": "This green claim has no author-year citation and has not been marked as read. ",
+              "source_type": "citation_original_source",
+              "source_anchor": "unread source",
+              "highlight": "green",
+              "citation_original_read": false
+            },
+            {
+              "text": "This yellow claim has no extra-reading chapter anchor.",
+              "source_type": "extra_reading_book",
+              "source_anchor": null,
+              "highlight": "yellow"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

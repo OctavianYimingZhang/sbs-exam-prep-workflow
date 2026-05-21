@@ -1,0 +1,29 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+dist/
+build/
+
+# Generated workflow outputs
+outputs/
+source_text/
+Example_Essays_DOCX/
+*.xlsx
+*.xlsm
+*.docx
+*.pdf
+*.zip
+*_diagnostics.json
+*_source_map.json
+example_essay_manifest.json
+example_essay_source_audit.json
+
+# Private source materials
+examples/private_sources/
+private_sources/

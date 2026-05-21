@@ -1,0 +1,330 @@
+{
+  "suite_name": "cross_subject_regression_suite",
+  "purpose": "Validate generic Skill behaviour across unit separation, exam-regime split, question-type routing, KP granularity, lecture-order coverage, and visual Excel adaptation.",
+  "hard_rule": "Benchmark units are never pooled for content prediction.",
+  "units": [
+    {
+      "unit_key": "Motor Systems",
+      "lecture_source_examples": [
+        "examples/private_sources/Motor_System.pdf"
+      ],
+      "past_paper_glob": "Motor System*",
+      "expected_behaviour": [
+        "answer-one essay exam",
+        "lecture-order slide coverage",
+        "slide images aligned with essay-style explanation",
+        "predicted essay prompt in far-right area"
+      ],
+      "must_not": [
+        "use 2016-2018 short-answer papers as direct current essay blueprint",
+        "pool Developmental Biology, Plant Biology, or Immunology content"
+      ],
+      "generic_contribution": "Validates exam-regime split when older answer-all short-answer/problem papers differ from recent answer-one essay/problem-essay papers, and validates slide-aligned visual workbook output.",
+      "transferable_rules": [
+        "Compare answer rules, section structure, timing, mark weighting, and question families across years before pooling past-paper evidence.",
+        "Use old structurally different papers for coverage or answer-schema evidence only, not as current blueprint prediction evidence.",
+        "For visually taught slide units, preserve lecture order and align locator, original slide image, explanation, and exam-facing preparation output."
+      ],
+      "future_unit_diagnostic_questions": [
+        "Did the answer rule change from answer-all to answer-one?",
+        "Did the dominant question type change across years?",
+        "Are old papers useful for coverage but unsafe for current blueprint prediction?",
+        "Does the unit need visual slide-image alignment to make the explanation usable?"
+      ],
+      "non_transferable_content": [
+        "MND/ALS",
+        "Brain Machine Interface",
+        "C9orf72",
+        "basal ganglia/Parkinson's disease",
+        "superior colliculus",
+        "vestibular scenario",
+        "Motor-specific topic recurrence"
+      ],
+      "workflow_steps_tested": [
+        "unit_grouping_regime_split",
+        "exam_format_diagnosis",
+        "archetype_mapping",
+        "past_paper_statistics",
+        "pattern_detection",
+        "question_type_outputs",
+        "excel_generation",
+        "cross_subject_regression"
+      ],
+      "anti_patterns_guarded_against": [
+        "using old short-answer papers as direct current essay blueprint",
+        "treating topic recurrence as more important than exam-format comparability",
+        "outputting a non-visual evidence-heavy workbook instead of the requested visual student workbook"
+      ]
+    },
+    {
+      "unit_key": "Principles of Developmental Biology",
+      "lecture_source_examples": [
+        "examples/private_sources/Developmental.pptx"
+      ],
+      "past_paper_glob": "Principles of Developmental Biology*",
+      "expected_regimes": [
+        {
+          "name": "old_section_a_answer_all_plus_section_b_essay",
+          "years": [
+            "2015",
+            "2016",
+            "2017"
+          ],
+          "format": "1.5 h; Section A answer all, 35 min, 40%; Section B answer one, 55 min, 60%",
+          "evidence_use": "concept_and_short_answer_schema_only"
+        },
+        {
+          "name": "current_section_a_short_conceptual_plus_section_b_major_essay",
+          "years": [
+            "2023",
+            "2024",
+            "2025"
+          ],
+          "format": "2 h; answer one question from Section A and one from Section B; Section A 15%; Section B 70%",
+          "evidence_use": "current_blueprint"
+        }
+      ],
+      "required_archetypes": [
+        "mechanism plus experimental evidence",
+        "GOF/LOF inference",
+        "model-system comparison",
+        "developmental pathway explanation",
+        "conservation across species",
+        "hypothesis-testing experiment design"
+      ],
+      "must_not": [
+        "ignore Section A",
+        "treat 2015-2017 and 2023-2025 as one stable format",
+        "split one mechanism/evidence unit into isolated slide fragments",
+        "infer lecture deck year from reference years inside slide text",
+        "silently resolve conflicts between lecture-deck guidance and formal-paper format"
+      ],
+      "generic_contribution": "Validates mechanism-heavy KP construction, Section A/B routing, and evidence-based essay planning where mechanisms must be tied to experiments and biological consequences.",
+      "transferable_rules": [
+        "For mechanism-heavy units, build knowledge points around mechanism -> evidence/experiment -> consequence rather than slide count.",
+        "When current papers contain sections with different answer styles, separate prep logic by section.",
+        "Use old answer-all short-question papers as coverage and mark-schema evidence when recent papers use a different major-answer format.",
+        "Predict examiner operations such as evidence interpretation, causal mechanism, comparison, or experimental inference rather than topic labels alone."
+      ],
+      "future_unit_diagnostic_questions": [
+        "Does the unit require experimental evidence to support mechanism claims?",
+        "Are short conceptual prompts and major essay prompts mixed in the current paper?",
+        "Are older papers structurally different from current papers?",
+        "Should a KP be split because it contains several mechanisms, or merged because one mechanism spans several slides?"
+      ],
+      "non_transferable_content": [
+        "Bicoid",
+        "Hox",
+        "Drosophila segmentation",
+        "somite clock",
+        "phyllotaxy",
+        "plant embryo regulators",
+        "Developmental Biology topic recurrence"
+      ],
+      "workflow_steps_tested": [
+        "unit_grouping_regime_split",
+        "question_type_gate",
+        "exam_format_diagnosis",
+        "knowledge_point_optimisation",
+        "archetype_mapping",
+        "question_type_outputs",
+        "example_essay_mode",
+        "cross_subject_regression"
+      ],
+      "anti_patterns_guarded_against": [
+        "splitting one mechanism/evidence unit into isolated slide fragments",
+        "merging a whole topic area into one huge KP",
+        "treating Section A and Section B as the same question type",
+        "using old-regime answer-all questions as current blueprint evidence"
+      ]
+    },
+    {
+      "unit_key": "Plants for the Future",
+      "lecture_source_examples": [
+        "examples/private_sources/Plant.pptx"
+      ],
+      "past_paper_glob": "Plants for the Future*",
+      "expected_regimes": [
+        {
+          "name": "old_essay_only",
+          "years": [
+            "2016",
+            "2019"
+          ],
+          "format": "2 h; answer two out of four; no Section A/B split",
+          "evidence_use": "old_regime_coverage_only"
+        },
+        {
+          "name": "online_sectioned",
+          "years": [
+            "2021"
+          ],
+          "format": "48 h; answer one from Section A and one from Section B; page/figure/reference constraints",
+          "evidence_use": "medium_regime_evidence"
+        },
+        {
+          "name": "transitional_section_a_b",
+          "years": [
+            "2023"
+          ],
+          "format": "Section A mini-essay from two and Section B problem from two; 50/50; 500-word limit detected",
+          "evidence_use": "current_related_blueprint"
+        },
+        {
+          "name": "current_in_room_mini_essay_plus_problem_data",
+          "years": [
+            "2024",
+            "2025"
+          ],
+          "format": "2 h in-room; Section A mini-essay from two; Section B problem/data from two; 50/50",
+          "evidence_use": "current_blueprint"
+        }
+      ],
+      "required_archetypes": [
+        "Section A mini-essay",
+        "Section B problem/data interpretation",
+        "mutant phenotype inference",
+        "gene-expression bar chart interpretation",
+        "transgenic overexpression data interpretation",
+        "field-trial design",
+        "crop-improvement mechanism-to-application reasoning"
+      ],
+      "must_not": [
+        "treat as pure essay",
+        "ignore Section B data/problem questions",
+        "output only topic labels such as ABA, FLC, drought, GM, or leaf angle",
+        "apply the 2023 500-word limit to 2024/2025 without evidence",
+        "invent graph values from image-only Section B figures",
+        "treat exam-only gene names as lecture-confirmed KPs without slide verification"
+      ],
+      "generic_contribution": "Validates mixed-format routing where a current paper contains both mini-essay and data/problem sections.",
+      "transferable_rules": [
+        "Do not treat mixed-format papers as pure essay units.",
+        "Data/problem sections require graph-reading, phenotype inference, mechanism inference, limitation, and follow-up-test archetypes.",
+        "If figures, graphs, or tables are image-only, flag visual inspection before claiming exact values.",
+        "Adapt the workbook prediction area by detected question type, not by unit name."
+      ],
+      "future_unit_diagnostic_questions": [
+        "Does the current paper contain both essay and data/problem sections?",
+        "Does one section require interpretation of figures, graphs, tables, mutants, or experimental conditions?",
+        "Are exact data values visible in extracted text, or only in images?",
+        "Should the far-right workbook area show data-operation logic instead of essay prompts?"
+      ],
+      "non_transferable_content": [
+        "ABA",
+        "GA",
+        "FLC",
+        "golden rice",
+        "barley domestication genes",
+        "leaf angle",
+        "crop-density examples",
+        "Plant-specific topic recurrence"
+      ],
+      "workflow_steps_tested": [
+        "question_type_gate",
+        "exam_format_diagnosis",
+        "archetype_mapping",
+        "question_type_outputs",
+        "excel_generation",
+        "qa",
+        "cross_subject_regression"
+      ],
+      "anti_patterns_guarded_against": [
+        "treating a mixed mini-essay plus data/problem unit as pure essay",
+        "outputting only topic names without data-operation logic",
+        "inventing graph values from image-only figures",
+        "applying one year's word limit to later years without evidence"
+      ]
+    },
+    {
+      "unit_key": "Immunology",
+      "lecture_source_examples": [
+        "examples/private_sources/Immunology.pptx"
+      ],
+      "past_paper_glob": "Immunology*",
+      "expected_regimes": [
+        {
+          "name": "old_answer_all_short_answer",
+          "years": [
+            "2016",
+            "2017",
+            "2018"
+          ],
+          "format": "1.5 h; answer all; answers in spaces provided",
+          "evidence_use": "concept_and_short_answer_schema_only"
+        },
+        {
+          "name": "recent_answer_one_essay_or_section_b",
+          "years": [
+            "2023",
+            "2024"
+          ],
+          "format": "Paper 2 essay-style answer-one format when detected",
+          "evidence_use": "recent_blueprint"
+        },
+        {
+          "name": "section_a_answer_all_plus_section_b_answer_one",
+          "years": [
+            "2025"
+          ],
+          "format": "2 h; Section A answer all on answer sheet; Section B answer one in booklet; Section B 60% overall unit mark",
+          "evidence_use": "current_split_blueprint"
+        }
+      ],
+      "required_archetypes": [
+        "immune process chain",
+        "pathogen-scenario response",
+        "cell-type comparison",
+        "clinical/application explanation",
+        "defect-to-phenotype reasoning",
+        "innate versus adaptive recognition contrast"
+      ],
+      "must_not": [
+        "pool old short-answer papers with current essay blueprint",
+        "output isolated vocabulary instead of immune process chains",
+        "ignore clinical/pathogen scenario structure",
+        "invent missing Paper 1 or Section A stems",
+        "invent the exact transition year between old and recent regimes"
+      ],
+      "generic_contribution": "Validates regime-shift handling where old concise answer-all short-answer papers coexist with newer essay/Section B papers, and validates process-chain KP segmentation.",
+      "transferable_rules": [
+        "Separate old short-answer papers from current essay or Section B blueprint evidence when the paper structure differs.",
+        "Build process-heavy KPs as stimulus/input -> actors -> signals/receptors -> location -> mechanism -> outcome -> application.",
+        "Use old papers for definitions, concise schemas, examples, and coverage when current paper structure differs.",
+        "Flag missing paper sections instead of inventing missing stems or answer keys."
+      ],
+      "future_unit_diagnostic_questions": [
+        "Is there a gap between old short-answer format and recent essay or major-answer format?",
+        "Do KPs need to be process chains rather than isolated terms?",
+        "Do questions rotate scenario contexts while preserving the same examiner operation?",
+        "Is any referenced paper section missing from the supplied sources?"
+      ],
+      "non_transferable_content": [
+        "antibodies",
+        "MHC",
+        "TCR",
+        "germinal centre",
+        "pathogen-specific immune content",
+        "clinical immunology examples",
+        "Immunology-specific topic recurrence"
+      ],
+      "workflow_steps_tested": [
+        "unit_grouping_regime_split",
+        "question_type_gate",
+        "exam_format_diagnosis",
+        "knowledge_point_optimisation",
+        "past_paper_statistics",
+        "pattern_detection",
+        "question_type_outputs",
+        "qa",
+        "cross_subject_regression"
+      ],
+      "anti_patterns_guarded_against": [
+        "pooling old short-answer papers with current essay blueprint",
+        "outputting isolated vocabulary instead of process-chain explanations",
+        "inventing missing Paper 1 or Section A content",
+        "inventing the exact transition year between regimes"
+      ]
+    }
+  ]
+}

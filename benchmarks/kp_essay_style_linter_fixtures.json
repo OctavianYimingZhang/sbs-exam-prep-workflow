@@ -1,0 +1,54 @@
+{
+  "suite_name": "kp_essay_style_linter_fixtures",
+  "purpose": "Validate that default workbook KP explanations are concept-first essay-style synthesis rather than page/slide narration or writing instructions.",
+  "cases": [
+    {
+      "id": "plant_style_page_trace_bad",
+      "column": "explanation",
+      "expected": "fail",
+      "text": "Pages 8-9 should be read as one connected exam paragraph. Page 8 first establishes the crop-production problem. Page 9 then develops the environmental pressure and Page 10 then closes with a food-security implication."
+    },
+    {
+      "id": "metabolism_style_meta_bad",
+      "column": "explanation",
+      "expected": "fail",
+      "text": "Glycolytic control is the central idea for this block. In an essay answer, it should be written as a pathway sequence. The first part of the sequence establishes substrate entry, and the later pages add the regulatory examples."
+    },
+    {
+      "id": "metabolism_soft_meta_bad",
+      "column": "explanation",
+      "expected": "fail",
+      "text": "Glycolysis should be understood as a connected metabolic process rather than a list of isolated reactions. This knowledge block is mainly an argument about metabolic control and is best written as a pathway summary."
+    },
+    {
+      "id": "immunology_style_slide_sequence_bad",
+      "column": "explanation",
+      "expected": "fail",
+      "text": "KP01 covers pages 15-24. The slide sequence should be read as a connected overview of innate recognition, with the remaining linked pages providing examples of inflammatory mediators and cell recruitment."
+    },
+    {
+      "id": "prep_column_turn_pages_bad",
+      "column": "prep",
+      "expected": "fail",
+      "text": "Turn pages 15-24 into one paragraph."
+    },
+    {
+      "id": "plant_concept_first_good",
+      "column": "explanation",
+      "expected": "pass",
+      "text": "Sustainable intensification frames crop improvement as a trade-off between yield, land use and environmental cost. Rising CO2 and climate instability increase the pressure to produce more food without simply expanding agricultural land, so plant science has to connect physiological traits, genetic variation and breeding tools to resource-efficient production. This matters because future crop improvement must raise productivity while limiting greenhouse-gas emissions and preserving ecological capacity."
+    },
+    {
+      "id": "immunology_concept_first_good",
+      "column": "explanation",
+      "expected": "pass",
+      "text": "Innate immunity begins with pattern recognition rather than antigen-specific memory. Phagocytes and other innate cells use receptors such as PRRs to detect microbial PAMPs or damage-associated DAMPs, allowing a rapid response to infection or tissue injury. This broad recognition triggers cytokine production, phagocytosis and inflammatory recruitment before adaptive immunity is fully established. The concept is important because PRR signalling explains how host defence can be fast and general while still linking to later immune specificity and inflammatory pathology."
+    },
+    {
+      "id": "metabolism_concept_first_good",
+      "column": "explanation",
+      "expected": "pass",
+      "text": "Metabolic regulation matches pathway flux to cellular energy demand and substrate availability. Enzymes at irreversible or highly regulated steps respond to signals such as ATP, ADP, AMP, NADH or covalent modification, so carbon flow is redirected when the energetic state changes. This control prevents wasteful cycling and enables tissues to prioritise ATP production, biosynthesis or fuel storage according to physiological context."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+interface:
+  display_name: "SBS Exam Prep Workflow"
+  short_description: "Visual single-sheet SBS exam prep workflow"
+  default_prompt: "Use $sbs-exam-prep-workflow to process my lecture slides, past papers, practice materials, notes, exemplars, and marking guidance into a student-facing single-sheet visual Excel exam-prep map, with diagnostics and optional evidence workbook kept separately. Preserve slide/page order from first to last, keep slide images at original aspect ratio, split KPs by examinable mechanism/process/evidence/data-operation units, and run cross-subject regression checks when benchmark examples are supplied."
+
+policy:
+  allow_implicit_invocation: true
