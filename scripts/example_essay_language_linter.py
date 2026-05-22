@@ -36,15 +36,39 @@ SOURCE_TRACE = [
     ("slide_trace", re.compile(r"\bSlides?\s+\d+\b", re.I)),
     ("lecture_sequence_narration", re.compile(r"\blecture sequence\b", re.I)),
     ("source_walkthrough", re.compile(r"\b(first establishes|then develops|then closes|later pages add|slide sequence)\b", re.I)),
+    (
+        "lecture_route_narration",
+        re.compile(
+            r"\b(?:the\s+)?(?:lecture|lectures|slides|source|chapter|section|module)\s+(?:\d+\s+)?"
+            r"(?:establishes|establish|adds|add|introduces|introduce|covers|cover|moves from|move from|develops|develop|closes with|close with)\b",
+            re.I,
+        ),
+    ),
 ]
 
 HOW_TO_WRITE = [
     ("how_to_write", re.compile(r"\b(should be written as|write this as|use these pages|turn pages|in an essay answer)\b", re.I)),
+    (
+        "exam_guidance_sentence",
+        re.compile(
+            r"\b(final\s+exam\s+thesis\s+should\s+be|exam\s+thesis\s+should\s+be|"
+            r"in\s+an\s+exam\s+answer|for\s+the\s+exam|the\s+answer\s+should\s+be|"
+            r"the\s+correct\s+conclusion\s+is|should\s+frame\s+this\s+as)\b",
+            re.I,
+        ),
+    ),
 ]
 
 WEAK_OPENERS = re.compile(r"^\s*(background|introduction|firstly|secondly|thirdly|to begin with)\b[:,]?", re.I)
 EXAMPLE_TERMS = re.compile(r"\b(for example|case study|case|firm|company|example)\b", re.I)
 EXAMPLE_TO_ARGUMENT = re.compile(r"\b(shows|demonstrates|supports|indicates|suggests|therefore|consequently|implies|evidence|illustrates)\b", re.I)
+NEGATIVE_FRAMING = re.compile(r"\b(not\s+(?:a|an|the|only|merely|simply)|rather than)\b", re.I)
+BROAD_IMPORTANCE = re.compile(r"\b(this matters|this is important|this is critical|the important point)\b", re.I)
+IMPORTANCE_WITH_CONSEQUENCE = re.compile(r"\b(because|therefore|consequently|as a result|so|means that|explains|limits|enables|constrains)\b", re.I)
+SUPPORT_TO_CAUSE_OVERCLAIM = re.compile(
+    r"\b(?:supports?|implicates?|suggests?|is consistent with|is associated with)\b[^.!?]{0,140}\b(?:the|a|single|sole)\s+cause\b",
+    re.I,
+)
 
 
 @dataclass
@@ -240,6 +264,12 @@ def lint_paragraph(record: ParagraphRecord, min_words: int, max_words: int) -> t
     example_count = len(EXAMPLE_TERMS.findall(text))
     if example_count >= 3 and not EXAMPLE_TO_ARGUMENT.search(text):
         failures.append({"type": "example_overload_without_inference", "example_terms": example_count})
+    if SUPPORT_TO_CAUSE_OVERCLAIM.search(text):
+        failures.append({"type": "citation_strength_overclaim", "phrase": SUPPORT_TO_CAUSE_OVERCLAIM.search(text).group(0)[:180]})
+    if len(NEGATIVE_FRAMING.findall(text)) >= 4:
+        warnings.append({"type": "repeated_negative_framing"})
+    if BROAD_IMPORTANCE.search(text) and not IMPORTANCE_WITH_CONSEQUENCE.search(text):
+        warnings.append({"type": "broad_importance_without_specific_consequence"})
 
     if record.is_conclusion:
         if AUTHOR_YEAR_RE.search(text):

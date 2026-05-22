@@ -15,10 +15,28 @@
       "text": "Slides 4-6 should be read as the main paragraph. Slide 4 first establishes the reliability problem, then Slide 5 develops calibration and Slide 6 closes with replication."
     },
     {
+      "id": "lecture_route_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "The lecture establishes spinal timing and the next module adds brainstem control. This route is useful for organising the answer, but it mainly describes how the source was taught."
+    },
+    {
+      "id": "exam_guidance_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "The final exam thesis should be that locomotion is layered control. In an exam answer, this should be framed as spinal rhythm plus sensory and brainstem modulation."
+    },
+    {
       "id": "citation_stack_bad",
       "expected": "fail",
       "has_lecture_anchor": true,
       "text": "Reliability is important because repeated observations can vary across instruments (Smith, 2020) (Jones, 2021) (Patel, 2022). The paragraph lists authority but does not explain which source proves which mechanism."
+    },
+    {
+      "id": "citation_strength_overclaim_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "The review supports inflammation as the single cause of the syndrome, so all other mechanisms can be treated as secondary. This overstates source strength and collapses a multi-hit mechanism into one cause."
     },
     {
       "id": "claim_mechanism_good",
@@ -31,6 +49,12 @@
       "expected": "pass",
       "has_lecture_anchor": true,
       "text": "The two models answer different parts of the same control problem. A feedback model explains how output is corrected after sensory evidence shows a mismatch, whereas a feedforward model explains how an expected demand can be prepared before error occurs. The contrast is therefore not whether one model replaces the other, but which timing assumption best explains the behaviour being tested."
+    },
+    {
+      "id": "evidence_mechanism_interpretation_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "The perturbation experiment supports a specific control claim rather than a general statement that feedback is important. A sudden balance disturbance activates a rapid corrective pathway, showing that sensory evidence can alter motor output when the ongoing pattern is mechanically unsafe. The limitation is equally important: the result supports feedback-dependent correction, not the claim that sensory input creates the basic rhythm from zero."
     }
   ]
 }

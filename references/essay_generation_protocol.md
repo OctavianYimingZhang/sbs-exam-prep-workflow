@@ -33,6 +33,7 @@ ExampleEssayMode:
   knowledge_inventory:
   paragraph_plan:
   language_compression_plan:
+  exam_ready_refinement_pass:
   highlight_plan:
   source_to_run_mapping:
   high_score_example_essay:
@@ -136,6 +137,7 @@ For lecture-heavy biological material, common logic patterns include:
 
 ```text
 biological problem -> molecular/cellular constraint -> mechanism -> evidence/example -> consequence
+evidence/experiment -> mechanism tested -> interpretation -> limitation
 ```
 
 For method, practical, or project material:
@@ -217,6 +219,8 @@ Remove:
 - repeated claim restatements;
 - repeated case descriptions;
 - firm/example-level details that do not support the question;
+- lecture-route or source-route narration;
+- exam-guidance sentences that tell the student what to write instead of writing the answer;
 - vague metacommentary such as `this essay will explore`;
 - decorative transitions;
 - unnecessary historical background;
@@ -229,12 +233,34 @@ Keep:
 - mechanisms;
 - causal links;
 - named evidence where it proves the point;
+- analytical interpretation of what the evidence shows and what it does not show;
 - necessary definitions;
 - scope limitations;
 - examiner-relevant contrasts;
 - verified citations for non-obvious claims.
 
 Do not compress by simply shortening every sentence. Compress by deciding what function each sentence performs.
+
+## Exam-Ready Refinement Pass
+
+After the compression pass, run a second pass focused on answer quality rather than length.
+
+Reject and rewrite:
+
+- lecture/source-route narration, such as sentences whose main function is to state what a lecture, chapter, source, or section introduces next;
+- exam-guidance phrasing, such as telling the student what the final thesis should be;
+- repeated negative framing where several sentences say only what the answer is not;
+- broad importance claims that do not specify the mechanism, consequence, or limitation;
+- examples or experiments that stop at description without interpretation;
+- citation-derived claims that overstate support as single-cause proof.
+
+For evidence-heavy material, each major experiment, dataset, case, or example must be reduced to its answer function:
+
+```text
+evidence -> mechanism tested -> interpretation -> limitation or scope
+```
+
+Use stronger causal verbs only when the verified source directly warrants them. Otherwise prefer calibrated verbs such as `supports`, `implicates`, `is consistent with`, `contributes to`, or `suggests`.
 
 ## High-Quality Essay Language Rules
 
@@ -246,8 +272,9 @@ Use the following style discipline for every Example Essay:
 4. Use examples as proof of a broader mechanism or sector/system pattern. Do not let examples become disconnected mini-case studies.
 5. Make contrasts explicit. Avoid ambiguous `rather than` sentences unless both sides of the contrast are named precisely.
 6. Prefer precise upper-level terms when a list is only illustrative, but keep the list when the listed mechanisms are examiner-relevant.
-7. End paragraphs with a consequence, limitation, or direct answer to the question.
-8. End the essay with synthesis, not new evidence.
+7. Avoid lecture-route narration and exam-guidance phrasing inside the answer.
+8. End paragraphs with a consequence, limitation, or direct answer to the question.
+9. End the essay with synthesis, not new evidence.
 
 Strong paragraph shape:
 
@@ -345,6 +372,8 @@ Do not cite:
 
 Avoid citation stacking. If several sources support the same general claim, keep the most directly relevant source(s). If evidence is insufficient, omit the claim or mark it uncertain in QA.
 
+Match claim strength to source strength. A study, review, or textbook section may support, implicate, refine, or constrain a mechanism without proving it as the sole cause. Do not write causal certainty unless the resolved source directly supports that level of certainty.
+
 ### Citation Fallback When The User Supplies No Citation List
 
 When the user asks for a complete Example Essay but does not provide citations:
@@ -427,6 +456,9 @@ Add QA flags when needed:
 - `unsupported_claim`;
 - `citation_stack_or_overcitation`;
 - `case_detail_overload`;
+- `lecture_route_narration_present`;
+- `exam_guidance_sentence_present`;
+- `citation_strength_overclaim`;
 - `slide_or_page_narration_present`.
 
 Fail safe by omitting uncertain material rather than inventing mechanisms, citations, mark schemes, dates, names, statistics, or lecturer preferences.
@@ -485,6 +517,7 @@ The workflow passes if every Example Essay:
 - is traceable to read source material;
 - compresses low-value repetition without losing required academic detail;
 - uses examples as evidence for a broader claim;
+- interprets evidence through mechanism, scope, and limitation;
 - handles citations conservatively;
 - separates source-grounded content from extra-reading enrichment;
 - follows the required DOCX output contract.

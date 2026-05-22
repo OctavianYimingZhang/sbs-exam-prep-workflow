@@ -80,9 +80,12 @@ Language rules:
 
 - Start with the answer, not with generic metacommentary.
 - Compress repeated or low-value detail without deleting required academic mechanisms.
+- Remove lecture-route narration and exam-guidance phrasing from the essay body.
 - Use examples as evidence for a broader claim, not as disconnected case descriptions.
+- Convert evidence-heavy examples into `evidence -> mechanism -> interpretation -> limitation`.
 - Make contrasts explicit and non-ambiguous.
 - Keep citations minimal and sufficient; support theory, mechanisms, data, experiments, or non-obvious generalisations.
+- Calibrate citation strength; do not write support, association, or mechanistic plausibility as sole-cause proof.
 - Do not cite-stack.
 - Omit unsupported claims rather than inventing citations.
 - Conclude by synthesis, not by adding new content.
@@ -211,6 +214,7 @@ Fail DOCX generation or mark the essay as non-compliant if:
 - margins, font family, line spacing, title alignment, subtitle alignment, or body justification fail the DOCX linter;
 - the essay is generic and not traceable to lecture logic;
 - the essay contains slide/page narration, repeated filler, unsupported claims, citation stacking, or examples used as standalone case detail rather than evidence for the answer;
+- the essay contains lecture-route narration, exam-guidance phrasing, or citation-strength overclaiming;
 - a citation printed on a slide is copied into the essay without resolving and reading the original source;
 - an uploaded formatting PDF or style exemplar is used as biological content.
 

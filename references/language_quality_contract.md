@@ -15,6 +15,7 @@ claim or problem -> mechanism/process/evidence -> scope or limitation -> consequ
 Acceptable variants:
 
 - `debate -> model A -> model B -> evidence -> evaluation`;
+- `evidence -> mechanism -> interpretation -> limitation`;
 - `question demand -> method principle -> readout -> interpretation -> control`;
 - `shared problem -> comparison axis -> contrast -> synthesis`;
 - `sector/system problem -> example evidence -> implementation mechanism -> wider implication`.
@@ -24,11 +25,15 @@ Acceptable variants:
 - Start with the answer or problem, not with metacommentary.
 - Preserve necessary mechanisms when compressing language.
 - Remove repeated definitions, repeated claims, decorative transitions, and low-value case details.
+- Remove lecture-route narration and exam-guidance phrasing from the answer body.
+- Add words only when they add mechanism, evidence, interpretation, limitation, or a required contrast.
 - When writing essay/problem-essay prediction outputs, phrase the prediction as an examinable theme with scope and operation, not as a guaranteed future question.
 - Use examples as evidence for a wider claim.
+- Convert experiments, data, and examples into evidence, mechanism, interpretation, and limitation when the question is evidence-heavy.
 - Make contrasts explicit; do not rely on ambiguous `rather than` phrasing.
 - Separate model, mechanism, evidence, and implication when a question asks for evaluation.
 - Use citations only for non-obvious facts, theories, mechanisms, methods, evidence, data, or broad generalisations.
+- Calibrate citation strength. Use `supports`, `implicates`, `is consistent with`, or `contributes to` unless the verified source directly proves causality.
 - Avoid citation stacking; one precise citation is usually better than several weakly connected citations.
 - Do not invent statistics, dates, mechanisms, source names, quotations, or citations.
 - If the user supplies no Example Essay citations, cite only sources found by slide-citation mining or verified classic-experiment fallback; never cite from memory.
@@ -39,11 +44,14 @@ Acceptable variants:
 Reject or rewrite paragraphs that:
 
 - narrate pages or slides instead of giving the argument;
+- narrate the lecture/source route instead of giving the answer;
 - say how the student should write instead of writing the answer;
+- include exam-guidance sentences such as telling the student what the final thesis should be;
 - list examples without explaining what they prove;
 - repeat the question using different words without adding mechanism;
 - overuse broad claims such as `this is important` without specifying consequence;
 - hide uncertainty behind confident language;
+- turn supporting or associative evidence into a single-cause claim;
 - use a citation copied from lecture slides without verifying the original source when source-derived content is included.
 
 ## Compression Standard
@@ -56,6 +64,7 @@ For each sentence, ask:
 Does it state the claim?
 Does it explain the mechanism/process?
 Does it provide evidence or an example that changes the answer?
+Does it interpret what that evidence proves and what it does not prove?
 Does it define the scope, limitation, or contrast?
 Does it link back to the question?
 ```

@@ -71,6 +71,9 @@ Do not derive language deltas from formal past-paper pages, formal papers with a
 - Compress repetition without removing mechanism.
 - Open paragraphs with claim or problem.
 - Explain examples as evidence for a broader argument.
+- Convert evidence-heavy examples into evidence, mechanism, interpretation, and limitation.
+- Remove lecture-route narration and exam-guidance phrasing from final essay prose.
+- Calibrate citation strength so support or implication is not written as single-cause proof.
 - State the debate before comparing models.
 - Separate old-regime evidence from current-regime prediction.
 - Treat answer keys as answer-schema evidence, not independent factual authority.

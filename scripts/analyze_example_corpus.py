@@ -25,14 +25,27 @@ except Exception:  # pragma: no cover
     extract_text = None
 
 
-TEXT_EXTS = {".txt", ".md", ".markdown", ".json"}
+TEXT_EXTS = {".txt", ".md", ".markdown", ".json", ".yml", ".yaml"}
 READABLE_EXTS = TEXT_EXTS | {".docx"} | set(SOURCE_SUPPORTED_EXTS)
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?")
 PAGE_TRACE = re.compile(r"\b(Pages?|Slides?)\s+\d+\b", re.I)
-META = re.compile(r"\b(this essay will|in this essay|in an essay answer|should be written as|use these pages|turn pages)\b", re.I)
+META = re.compile(
+    r"\b(this essay will|in this essay|in an essay answer|should be written as|use these pages|turn pages|"
+    r"final\s+exam\s+thesis\s+should\s+be|the\s+answer\s+should\s+be|the\s+correct\s+conclusion\s+is)\b",
+    re.I,
+)
 CITATION_STACK = re.compile(r"(?:\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\).*){3,}")
 EXAMPLE_WITHOUT_INFERENCE = re.compile(r"\b(for example|case study|case|firm|company|example)\b", re.I)
 INFERENCE = re.compile(r"\b(shows|demonstrates|supports|suggests|therefore|implies|illustrates|evidence)\b", re.I)
+LECTURE_ROUTE = re.compile(
+    r"\b(?:the\s+)?(?:lecture|lectures|slides|source|chapter|section|module)\s+(?:\d+\s+)?"
+    r"(?:establishes|establish|adds|add|introduces|introduce|covers|cover|moves from|move from|develops|develop|closes with|close with)\b",
+    re.I,
+)
+SUPPORT_TO_CAUSE_OVERCLAIM = re.compile(
+    r"\b(?:supports?|implicates?|suggests?|is consistent with|is associated with)\b[^.!?]{0,140}\b(?:the|a|single|sole)\s+cause\b",
+    re.I,
+)
 LANGUAGE_DELTA_EXCLUDED_ROLES = {
     "formal_past_paper",
     "formal_past_paper_with_answers",
@@ -110,6 +123,18 @@ def analyse_paragraph(source_id: str, paragraph: str) -> list[dict[str, Any]]:
                 paragraph,
             )
         )
+    if LECTURE_ROUTE.search(paragraph):
+        deltas.append(
+            make_delta(
+                source_id,
+                "lecture_or_source_route_narration_inside_answer",
+                "Rewrite source-route narration as direct claim -> mechanism/evidence -> interpretation prose.",
+                "Final essay prose must answer the question rather than narrating how a lecture, source, or section was taught.",
+                "example_essay_language_linter lecture_route_narration",
+                "high",
+                paragraph,
+            )
+        )
     if CITATION_STACK.search(paragraph):
         deltas.append(
             make_delta(
@@ -119,6 +144,18 @@ def analyse_paragraph(source_id: str, paragraph: str) -> list[dict[str, Any]]:
                 "Citations must be minimal and sufficient, not stacked to create authority.",
                 "example_essay_language_linter citation_stack",
                 "medium",
+                paragraph,
+            )
+        )
+    if SUPPORT_TO_CAUSE_OVERCLAIM.search(paragraph):
+        deltas.append(
+            make_delta(
+                source_id,
+                "citation_support_overstated_as_single_cause",
+                "Use calibrated source-strength verbs such as supports, implicates, contributes to, or is consistent with unless direct causality is verified.",
+                "Citation-derived claims must not turn support, association, or plausibility into sole-cause proof.",
+                "example_essay_language_linter citation_strength_overclaim",
+                "high",
                 paragraph,
             )
         )
@@ -226,6 +263,7 @@ def main() -> int:
     extensions = {item.strip().lower() for item in args.extensions.split(",") if item.strip()} if args.extensions else None
     reports = [analyse_file(path) for path in iter_inputs(args.inputs, extensions=extensions, max_files=args.max_files)]
     result = {
+        "status": "ok",
         "examples_read": sum(1 for report in reports if report["status"] == "read"),
         "examples_unreadable": sum(1 for report in reports if report["status"] != "read"),
         "source_role_counts": {

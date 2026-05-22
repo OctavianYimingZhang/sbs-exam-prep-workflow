@@ -236,13 +236,17 @@ Example Essay language must follow these rules:
 
 - start each paragraph with a claim or problem, not a vague topic label;
 - build the paragraph through cause, mechanism, evidence, scope, and consequence;
+- for evidence-heavy paragraphs, convert examples and experiments into `evidence -> mechanism -> interpretation -> limitation`;
 - compress repeated points and low-value detail, but do not remove necessary academic mechanisms;
+- remove lecture-route narration and exam-guidance phrasing from the essay body; the essay must answer, not describe how the source was taught or how the student should answer;
 - use examples as evidence for a broader argument, not as disconnected case descriptions;
 - make contrasts explicit and non-ambiguous;
 - write sector-level, system-level, biological, clinical, or methodological implications when the question requires them;
 - use citations only where they support non-obvious facts, theory, mechanisms, methods, evidence, or sector-level claims;
+- calibrate citation strength: use language such as `supports`, `implicates`, `is consistent with`, or `contributes to` unless the verified source directly proves the stronger causal claim;
 - avoid citation stacking;
 - omit unsupported claims rather than inventing sources;
+- add length only when it adds mechanism, evidence, interpretation, limitation, or a required contrast;
 - conclude by synthesising the answer, not by adding new content.
 
 Use `references/language_quality_contract.md` as the source of truth for prose quality. Use `scripts/example_essay_language_linter.py` or an equivalent check before treating the language gap as closed.
