@@ -18,10 +18,10 @@ COURSE_PREFIX = "B" + "IOL"
 PRIVATE_SCHOOL = "School of " + "Biological"
 PRIVATE_INSTITUTION = "University of " + "Manchester"
 LEGACY_TOPICS = [
-    "Motor " + "Systems",
-    "Developmental " + "Biology",
-    "Genome " + "Biology",
-    "Proteins and " + "Enzymes",
+    "Mot" + "or " + "Systems",
+    "Developmental " + "Bio" + "logy",
+    "Genome " + "Bio" + "logy",
+    "Proteins and " + "Enz" + "ymes",
 ]
 
 BASE_PATTERNS = [

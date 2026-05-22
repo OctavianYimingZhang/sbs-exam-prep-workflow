@@ -60,6 +60,12 @@ LanguageDelta:
 5. Add a validation check that can fail future outputs.
 6. Record non-transferable content explicitly.
 
+## Language Delta Scope
+
+Scan external essays, formative feedback, answer-style exemplars, reasoned answer keys, and generated outputs for language deltas.
+
+Do not derive language deltas from formal past-paper pages, formal papers with answer appendices, lecture slides, practical protocols, reading lists, or marking criteria. Those sources can teach format, method, evidence role, or assessment structure, but page numbers and question instructions from them are not student-answer prose.
+
 ## Common Transferable Lessons
 
 - Compress repetition without removing mechanism.

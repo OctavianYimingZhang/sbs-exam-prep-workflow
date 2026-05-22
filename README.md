@@ -62,7 +62,7 @@ python scripts/example_essay_language_linter.py --plan /path/to/example_essay_pl
 Analyse external examples into transferable deltas:
 
 ```bash
-python scripts/analyze_example_corpus.py /path/to/examples --output /path/to/example_analysis.json
+python scripts/analyze_example_corpus.py /path/to/examples --output /path/to/example_analysis.json --max-files 80
 ```
 
 Run public metadata-only regression checks:
