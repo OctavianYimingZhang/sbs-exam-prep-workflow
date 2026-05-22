@@ -212,7 +212,7 @@ Outputs:
 
 - MCQ discriminator axes;
 - short-answer mark-producing schemas;
-- predicted practice essay questions;
+- predicted essay themes by lecture scope, with optional practice variants;
 - data/problem operations;
 - long-answer project method/readout/control plans.
 
@@ -256,10 +256,10 @@ Minimum inputs:
 Outputs:
 
 - one standalone DOCX per essay;
-- manifest JSON;
-- source audit JSON;
-- per-essay source map and QA JSON;
-- optional ZIP.
+- internal manifest JSON, source audit JSON, source maps, and QA JSON for validation;
+- optional ZIP only if requested or needed as the final delivery format.
+
+User-facing output should include the requested final artefacts. Keep internal validation files out of the public output folder unless the user explicitly requests an audit package.
 
 Standalone behaviour:
 

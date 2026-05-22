@@ -24,12 +24,14 @@ Acceptable variants:
 - Start with the answer or problem, not with metacommentary.
 - Preserve necessary mechanisms when compressing language.
 - Remove repeated definitions, repeated claims, decorative transitions, and low-value case details.
+- When writing essay/problem-essay prediction outputs, phrase the prediction as an examinable theme with scope and operation, not as a guaranteed future question.
 - Use examples as evidence for a wider claim.
 - Make contrasts explicit; do not rely on ambiguous `rather than` phrasing.
 - Separate model, mechanism, evidence, and implication when a question asks for evaluation.
 - Use citations only for non-obvious facts, theories, mechanisms, methods, evidence, data, or broad generalisations.
 - Avoid citation stacking; one precise citation is usually better than several weakly connected citations.
 - Do not invent statistics, dates, mechanisms, source names, quotations, or citations.
+- If the user supplies no Example Essay citations, cite only sources found by slide-citation mining or verified classic-experiment fallback; never cite from memory.
 - Conclude by synthesis. Do not add new evidence in the conclusion.
 
 ## Banned Patterns
@@ -88,6 +90,7 @@ Use the smallest citation set that supports the claim. Do not cite:
 Use citations for:
 
 - original papers cited by lecture slides and actually read;
+- verified classic experiments or landmark primary studies found because relevant lecture slides contain no usable citations;
 - extra-reading material matched to a chapter or section;
 - online academic sources verified by DOI, PubMed, publisher page, textbook, or equivalent academic source.
 

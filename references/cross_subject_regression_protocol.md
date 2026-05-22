@@ -106,7 +106,7 @@ Output layout:
 
 QA:
 
-- predictions are labelled as predicted practice questions;
+- predictions are labelled conservatively by question type, including predicted essay themes for essay/problem-essay outputs;
 - source uncertainty is flagged;
 - unsupported claims are omitted or flagged;
 - benchmark/example leakage is flagged;
@@ -117,8 +117,7 @@ QA:
 When an Example Essay DOCX directory is supplied to the regression checker, validate:
 
 - each complete essay is a separate `.docx`;
-- `example_essay_manifest.json` exists;
-- `example_essay_source_audit.json` exists;
+- internal QA artefacts such as `example_essay_manifest.json` and `example_essay_source_audit.json` exist in the public DOCX directory or a separate internal QA directory;
 - no generated Example Essay exists only as an Excel row;
 - DOCX formatting passes the current contract: Arial, 2.5 cm margins, 1.5 line spacing, justified body, centered title, left-aligned subtitles/headings, and no empty spacer paragraphs;
 - yellow-highlighted runs map to uploaded Extra Reading Book chapter/section anchors;

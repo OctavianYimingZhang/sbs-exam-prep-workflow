@@ -32,10 +32,11 @@ def audit_from_source_map(path: Path) -> dict[str, Any]:
             lecture_sources.setdefault(key, set()).add(pid)
         for run in paragraph.get("runs", []):
             total_words += int(run.get("word_count") or 0)
-            if run.get("source_type") == "citation_original_source":
+            if run.get("source_type") in {"citation_original_source", "classic_experiment_source"}:
                 green_words += int(run.get("word_count") or 0)
                 citation_sources.append(
                     {
+                        "source_type": run.get("source_type"),
                         "raw_citation": run.get("in_text_citation"),
                         "slide_anchor": run.get("source_anchor"),
                         "resolved_to": run.get("source_anchor"),

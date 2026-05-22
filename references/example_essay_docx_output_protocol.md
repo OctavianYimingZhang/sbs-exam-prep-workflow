@@ -20,13 +20,11 @@ If N Example Essays are generated, produce N Word documents:
 
 Also produce:
 
-- `example_essay_manifest.json`
-- `example_essay_source_audit.json`
-- one source map JSON per essay, such as `EE01_source_map.json`
-- one QA JSON per essay, such as `EE01_qa.json`
-- optionally `Example_Essays_DOCX.zip`
+- internal QA artefacts for validation, such as `example_essay_manifest.json`, `example_essay_source_audit.json`, source maps, QA JSON, and citation-resolution logs.
 
 Do not place a complete essay into one Excel cell. Do not merge multiple complete essays into one Word document. Excel paragraph-row output is allowed only as an optional audit artefact when the user explicitly requests it.
+
+Final user-facing output may include the requested final artefacts, such as Example Essay DOCX files, an Exam-Prep Excel workbook, or another explicitly requested final format. Do not return or package helper JSON, source maps, manifests, source-audit files, render previews, or citation-resolution logs unless the user explicitly asks for an audit package.
 
 ## Word Document Formatting
 
@@ -97,16 +95,17 @@ Highlight mapping:
 
 - Extra Reading Books content: yellow highlight.
 - Lecture-slide citation original-source content: green highlight.
+- Verified classic-experiment fallback content: green highlight.
 
 Implementation mapping:
 
 - Extra Reading Books: `WD_COLOR_INDEX.YELLOW`
-- Cited original papers / theories / experiments from lecture-slide citations: `WD_COLOR_INDEX.BRIGHT_GREEN`
+- Cited original papers / theories / experiments from lecture-slide citations, plus verified classic-experiment fallback sources: `WD_COLOR_INDEX.BRIGHT_GREEN`
 
 Rules:
 
 - Yellow highlight is applied only to content derived from Extra Reading Books or chapters uploaded by the user.
-- Green highlight is applied only to content derived from original citation sources identified from lecture slides and then read or verified.
+- Green highlight is applied only to content derived from original citation sources identified from lecture slides and then read or verified, or from verified classic-experiment fallback sources used because lecture slides contained no usable citations.
 - If a sentence uses a lecture-slide cited original source, include an author-year in-text citation and highlight the full cited-source-derived clause or sentence green, including the citation.
 - If a sentence uses Extra Reading Books, highlight the extra-reading-derived phrase or sentence yellow.
 - If a paragraph contains both lecture content and extra-reading content, highlight only the extra-reading portion yellow.
@@ -135,6 +134,12 @@ If Extra Reading Books are not uploaded:
 
 ## Citation-Source Integration
 
+If the user does not provide citations for Example Essay generation, the workflow must perform citation discovery:
+
+1. inspect relevant lecture slides for citation information;
+2. resolve and read lecture-slide cited originals where possible;
+3. if no usable slide citation exists, search for several classic experiments or landmark primary studies directly tied to the lecture mechanism.
+
 If the relevant lecture slides contain citations:
 
 - parse all citations on slides used by the essay;
@@ -151,6 +156,14 @@ If a citation cannot be resolved or the original source cannot be read:
 - add QA flag `citation_original_unreadable`;
 - list the unresolved citation in `example_essay_source_audit.json`.
 
+If the relevant lecture slides contain no usable citations:
+
+- perform targeted academic search using lecture terms, mechanism names, model systems, methods, and named experiments;
+- prefer primary experimental papers with DOI/PubMed/publisher records;
+- use authoritative reviews only for orientation unless the paragraph claim is review-level;
+- record `lecture_slide_citation_absent_classic_experiment_search_required` internally;
+- insert only verified, read classic-experiment content, with author-year citation and green highlight.
+
 ## Source Hierarchy
 
 Essay content must be built in this order:
@@ -159,8 +172,9 @@ Essay content must be built in this order:
 2. Official lecture notes / official course handouts.
 3. Formal exam question wording or predicted practice question prompt.
 4. Lecture-slide cited original sources, only after reading them.
-5. Uploaded Extra Reading Books, only relevant chapters/sections.
-6. Other peer-reviewed or textbook sources only if explicitly allowed or needed for citation resolution.
+5. Verified classic experiments found because no usable lecture-slide citation exists.
+6. Uploaded Extra Reading Books, only relevant chapters/sections.
+7. Other peer-reviewed or textbook sources only if explicitly allowed or needed for citation resolution.
 
 Extra Reading and citation-source content must enrich the lecture answer, not replace it.
 
@@ -193,6 +207,7 @@ Fail DOCX generation or mark the essay as non-compliant if:
 - yellow-highlighted content lacks an Extra Reading source anchor;
 - green-highlighted content lacks an in-text citation;
 - green-highlighted content is not linked to a read original citation source;
+- classic-experiment fallback content was used without verification or without direct relevance to the paragraph claim;
 - margins, font family, line spacing, title alignment, subtitle alignment, or body justification fail the DOCX linter;
 - the essay is generic and not traceable to lecture logic;
 - the essay contains slide/page narration, repeated filler, unsupported claims, citation stacking, or examples used as standalone case detail rather than evidence for the answer;
@@ -207,9 +222,6 @@ When the user asks for Example Essays, return paths in this form:
 Generated:
 - Example_Essays_DOCX/EE01_<title>.docx
 - Example_Essays_DOCX/EE02_<title>.docx
-- Example_Essays_DOCX/example_essay_manifest.json
-- Example_Essays_DOCX/example_essay_source_audit.json
-- Example_Essays_DOCX.zip
 ```
 
 The user should not need to manually reformat the Word documents.

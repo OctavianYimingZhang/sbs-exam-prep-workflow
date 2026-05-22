@@ -12,7 +12,7 @@ Exam blueprint -> question archetype -> slot grammar -> compatible knowledge poi
 
 This Skill is for preparation, revision, source organization, workbook generation, and practice-question planning. It must not be used for a live exam, active assessed submission, or contract-cheating request.
 
-Predictions must be labelled as predicted practice questions, never official exam questions.
+Essay/problem-essay predictions must be labelled as predicted themes, with any stems marked only as practice variants. No prediction should be presented as an official exam question.
 
 ## Repository Contents
 
@@ -57,6 +57,24 @@ Lint complete Example Essay language:
 
 ```bash
 python scripts/example_essay_language_linter.py --plan /path/to/example_essay_plan.json
+```
+
+Lint essay/problem-essay prediction wording:
+
+```bash
+python scripts/essay_theme_prediction_linter.py
+```
+
+Prepare citation resolution or classic-experiment fallback for Example Essay mode:
+
+```bash
+python scripts/lecture_citation_resolver.py --input /path/to/slides.pptx --output-dir /path/to/internal_qa --classic-search-if-no-citations
+```
+
+Check that a public output folder excludes internal helper artefacts:
+
+```bash
+python scripts/final_deliverable_linter.py /path/to/public_output
 ```
 
 Analyse external examples into transferable deltas:

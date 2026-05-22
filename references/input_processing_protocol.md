@@ -22,6 +22,7 @@ Classify every file before analysis:
 - `extra_reading_book`
 - `extra_reading_chapter`
 - `citation_original_source`
+- `classic_experiment_source`
 - `citation_reference_list`
 - `reading_list`
 - `docx_format_reference`
@@ -68,6 +69,7 @@ Student handwritten annotations on slides may be used as interpretation hints, b
 - `extra_reading`
 - `lecture_slide_core`
 - `lecture_slide_citation_original`
+- `classic_experiment_source`
 - `docx_format_reference`
 - `excluded`
 
@@ -198,6 +200,7 @@ Old-regime papers may support concept coverage and possible slot fillers, but th
 - A user-uploaded textbook, book chapter, monograph, or long PDF supplied as additional reading must be classified as `extra_reading_book` unless it is clearly a lecture slide or past paper.
 - A standalone chapter or chapter extract supplied as additional reading must be classified as `extra_reading_chapter`.
 - A PDF or paper resolved from a citation on a lecture slide must be classified as `citation_original_source`.
+- A classic or landmark primary experiment found because relevant lecture slides contain no usable citations must be classified as `classic_experiment_source` after verification and reading.
 - A bibliography/reference-list file supplied to resolve slide citations may be classified as `citation_reference_list`.
 - A user-uploaded formatting PDF or screenshot must be classified as `docx_format_reference` and used only for layout/style, not factual content.
 - A reasoned answer key must be classified by provenance where possible: official/lecturer, paper-with-answer, student, generated, or unknown. Use it for answer schema, rationale, distractor traps, and marking expectations, not direct prediction.
@@ -226,6 +229,16 @@ For lecture-slide citations:
 - parse author-year, DOI, PMID, title fragments, journal names, and reference-list entries;
 - classify resolved/read source files as `citation_original_source`;
 - do not use source-derived content until the cited original source has been resolved and read.
+
+If the user asks for Example Essay generation but supplies no citation list:
+
+- treat citation discovery as mandatory, not optional;
+- inspect relevant lecture slides first for author-year, DOI, PMID, title fragments, journal names, reference-list entries, figure-caption citations, and notes citations;
+- emit academic search queries for unresolved slide citations;
+- if no usable slide citations exist, create a classic-experiment search plan from lecture terms, named mechanisms, model systems, methods, and evidence claims;
+- require several candidate classic experiments or landmark primary studies where possible, but insert only those that have been verified and read;
+- classify verified fallback sources as `classic_experiment_source`;
+- flag `lecture_slide_citation_absent_classic_experiment_search_required` internally when this fallback path is used.
 
 ## ExamFormat Fields
 
@@ -270,7 +283,7 @@ KnowledgePoint:
   essay_style_paragraph:
   mcq_statement_candidates: []
   short_answer_possible_questions: []
-  essay_question_candidates: []
+  essay_theme_candidates: []
   compatible_archetypes: []
   essay_function:
     - thesis_support

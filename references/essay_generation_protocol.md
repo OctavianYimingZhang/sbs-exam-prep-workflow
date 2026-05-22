@@ -28,6 +28,7 @@ ExampleEssayMode:
   source_logic_reconstruction:
   citation_detection:
   citation_original_source_resolution_and_reading:
+  classic_experiment_fallback_if_slide_citations_absent:
   extra_reading_book_or_academic_search:
   knowledge_inventory:
   paragraph_plan:
@@ -42,14 +43,15 @@ ExampleEssayMode:
   examiner_fit_checklist:
 ```
 
-The final user-facing answer may expose only requested artefacts, but the essay must visibly follow the internal plan.
+The final user-facing answer should expose requested artefacts and keep internal helper files out, while the essay itself must visibly follow the internal plan.
 
 Do not:
 
 - write from memory;
-- write from predicted questions alone;
+- write from a predicted theme or practice variant alone without verifying the supplied lecture/source scope;
 - write from a past-paper stem without reading the relevant lecture/source material;
 - copy citations printed in slides without resolving and reading the original source when source-derived content is used;
+- skip citation discovery merely because the user did not provide a citation list;
 - add extra reading without locating the relevant chapter, section, paper, DOI, PubMed record, publisher page, or textbook source;
 - hide all source logic in diagnostics while outputting an ungrounded essay;
 - produce several complete essays in one Word document;
@@ -65,8 +67,9 @@ Source priority:
 2. Formal question wording and official exam guidance.
 3. Practical materials, mocks, answer keys, and exemplars for format and answer-style support.
 4. Original sources cited by relevant lecture material, only after they are resolved and read.
-5. Uploaded extra-reading books, only matched chapters or sections.
-6. Other peer-reviewed papers, textbooks, DOI/PubMed/publisher pages, or Google Scholar results when no official reading is supplied or citation resolution requires it.
+5. Verified classic or landmark experiments found by academic search when relevant lecture slides contain no usable citations.
+6. Uploaded extra-reading books, only matched chapters or sections.
+7. Other peer-reviewed papers, textbooks, DOI/PubMed/publisher pages, or Google Scholar results when no official reading is supplied or citation resolution requires it.
 
 If relevant lecture/source material cannot be identified or read, do not generate a polished essay. Emit a QA flag and ask for the missing material.
 
@@ -342,6 +345,20 @@ Do not cite:
 
 Avoid citation stacking. If several sources support the same general claim, keep the most directly relevant source(s). If evidence is insufficient, omit the claim or mark it uncertain in QA.
 
+### Citation Fallback When The User Supplies No Citation List
+
+When the user asks for a complete Example Essay but does not provide citations:
+
+1. Read the relevant lecture slides before searching.
+2. Detect citations in slide text, notes, reference slides, footers, figure captions, and OCR/visual inspection of relevant image-only slides.
+3. Resolve detected citations by DOI, PMID, author-year, title fragment, journal information, or publisher/PubMed/Google Scholar records.
+4. Read the original source before using source-derived content. Green-highlight only the source-derived clause or sentence and include a verified author-year citation.
+5. If no usable lecture-slide citation exists, perform targeted academic search for several classic experiments or landmark primary studies that directly test the lecture mechanism, model, method, or evidence claim.
+6. Select classic experiments using the same standard inferred from lecture-cited sources: direct mechanistic relevance, primary evidence where possible, reliable academic locator, and verified author-year details.
+7. Use no more classic-experiment detail than needed to support the lecture-grounded argument. The essay must remain controlled by lecture logic.
+
+Never cite a source just because it is famous. It must support the exact paragraph claim and be verified from a reliable academic source.
+
 ## Extra Reading
 
 Use extra reading only if it directly improves the answer to this exact question.
@@ -399,6 +416,9 @@ Add QA flags when needed:
 - `essay_exceeds_word_limit`;
 - `example_used_as_fact`;
 - `citation_original_unreadable`;
+- `lecture_slide_citation_absent_classic_experiment_search_required`;
+- `classic_experiment_source_unverified`;
+- `classic_experiment_not_question_relevant`;
 - `extra_reading_unverified`;
 - `extra_reading_not_question_relevant`;
 - `extra_reading_too_large`;
@@ -445,13 +465,14 @@ ExampleEssayDOCXOutput:
   documents:
     - EE01_<short_safe_question_title>.docx
     - EE02_<short_safe_question_title>.docx
-  manifest: example_essay_manifest.json
-  source_audit: example_essay_source_audit.json
-  per_essay_source_maps:
+  user_facing_only:
+    - requested final artefacts
+  internal_qa_artifacts_not_returned_unless_requested:
+    - example_essay_manifest.json
+    - example_essay_source_audit.json
     - EE01_source_map.json
-  per_essay_qa:
     - EE01_qa.json
-  optional_zip: Example_Essays_DOCX.zip
+    - citation_resolution_log.json
 ```
 
 For Excel, never place a complete essay into one cell. Excel paragraph-row output is an optional audit export only when explicitly requested.

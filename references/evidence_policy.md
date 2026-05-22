@@ -32,6 +32,11 @@ EvidenceUse:
     highlight: green
     allowed_use: brief evidence or mechanism refinement with author-year in-text citation
 
+  classic_experiment_source:
+    meaning: verified classic or landmark primary experiment found because relevant lecture slides contain no usable citations
+    highlight: green
+    allowed_use: brief experimental evidence directly supporting the lecture mechanism, with author-year in-text citation
+
   docx_format_reference:
     meaning: user-supplied PDF/image showing desired Word layout, highlighting, captions, or citation style
     highlight: none
@@ -46,6 +51,8 @@ Extra Reading Books may refine the answer but must not displace the lecture sequ
 A citation printed on a slide is not enough. The cited original source must be resolved and read before any content from that source is inserted into the essay.
 Do not copy author-year citations from slides into the essay unless the cited source has been resolved and the relevant claim verified.
 If a cited source cannot be read, omit source-derived details and flag the unresolved citation.
+If the user supplies no citations for an Example Essay, actively mine lecture slides for citations before searching externally.
+If relevant lecture slides contain no usable citations, find several verified classic experiments or landmark primary studies through academic search. Use them only when they directly support the lecture-grounded paragraph claim.
 If Extra Reading Books are uploaded, locate the relevant chapter/section before using them. Do not cite or highlight a whole book vaguely.
 Formatting reference PDFs are layout/style evidence only and must not supply biological claims.
 ```
@@ -93,6 +100,8 @@ Extra reading may be inserted into essays only as:
 
 It must not replace lecture content, exceed 15% of the essay, introduce an unrelated mechanism, contradict slides without explanation, or appear without verified source anchoring. In explicit Example Essay Mode, uploaded Extra Reading Book content should be 10-15% of body words when a relevant chapter/section is found, and those words must be yellow-highlighted.
 
+Classic-experiment fallback is not a licence to broaden the answer. Use it only after confirming that relevant lecture slides contain no usable citations, and only for directly relevant experiments with verified author-year/source details. Classic experiments are green-highlighted citation-source content, not yellow-highlighted Extra Reading Book content.
+
 For non-essay long-answer/project answers, extra reading should be one compact refinement only. It may support a named method example, clarify a limitation, justify a technique choice, or add directly relevant method context. It must not become a second answer.
 
 ## Exemplar Distillation
@@ -136,6 +145,9 @@ Do not:
 - write a benchmark-specific instruction outside an explicit regression context;
 - apply an example lesson without a matching target evidence condition;
 - insert unverified citations;
+- skip slide-citation mining when the user does not supply citations for Example Essay generation;
+- use classic experiments before checking whether lecture slides contain usable citations;
+- use famous experiments that are not directly relevant to the exact paragraph claim;
 - insert extra reading that is not directly relevant to the exact essay question;
 - let extra reading replace lecture logic;
 - use more than one focused extra-reading insert unless the user explicitly requests more;
@@ -179,6 +191,10 @@ Use these flags when applicable:
 - `citation_original_resolved`
 - `citation_original_unreadable`
 - `citation_original_used_without_reading`
+- `lecture_slide_citation_absent_classic_experiment_search_required`
+- `classic_experiment_source_verified`
+- `classic_experiment_source_unverified`
+- `classic_experiment_not_question_relevant`
 - `green_highlight_missing_citation`
 - `green_highlight_missing_source_anchor`
 - `extra_reading_book_supplied`

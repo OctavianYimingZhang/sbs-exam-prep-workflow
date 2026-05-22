@@ -242,9 +242,49 @@ When a user explicitly asks for a model answer or Example Essay for a project/sc
 
 Do not let old short-answer or coverage-only papers control the current long-answer project blueprint. They may support concept coverage only unless exam-format parsing proves the same regime.
 
-## Essay Outputs
+## Essay / Problem-Essay Outputs
 
-For each predicted essay, output predicted practice questions by default. Generate a full Example Essay only when the user explicitly asks for an Example Essay, model essay, essay-style answer, essay paragraph, or similar.
+For essay and problem-essay prediction, the default prediction object is a theme-level scope, not an exact question stem. Generate a full Example Essay only when the user explicitly asks for an Example Essay, model essay, essay-style answer, essay paragraph, or similar.
+
+Theme-level prediction means:
+
+- predict the likely examinable theme or theme family;
+- state the lecture scope that supports it;
+- state whether the scope is roughly one lecture with one main theme, one lecture with two separable themes, two adjacent lectures forming one theme, or a cross-lecture synthesis;
+- state the examiner operation likely to be rewarded, such as explain mechanism, compare pathways, evaluate evidence, interpret experiment, or apply to disease/scenario;
+- provide optional practice angles only as practice variants, not as predicted official wording.
+
+If a recent formal paper has an answer-one essay section with several broad options, infer option slots and theme families. Keep short-answer or fill-blank sections separate: repeated Section A terms can support factual coverage, but they must not inflate essay-theme prediction unless the same lecture block also fits Section B wording and lecture centrality.
+
+Essay/problem-essay theme schema:
+
+```yaml
+EssayThemePrediction:
+  target_group_key:
+  exam_regime:
+  theme_id:
+  theme_title:
+  lecture_scope:
+    scope_type: one_lecture_one_theme | one_lecture_two_themes | two_lectures_one_theme | cross_lecture_synthesis | uncertain
+    lecture_titles_or_blocks: []
+    source_anchor_pages_or_slides: []
+  core_examiner_operation:
+  why_examinable:
+    - formal_paper_pattern
+    - lecture_centrality
+    - learning_objective_or_summary
+    - mechanism_or_evidence_density
+    - coverage_gap_or_rotation_slot
+  compatible_kps: []
+  possible_practice_angles: []
+  not_claimed:
+    - exact_exam_wording
+    - guaranteed_question
+    - lecturer_identity_trigger
+  confidence: High | Medium | Low
+```
+
+Use `Predicted essay theme` as the student-facing label. If a practice stem is useful, label it `Practice variant from predicted theme`.
 
 When Example Essay Mode is triggered, follow `essay_generation_protocol.md`.
 
@@ -279,7 +319,7 @@ Every essay paragraph must be split into separate Excel rows:
 
 Do not write slide-by-slide summaries. Each paragraph must serve the question command verb.
 
-For the default student-facing visual workbook, include predicted essay practice questions only. Do not include full example essays unless the user explicitly requests examples.
+For the default student-facing visual workbook, include predicted essay themes and optional practice variants only. Do not include full example essays unless the user explicitly requests examples.
 
 The essay must be built from paragraph functions, not from slide order alone. Slide order informs lecture logic; paragraph order is determined by the command word, expected scope, and lecturer intent.
 

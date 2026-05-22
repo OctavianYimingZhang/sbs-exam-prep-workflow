@@ -174,7 +174,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
                 citation = source_run.get("in_text_citation")
                 if not citation and not AUTHOR_YEAR_RE.search(run.text):
                     green_runs_missing_citation.append({"paragraph": visible_paragraph_index, "run": r_idx, "text": run.text[:120]})
-                if source_run.get("source_type") != "citation_original_source" or source_run.get("citation_original_read") is not True:
+                if source_run.get("source_type") not in {"citation_original_source", "classic_experiment_source"} or source_run.get("citation_original_read") is not True:
                     green_runs_missing_read_source.append({"paragraph": visible_paragraph_index, "run": r_idx, "text": run.text[:120]})
             elif highlight is not None:
                 unexpected_highlights.append({"paragraph": visible_paragraph_index, "run": r_idx, "highlight": str(highlight)})

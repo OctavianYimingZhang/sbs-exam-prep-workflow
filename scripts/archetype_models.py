@@ -9,11 +9,13 @@ from typing import Literal
 Confidence = Literal["High", "Medium", "Low"]
 QuestionFamily = Literal["mcq", "short_answer", "essay", "case_study", "data_problem", "long_answer_project"]
 OutputMode = Literal["default_excel_workbook", "docx_example_essay", "excel_evidence_workbook"]
+EssayScopeType = Literal["one_lecture_one_theme", "one_lecture_two_themes", "two_lectures_one_theme", "cross_lecture_synthesis", "uncertain"]
 EssayRunSourceType = Literal[
     "lecture_slide_core",
     "official_note",
     "citation_original_source",
     "extra_reading_book",
+    "classic_experiment_source",
     "student_visible_transition",
     "question_framing",
 ]
@@ -68,6 +70,40 @@ class QuestionArchetype:
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass
+class EssayThemePrediction:
+    target_group_key: str
+    exam_regime: str
+    theme_id: str
+    theme_title: str
+    scope_type: EssayScopeType
+    lecture_blocks: list[str]
+    source_anchor_pages_or_slides: list[str]
+    core_examiner_operation: str
+    why_examinable: list[str]
+    compatible_kps: list[str]
+    possible_practice_angles: list[str]
+    confidence: Confidence = "Medium"
+    exact_question_wording_claimed: bool = False
+    derived_from_external_example: str | None = None
+    transferable_rule: str | None = None
+    non_transferable_content: list[str] = field(default_factory=list)
+    format_match_required: str | None = None
+
+    def validate(self) -> list[str]:
+        errors: list[str] = []
+        if self.exact_question_wording_claimed:
+            errors.append("essay_theme_prediction_must_not_claim_exact_question_wording")
+        if not self.theme_title.strip():
+            errors.append("essay_theme_prediction_requires_theme_title")
+        if not self.core_examiner_operation.strip():
+            errors.append("essay_theme_prediction_requires_examiner_operation")
+        return errors
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -286,20 +322,20 @@ class EssayTextRun:
 
     def validate(self) -> list[str]:
         errors: list[str] = []
-        if self.source_type == "citation_original_source":
+        if self.source_type in {"citation_original_source", "classic_experiment_source"}:
             if self.highlight != "green":
-                errors.append("citation_original_source_requires_green_highlight")
+                errors.append(f"{self.source_type}_requires_green_highlight")
             if not self.in_text_citation:
-                errors.append("citation_original_source_requires_in_text_citation")
+                errors.append(f"{self.source_type}_requires_in_text_citation")
             if self.citation_original_read is not True:
-                errors.append("citation_original_source_requires_read_status_true")
+                errors.append(f"{self.source_type}_requires_read_status_true")
         if self.source_type == "extra_reading_book":
             if self.highlight != "yellow":
                 errors.append("extra_reading_book_requires_yellow_highlight")
             if not self.source_anchor:
                 errors.append("extra_reading_book_requires_chapter_or_section_anchor")
-        if self.highlight == "green" and self.source_type != "citation_original_source":
-            errors.append("green_highlight_only_for_citation_original_source")
+        if self.highlight == "green" and self.source_type not in {"citation_original_source", "classic_experiment_source"}:
+            errors.append("green_highlight_only_for_verified_citation_or_classic_experiment_source")
         if self.highlight == "yellow" and self.source_type != "extra_reading_book":
             errors.append("yellow_highlight_only_for_extra_reading_book")
         return errors

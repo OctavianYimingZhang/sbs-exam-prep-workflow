@@ -24,6 +24,7 @@ Classify every input before analysis:
 - Practical materials, mocks, quizzes, answer keys, and exemplars support coverage, answer style, and practice planning only unless official guidance says they are representative.
 - Extra Reading recommendations and recommended books enrich an answer only after the relevant chapter, section, paper, DOI, PubMed record, publisher page, or textbook source has been verified.
 - If no extra reading is supplied, perform online academic search only for directly relevant peer-reviewed papers, textbooks, publisher pages, PubMed/Google Scholar/DOI records, or official academic sources.
+- If the user asks for Example Essays but supplies no citations, first mine the relevant lecture slides for citation information and resolve/read the original source. If the slides contain no usable citations, find several verified classic experiments or landmark primary studies that directly support the lecture mechanism. Do not insert any citation until the source is verified and read.
 - Student annotations and image examples can teach style or interpretation, but they are not factual authority unless verified against official course material or reliable academic sources.
 - Cross-course examples and benchmark fixtures are tests and style references only. They must be abstracted into transferable workflow rules and never used as factual content or prediction evidence for a new source set.
 
@@ -122,7 +123,7 @@ Parse:
 
 The selected preparation strategy follows the exam strategy:
 
-- Stable essay regime: build practice essay questions, paragraph plans, and essay-ready KP synthesis.
+- Stable essay or problem-essay regime: predict examinable themes by lecture scope, then build paragraph plans and essay-ready KP synthesis. Do not make exact question wording the default prediction product.
 - MCQ-heavy regime: build discriminator axes, contrast tables, exception lists, mechanism-order traps, and wrong-option diagnosis.
 - Short-answer regime: build 2/4/6/8-mark answer schemas with concise exam answers and reference expansions.
 - Data/problem regime: build input -> operation -> inference -> limitation -> follow-up logic.
@@ -189,9 +190,9 @@ Short answer:
 - fuller `Reference Expansion`;
 - required terms, examples, and controls.
 
-Essay:
+Essay / problem-essay:
 
-- predicted practice essay questions;
+- predicted examinable themes, with lecture scope, examiner operation, and optional practice angles;
 - paragraph plans;
 - essay-style knowledge-point explanations;
 - no complete essays unless explicitly requested.
@@ -217,6 +218,7 @@ lecture slide scope detection
 lecture slide reading
 lecture logic reconstruction
 citation detection and original-source reading
+classic-experiment fallback when slide citations are absent
 extra-reading chapter matching and reading
 knowledge inventory
 paragraph plan
@@ -289,7 +291,7 @@ Produce diagnostics for:
 - benchmark/example content leaking into production content;
 - generated prose failing language lint.
 
-Predictions must be labelled as predicted practice questions, never official exam questions.
+Predictions must be labelled conservatively. For essay/problem-essay exams, label the default output as `Predicted essay theme`, not as an official question or guaranteed stem. Optional practice stems may be included only as practice variants derived from the theme.
 
 Before delivery, lint generated workbook prose and Example Essay prose where scripts exist. Rewrite or fail if the output contains slide-by-slide narration, page-tracing language, unsupported claims, how-to-write instructions inside answer prose, or repeated low-value filler.
 
@@ -321,19 +323,15 @@ When modifying the Skill itself, completion requires:
 
 ## Output Contract
 
-Default workflow deliverables:
+Default user-facing output:
 
-1. a student-facing single-sheet Excel workbook with no evidence columns;
-2. diagnostics JSON;
-3. optionally, a separate evidence workbook when useful for audit or debugging.
+- normally includes the requested `Exam-Prep Excel` workbook when workbook generation is requested.
 
-Explicit Example Essay Mode deliverables:
+Explicit Example Essay Mode user-facing output:
 
-1. `Example_Essays_DOCX/` containing one standalone `.docx` per essay;
-2. `example_essay_manifest.json`;
-3. `example_essay_source_audit.json`;
-4. per-essay source maps and QA JSON files;
-5. optionally `Example_Essays_DOCX.zip`.
+- normally includes one standalone `Example Essay` `.docx` per essay when complete essays are requested.
+
+Internal helper files such as diagnostics JSON, source maps, QA JSON, manifests, citation-resolution logs, rendered previews, and source-audit files may be generated for validation, but they must not be mixed into the final user-facing output unless the user explicitly asks for an audit package.
 
 Do not edit, rename, delete, or overwrite source files.
 

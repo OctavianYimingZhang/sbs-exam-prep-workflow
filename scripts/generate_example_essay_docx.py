@@ -2,9 +2,9 @@
 """Generate standalone DOCX files for explicit Example Essay Mode.
 
 Input is a JSON document containing one or more ExampleEssayDocumentPlan-like
-records. The script writes one DOCX per essay, a manifest, per-essay source
-maps, per-essay QA files, and a combined source audit shell. It enforces the
-formatting contract directly on every paragraph and run.
+records. The script writes one DOCX per essay plus internal QA/source-map
+artefacts. It enforces the formatting contract directly on every paragraph and
+run.
 """
 
 from __future__ import annotations
@@ -114,26 +114,26 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
         for run_idx, run in enumerate(paragraph.get("text_runs", []), start=1):
             source_type = run.get("source_type")
             highlight = run.get("highlight", "none")
-            if source_type == "citation_original_source":
+            if source_type in {"citation_original_source", "classic_experiment_source"}:
                 if highlight != "green":
-                    errors.append(f"paragraph_{idx}_run_{run_idx}_citation_source_requires_green")
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_{source_type}_requires_green")
                 if not run.get("in_text_citation") and not AUTHOR_YEAR_RE.search(str(run.get("text", ""))):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_green_run_missing_author_year")
                 if run.get("citation_original_read") is not True:
-                    errors.append(f"paragraph_{idx}_run_{run_idx}_citation_original_not_read")
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_{source_type}_not_read")
             if source_type == "extra_reading_book":
                 if highlight != "yellow":
                     errors.append(f"paragraph_{idx}_run_{run_idx}_extra_reading_requires_yellow")
                 if not run.get("source_anchor"):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_extra_reading_missing_chapter_anchor")
-            if highlight == "green" and source_type != "citation_original_source":
+            if highlight == "green" and source_type not in {"citation_original_source", "classic_experiment_source"}:
                 errors.append(f"paragraph_{idx}_run_{run_idx}_green_wrong_source_type")
             if highlight == "yellow" and source_type != "extra_reading_book":
                 errors.append(f"paragraph_{idx}_run_{run_idx}_yellow_wrong_source_type")
     return errors
 
 
-def write_essay(essay: dict[str, Any], out_dir: Path, index: int) -> dict[str, Any]:
+def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) -> dict[str, Any]:
     qa_flags = list(essay.get("qa_flags", []))
     validation_errors = validate_plan(essay)
     qa_flags.extend(validation_errors)
@@ -221,8 +221,8 @@ def write_essay(essay: dict[str, Any], out_dir: Path, index: int) -> dict[str, A
 
     doc.save(docx_path)
 
-    source_map_path = out_dir / f"{essay_id}_source_map.json"
-    qa_path = out_dir / f"{essay_id}_qa.json"
+    source_map_path = qa_dir / f"{essay_id}_source_map.json"
+    qa_path = qa_dir / f"{essay_id}_qa.json"
     source_map_path.write_text(json.dumps(source_map, indent=2), encoding="utf-8")
     qa_path.write_text(json.dumps({"essay_id": essay_id, "qa_flags": qa_flags, "validation_errors": validation_errors}, indent=2), encoding="utf-8")
 
@@ -255,11 +255,17 @@ def main() -> int:
     parser.add_argument("--zip", action="store_true", dest="make_zip")
     parser.add_argument("--clean", action="store_true")
     parser.add_argument("--strict", action="store_true", help="Fail if any generated essay records validation QA flags")
+    parser.add_argument("--qa-dir", type=Path, help="Optional internal QA artefact directory. Use this to keep the public output directory deliverable-only.")
+    parser.add_argument("--deliverable-only", action="store_true", help="Write helper JSON outside the public output directory.")
     args = parser.parse_args()
 
     if args.clean and args.output_dir.exists():
         shutil.rmtree(args.output_dir)
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    qa_dir = args.qa_dir or (args.output_dir.parent / f"{args.output_dir.name}_internal_qa" if args.deliverable_only else args.output_dir)
+    if args.clean and qa_dir.exists() and qa_dir != args.output_dir:
+        shutil.rmtree(qa_dir)
+    qa_dir.mkdir(parents=True, exist_ok=True)
 
     essays = load_essays(args.plan)
     manifest = {
@@ -268,9 +274,9 @@ def main() -> int:
         "documents": [],
     }
     for idx, essay in enumerate(essays, start=1):
-        manifest["documents"].append(write_essay(essay, args.output_dir, idx))
+        manifest["documents"].append(write_essay(essay, args.output_dir, qa_dir, idx))
 
-    manifest_path = args.output_dir / "example_essay_manifest.json"
+    manifest_path = qa_dir / "example_essay_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     combined_audit = {
@@ -286,7 +292,7 @@ def main() -> int:
             for doc in manifest["documents"]
         ]
     }
-    audit_path = args.output_dir / "example_essay_source_audit.json"
+    audit_path = qa_dir / "example_essay_source_audit.json"
     audit_path.write_text(json.dumps(combined_audit, indent=2), encoding="utf-8")
 
     if args.make_zip:

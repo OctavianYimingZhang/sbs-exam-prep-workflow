@@ -26,7 +26,7 @@ Use the screenshot logic for simple essay-style source sets:
 | Locator | A:B | Module/block, lecture title, knowledge-point number/title, exam type label. Omit lecturer unless the user explicitly asks for it. |
 | Lecture slides | C:G | Original lecture slide images for the current knowledge point, pasted directly into the workbook. Use several relevant slides/pages when needed. |
 | Explanation | H:J | Student-facing essay-style explanation in academic English. Use readable paragraphs, not dense unbroken text. |
-| Prediction / prep | K:N | If essay exam: predicted practice essay questions only by default. If short-answer exam: likely archetypes and mark-producing answer skeletons. If MCQ exam: discriminator axes, distractor families, and traps. |
+| Prediction / prep | K:N | If essay/problem-essay exam: predicted essay themes by lecture scope, with optional practice variants. If short-answer exam: likely archetypes and mark-producing answer skeletons. If MCQ exam: discriminator axes, distractor families, and traps. |
 
 For mixed-format source sets, prefer the same minimal six-column layout when it can express the answer product clearly:
 
@@ -51,7 +51,7 @@ Only if the user explicitly asks for an expanded audit-style workbook, use this 
 
 The label for O:Q must be selected automatically after exam-format parsing:
 
-- Essay: `Predicted Essay Question / Essay Archetype`
+- Essay / Problem-Essay: `Predicted Essay Theme / Scope / Practice Angle`
 - Short Answer: `Likely Short-Answer Form / Mark-Producing Answer Schema`
 - MCQ: `Likely Statement Trap / Discriminator / One-line Rule`
 - Problem/Data: `Likely Data-Problem Archetype / Graph-Reading Operation / Mechanism Inference`
@@ -69,7 +69,7 @@ Every knowledge-point block should contain:
 - a concise block header;
 - one or more original slide/page images;
 - the explanation immediately to the right of those slides;
-- the predicted practice question or question-type-specific prep output further right.
+- the predicted theme, optional practice angle, or question-type-specific prep output further right.
 
 Continue stacking blocks downward. Do not create a separate sheet per lecture for the default student-facing workbook.
 Do not include page-function labels such as `content`, KP-chain IDs, chain-order values, sequence-locator prose, raw extracted slide text, OCR status, slide titles, or provenance columns in the student-facing sheet.
@@ -111,7 +111,7 @@ These lessons are reusable only when target evidence has the matching structural
 - Do not include source-anchor/evidence columns in the student sheet.
 - Exclude non-informative navigation pages from the student-facing workbook: lecture home/title pages, recommended-reading pages, pure `Content`/agenda/outline pages, section-divider title pages, learning-objective pages, resources-only pages, admin/project-logistics pages, blank pages, and end/interactive prompt pages.
 - Retain slides with examinable mechanisms, equations, data figures, case studies, comparisons, experimental results, or crop examples even when OCR/extracted text is weak; the original slide image is then the source evidence.
-- Label all predicted questions as `Predicted practice question`.
+- Label essay/problem-essay predictions as `Predicted essay theme`. If optional stems are useful, label them `Practice variant from predicted theme`, not predicted official questions.
 - For essay exams, do not include example essays unless explicitly requested.
 - For short-answer and MCQ exams, show the operational preparation product: answer schemas or discriminator/trap banks.
 - For non-essay long-answer/project exams, show the project operation and answer logic: method choice, expected readout, interpretation, and control/limitation. Do not label it as a broad essay prompt.
@@ -162,7 +162,8 @@ If the source material is weak-OCR or image-heavy, keep the original image and f
 
 `Exam-Facing Prep` should contain actual preparation products:
 
-- predicted practice questions;
+- predicted essay/problem-essay themes;
+- optional practice variants derived from those themes;
 - answer operations;
 - comparison axes;
 - data/problem prompts;
@@ -184,7 +185,7 @@ When Example Essay Mode is explicitly requested:
 - the primary output is standalone DOCX files, one per essay;
 - Excel paragraph-row output is optional audit output only;
 - do not put full essays into the student-facing visual workbook;
-- if an index is useful, create a small `Example_Essay_Index` sheet or JSON manifest listing essay ID, question, DOCX filename, lecture anchors, citation status, extra-reading status, and QA status.
+- if an index is useful, create it as an internal QA artefact unless the user explicitly asks for an audit/index output.
 
 ## Required Workbook Sheets
 
@@ -200,7 +201,7 @@ Evidence workbook may contain:
 - `07_Prediction_Dashboard`
 - `08_MCQ_HighFreq_Statements`
 - `09_ShortAnswer_Predicted_QA`
-- `10_Essay_Predicted_Questions`
+- `10_Essay_Predicted_Themes`
 - `11_Example_Essays` only as an optional audit/index sheet for DOCX outputs, not as the primary full-essay deliverable
 - `12_Figure_Plans`
 - `13_Extra_Reading`
@@ -282,5 +283,5 @@ Before delivery:
 - inspect at least the first 20 rows of every sheet;
 - render or otherwise visually check main text sheets;
 - check no essential headers/text are clipped;
-- check predictions are visibly labelled as predicted practice questions;
+- check essay/problem-essay predictions are visibly labelled as predicted themes, with any stems clearly marked as practice variants;
 - check unsupported claims are labelled or omitted.

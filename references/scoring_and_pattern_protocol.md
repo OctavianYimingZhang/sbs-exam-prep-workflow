@@ -24,6 +24,16 @@ The workflow must ask:
 
 KP posterior/hotness is auxiliary and must not override a stronger archetype/regime signal.
 
+For essay/problem-essay exams, the student-facing prediction object is narrower and safer than an exact stem:
+
+```text
+examinable theme + lecture scope + likely examiner operation + possible practice angles
+```
+
+Use this when a formal paper asks broad essay or problem-essay questions and lecture content naturally groups into themes. A valid theme is a coherent lecture block, not a raw topic label: it should normally correspond to one lecture with one main theme, one lecture with two separable themes, two adjacent lectures forming one theme, or a cross-lecture synthesis supported by formal-paper wording. Do not predict exact question wording unless official wording is already supplied by the user.
+
+When the same current regime combines a short-answer/fill-blank section with a high-weight answer-one essay section, separate the evidence streams. Short-answer recurrence supports the factual coverage matrix. Essay prediction should come from broad Section B option structure, lecture-scope coherence, and examiner operation fit.
+
 ## Target-Internal Comparison Rule
 
 Only compare papers within the same normalized `target_group_key` or compatible source group. Do not use MCQ, short-answer, or content patterns from one source group to predict another source group's content.
@@ -220,6 +230,26 @@ EssayLecturerIntentResult:
 Do not infer lecturer preference from one question alone unless labelled `Low` confidence. Combine learning objectives, repeated examples, formal past-paper patterns, module boundaries, and question wording.
 
 For Example Essay Mode, lecturer intent controls paragraph planning. It does not override source accuracy or question wording.
+
+For Essay Problem prediction, add:
+
+```yaml
+EssayProblemThemeResult:
+  theme_title:
+  lecture_scope_type: one_lecture_one_theme | one_lecture_two_themes | two_lectures_one_theme | cross_lecture_synthesis | uncertain
+  lecture_blocks: []
+  supporting_evidence:
+    - formal paper format
+    - lecture objective or summary
+    - mechanism/process/evidence density
+    - compatible past-paper operation
+  predicted_theme_not_stem: true
+  possible_practice_angles: []
+  exact_question_wording_claimed: false
+  confidence: High | Medium | Low
+```
+
+This result may be ranked, but it must not be rewritten as `this exact question will appear`.
 
 ## LongAnswerProjectSlotDetector
 

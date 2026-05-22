@@ -13,7 +13,7 @@
         "answer-one essay exam",
         "lecture-order slide coverage",
         "source images aligned with essay-style explanation",
-        "predicted essay prompt in far-right area"
+        "predicted essay theme in far-right area"
       ],
       "must_not": [
         "use old answer-all short-answer papers as direct current essay blueprint",

@@ -20,6 +20,8 @@ jobs:
         run: python scripts/essay_style_linter.py --fixture benchmarks/kp_essay_style_linter_fixtures.json
       - name: Lint Example Essay language fixture
         run: python scripts/example_essay_language_linter.py --fixture benchmarks/example_essay_language_linter_fixtures.json
+      - name: Lint essay theme prediction language
+        run: python scripts/essay_theme_prediction_linter.py
       - name: Validate cross-subject benchmark metadata
         run: python scripts/cross_subject_regression_check.py --metadata-only --suite benchmarks/cross_subject_regression_suite.json
       - name: Validate long-answer benchmark metadata

@@ -232,6 +232,7 @@ def main() -> int:
     parser.add_argument("--metadata-only", action="store_true", help="Validate benchmark metadata without requiring private source files.")
     parser.add_argument("--workbook", action="append", type=Path, default=[], help="Optional generated workbook to validate with essay_style_linter.py.")
     parser.add_argument("--example-essay-docx-dir", type=Path, help="Optional Example_Essays_DOCX directory to validate.")
+    parser.add_argument("--example-essay-qa-dir", type=Path, help="Optional internal QA directory containing Example Essay manifest/source audit/source maps.")
     parser.add_argument("--check-docx-format", action="store_true")
     parser.add_argument("--check-source-highlights", action="store_true")
     parser.add_argument("--output", type=Path)
@@ -425,11 +426,13 @@ def main() -> int:
 
     if args.example_essay_docx_dir:
         docx_dir = args.example_essay_docx_dir
+        qa_dir = args.example_essay_qa_dir or docx_dir
         docx_files = sorted(docx_dir.glob("*.docx")) if docx_dir.exists() else []
-        manifest = docx_dir / "example_essay_manifest.json"
-        source_audit = docx_dir / "example_essay_source_audit.json"
+        manifest = qa_dir / "example_essay_manifest.json"
+        source_audit = qa_dir / "example_essay_source_audit.json"
         docx_result = {
             "path": str(docx_dir),
+            "qa_path": str(qa_dir),
             "exists": docx_dir.exists(),
             "docx_count": len(docx_files),
             "manifest_exists": manifest.exists(),

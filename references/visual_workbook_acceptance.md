@@ -32,4 +32,4 @@ Expected generic behaviour:
 6. Generate the final Excel workbook when requested.
 7. Create the requested output folder or report a safe fallback path.
 8. Save a student-facing workbook plus diagnostics/QA files.
-9. The student-facing workbook must use one sheet named `Exam_Prep_Map`, paste original source images into the middle region, place essay-style explanation immediately to the right, and place predicted practice questions or question-type-specific prep further right. It must not include evidence columns.
+9. The student-facing workbook must use one sheet named `Exam_Prep_Map`, paste original source images into the middle region, place essay-style explanation immediately to the right, and place predicted essay themes or question-type-specific prep further right. It must not include evidence columns.

@@ -86,11 +86,31 @@ def main() -> int:
         tmp_dir = Path(tmp)
         positive_dir = tmp_dir / "positive_docx"
         negative_dir = tmp_dir / "negative_docx"
+        deliverable_dir = tmp_dir / "deliverable_docx"
+        deliverable_qa_dir = tmp_dir / "deliverable_docx_internal_qa"
+        bad_public_dir = tmp_dir / "bad_public_output"
+        citation_fallback_dir = tmp_dir / "citation_fallback"
+        bad_public_dir.mkdir(parents=True, exist_ok=True)
+        (bad_public_dir / "example_essay_manifest.json").write_text("{}", encoding="utf-8")
         checks.extend(
             [
                 run_command("compile_scripts", [py, "-m", "compileall", "-q", "scripts"]),
                 run_command("workbook_language_fixture", [py, "scripts/essay_style_linter.py", "--fixture", "benchmarks/kp_essay_style_linter_fixtures.json"]),
                 run_command("example_essay_language_fixture", [py, "scripts/example_essay_language_linter.py", "--fixture", "benchmarks/example_essay_language_linter_fixtures.json"]),
+                run_command("essay_theme_prediction_language", [py, "scripts/essay_theme_prediction_linter.py"]),
+                run_command(
+                    "citation_fallback_fixture",
+                    [
+                        py,
+                        "scripts/lecture_citation_resolver.py",
+                        "--input",
+                        "tests/fixtures/citation_fallback/no_citation_lecture.txt",
+                        "--output-dir",
+                        str(citation_fallback_dir),
+                        "--classic-search-if-no-citations",
+                    ],
+                ),
+                run_command("citation_fallback_lint", [py, "scripts/citation_fallback_linter.py", "--dir", str(citation_fallback_dir), "--require-classic-plan"]),
                 run_command("cross_subject_metadata", [py, "scripts/cross_subject_regression_check.py", "--metadata-only", "--suite", "benchmarks/cross_subject_regression_suite.json"]),
                 run_command("method_long_answer_metadata", [py, "scripts/cross_subject_regression_check.py", "--metadata-only", "--suite", "benchmarks/method_long_answer_suite.json"]),
                 run_command("identity_trigger_scan", [py, "scripts/no_identity_trigger_linter.py"]),
@@ -110,6 +130,32 @@ def main() -> int:
             ]
         )
         checks.append(run_command("positive_docx_format_and_language", [py, "scripts/docx_format_linter.py", str(positive_dir), "--check-language"]))
+        checks.append(
+            run_command(
+                "deliverable_only_docx_generate",
+                [
+                    py,
+                    "scripts/generate_example_essay_docx.py",
+                    "--plan",
+                    "tests/fixtures/example_essay_docx/positive_docx_plan.json",
+                    "--output-dir",
+                    str(deliverable_dir),
+                    "--qa-dir",
+                    str(deliverable_qa_dir),
+                    "--clean",
+                    "--strict",
+                    "--deliverable-only",
+                ],
+            )
+        )
+        checks.append(run_command("public_output_has_no_helper_artifacts", [py, "scripts/final_deliverable_linter.py", str(deliverable_dir)]))
+        checks.append(
+            run_command(
+                "public_output_rejects_helper_artifacts",
+                [py, "scripts/final_deliverable_linter.py", str(bad_public_dir)],
+                expect_failure=True,
+            )
+        )
         checks.append(
             run_command(
                 "negative_docx_strict_rejects_bad_source_plan",
