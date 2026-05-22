@@ -2,6 +2,8 @@
 
 This protocol governs the default workbook knowledge-point explanation. It is not full Example Essay Mode. It is the mandatory synthesis pass that converts source coverage into a student-facing essay paragraph fragment.
 
+Use `language_quality_contract.md` for shared prose-quality rules. This file adds workbook-specific constraints: no source tracing in explanation cells, no how-to-write language, and no page/slide narration.
+
 ## Core Separation
 
 Internal source coverage and final student-facing prose are different products.
@@ -17,7 +19,7 @@ Internal coverage may preserve:
 - coverage audit records;
 - diagnostic flags.
 
-The visible explanation cell must not describe that coverage. It must state the biological argument directly.
+The visible explanation cell must not describe that coverage. It must state the scientific argument directly.
 
 Hard rule:
 
@@ -34,7 +36,7 @@ The default workbook explanation is:
 - normally 80-180 words;
 - up to 240 words only for genuinely complex multi-mechanism KPs;
 - direct academic English prose;
-- factual only from target-unit evidence or verified sources;
+- factual only from target source evidence or verified sources;
 - free of instructions to the student;
 - free of page-by-page or slide-by-slide narration.
 
@@ -44,10 +46,10 @@ The paragraph itself is the output. Do not write commentary about how the studen
 
 Every KP synthesis should follow this structure unless the source material clearly requires a different order:
 
-1. Topic sentence: state the biological problem, principle, or argument.
+1. Topic sentence: state the scientific problem, principle, or argument.
 2. Causal or mechanistic development: explain how actors, processes, compartments, signals, cells, or methods relate.
 3. Named lecture examples: include only the most useful examples, not every extracted bullet.
-4. Consequence or link-back: state why the mechanism matters for physiology, pathology, crop improvement, metabolism, immunity, exam argument, or experimental interpretation.
+4. Consequence or link-back: state why the mechanism matters for explanation, prediction, application, physiology, pathology, design, exam argument, or experimental interpretation.
 
 Allowed source-order use:
 
@@ -57,15 +59,15 @@ Use slide/page order to understand lecture logic, prerequisites, and transitions
 
 ## Domain Templates
 
-Choose the best template by evidence in the target unit, not by benchmark unit name.
+Choose the best template by evidence in the target sources, not by benchmark identity.
 
-### Motor / Neuroscience
+### Neural / Control Systems
 
 ```text
-behaviour or control problem -> circuit, sensory, or motor mechanism -> functional or clinical consequence
+behaviour or control problem -> circuit, sensory, or control mechanism -> functional or clinical consequence
 ```
 
-Example logic: posture, gaze, reflexes, voluntary movement, sensory feedback, motor hierarchy, lesion effects.
+Example logic: posture, gaze, reflexes, voluntary movement, sensory feedback, control hierarchy, lesion effects.
 
 ### Metabolism
 
@@ -75,7 +77,7 @@ substrate, compartment, enzyme, or regulator -> flux or energetic state -> physi
 
 Example logic: ATP/NADH balance, substrate routing, enzyme regulation, compartmentalisation, fed/fasted or stress state.
 
-### Immunology
+### Immune Response
 
 ```text
 trigger, antigen, or damage signal -> cell, receptor, or cytokine interaction -> effector response -> disease, protection, diagnosis, or therapy implication
@@ -83,7 +85,7 @@ trigger, antigen, or damage signal -> cell, receptor, or cytokine interaction ->
 
 Example logic: PRR/PAMP/DAMP recognition, antigen presentation, cytokine networks, effector differentiation, immune pathology, vaccination or therapy.
 
-### Plants
+### Plant / Agricultural Systems
 
 ```text
 agricultural/environmental problem or trait -> plant mechanism, gene, hormone, physiology, or breeding tool -> evidence or named example -> crop or food-security consequence
@@ -155,8 +157,8 @@ Before writing to Excel, remove:
 Rewrite by asking:
 
 ```text
-If the page numbers disappeared, what biological argument remains?
-What is the mechanism?
+If the page numbers disappeared, what scientific argument remains?
+What is the mechanism, model, process, or operation?
 Which named example genuinely improves the claim?
 What consequence makes this examinable?
 ```
@@ -166,37 +168,37 @@ What consequence makes this examinable?
 Bad:
 
 ```text
-Pages 25-27 should be read as one connected paragraph. Page 25 first establishes rising CO2. Page 26 then develops climate risk.
+Pages 25-27 should be read as one connected paragraph. Page 25 first establishes the operating problem. Page 26 then develops the degradation risk.
 ```
 
 Target:
 
 ```text
-Sustainable intensification frames crop improvement as a trade-off between yield, land use and environmental cost. Rising CO2 and climate instability increase the pressure to produce more food without simply expanding agricultural land, so plant science has to connect physiological traits, genetic variation and breeding tools to resource-efficient production. The examinable argument is not only that food demand is increasing, but that future crop improvement must raise productivity while limiting greenhouse-gas emissions and preserving ecological capacity.
+Battery degradation is best framed as an interaction between electrode chemistry, ion transport and operating conditions rather than as a single failure mode. High current, repeated cycling and temperature stress can accelerate side reactions or structural change, reducing the active material available for reversible charge storage. The examinable argument is that performance loss is mechanistic: operating choices alter microscopic processes, and those processes accumulate into measurable capacity fade.
 ```
 
 Bad:
 
 ```text
-KP covers pages 15-24. The slide sequence should be read as an overview of innate immunity, with remaining linked pages adding examples.
+KP covers pages 15-24. The slide sequence should be read as an overview of measurement reliability, with remaining linked pages adding examples.
 ```
 
 Target:
 
 ```text
-Innate immunity begins with pattern recognition rather than antigen-specific memory. Phagocytes and other innate cells use receptors such as PRRs to detect microbial PAMPs or damage-associated DAMPs, allowing a rapid response to infection or tissue injury. This broad recognition triggers cytokine production, phagocytosis and inflammatory recruitment before adaptive immunity is fully established. The essay value is that PRR signalling explains how host defence can be fast and general while still linking to later immune specificity and inflammatory pathology.
+Measurement reliability depends on separating systematic bias from random error. Bias shifts observations in a consistent direction, while random error widens the spread of repeated measurements, so calibration and replication solve different problems. This distinction matters because a precise instrument can still be wrong if it is miscalibrated, whereas an unbiased but noisy instrument may require more repeated observations before the underlying signal is clear.
 ```
 
 Bad:
 
 ```text
-The central idea for this block is metabolic regulation. In an essay answer, use these pages to explain the first part of the sequence and then add the later pages.
+The central idea for this block is reaction-rate control. In an essay answer, use these pages to explain the first part of the sequence and then add the later pages.
 ```
 
 Target:
 
 ```text
-Metabolic regulation matches pathway flux to cellular energy demand and substrate availability. Enzymes at irreversible or highly regulated steps respond to signals such as ATP, ADP, AMP, NADH or covalent modification, so carbon flow is redirected when the energetic state changes. This control prevents wasteful cycling and allows tissues to prioritise ATP production, biosynthesis or fuel storage according to physiological context. The examinable point is that metabolism is regulated as an integrated network rather than as isolated reactions.
+Reaction-rate control links microscopic collision conditions to macroscopic yield, selectivity and safety. Temperature, concentration, catalysts and surface area alter the probability that particles collide with sufficient energy and the correct orientation, so changing a process condition changes both rate and sometimes product distribution. The examinable point is that rate is not a descriptive constant; it is a mechanistic consequence of controllable variables.
 ```
 
 ## Exam-Facing Prep Rule
@@ -218,13 +220,13 @@ It must not say `Turn pages X-Y into one paragraph`, `use these pages`, or simil
 
 Do not invent biological content to make prose smoother. If extracted text is insufficient, inspect available slide images or source evidence where possible. If the evidence still does not support a confident paragraph, write a conservative claim and flag low confidence internally rather than adding unsupported mechanisms, examples, dates, names, statistics, or citations.
 
-Exemplars may guide style, paragraph density, and logic only. Do not copy exemplar factual claims or treat them as authority unless verified from the target unit's own materials or reliable sources.
+Exemplars may guide style, paragraph density, and logic only. Do not copy exemplar factual claims or treat them as authority unless verified from the target source materials or reliable sources.
 
 ## Acceptance Criteria
 
 The workflow passes this protocol if:
 
-- concept-first synthesis quality is preserved across units;
+- concept-first synthesis quality is preserved across source sets;
 - page-trace and module-overview anti-patterns no longer narrate pages/slides in the explanation column;
 - at least 95% of KP explanation cells contain direct essay-style synthesis without banned phrases;
 - explanation cells do not tell the student how to write;

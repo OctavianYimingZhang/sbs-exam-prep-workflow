@@ -2,7 +2,7 @@
 """Lightweight benchmark checker for cross-subject regression examples.
 
 The checker is deliberately conservative. It verifies file availability,
-unit-key separation, rough exam-regime signals, lecture-source extractability,
+target-group separation, rough exam-regime signals, lecture-source extractability,
 and benchmark expectation wiring. It does not make content predictions.
 """
 
@@ -51,31 +51,31 @@ DEFAULT_SUITE = Path(__file__).resolve().parents[1] / "benchmarks" / "cross_subj
 REQUIRED_CONTRIBUTION_FIELDS = {
     "generic_contribution": "missing_generic_contribution",
     "transferable_rules": "missing_transferable_rules",
-    "future_unit_diagnostic_questions": "missing_future_unit_diagnostic_questions",
+    "future_target_diagnostic_questions": "missing_future_target_diagnostic_questions",
     "non_transferable_content": "missing_non_transferable_content",
     "workflow_steps_tested": "missing_workflow_steps_tested",
     "anti_patterns_guarded_against": "missing_anti_patterns_guarded_against",
 }
 
 
-def normalise_benchmark_units(suite: dict) -> list[dict]:
-    """Return a uniform list of benchmark unit records.
+def normalise_benchmark_target_groups(suite: dict) -> list[dict]:
+    """Return a uniform list of benchmark group records.
 
-    Cross-subject fixtures use a `units` array. Single-unit fixtures, such as
-    the BIOL21111 long-answer suite, store benchmark metadata at the root.
+    Cross-subject fixtures use a `target_groups` array. Single-benchmark fixtures can
+    also store benchmark metadata at the root for compatibility.
     """
-    if isinstance(suite.get("units"), list):
-        return suite["units"]
+    if isinstance(suite.get("target_groups"), list):
+        return suite["target_groups"]
 
-    if "unit_key" not in suite:
+    if "target_group_key" not in suite:
         return []
 
     source_examples = suite.get("source_examples", {})
     lecture_folder = source_examples.get("lecture_folder")
     return [
         {
-            "unit_key": suite.get("unit_key"),
-            "unit_code": suite.get("unit_code"),
+            "target_group_key": suite.get("target_group_key"),
+            "target_code": suite.get("target_code"),
             "lecture_source_examples": source_examples.get("lecture_sources", []),
             "source_folder_examples": [lecture_folder] if lecture_folder else [],
             "past_paper_paths": source_examples.get("formal_papers", []),
@@ -84,7 +84,7 @@ def normalise_benchmark_units(suite: dict) -> list[dict]:
             "must_not": suite.get("hard_rules", []),
             "generic_contribution": suite.get("generic_contribution"),
             "transferable_rules": suite.get("transferable_rules", []),
-            "future_unit_diagnostic_questions": suite.get("future_unit_diagnostic_questions", []),
+            "future_target_diagnostic_questions": suite.get("future_target_diagnostic_questions", []),
             "non_transferable_content": suite.get("non_transferable_content", []),
             "workflow_steps_tested": suite.get("workflow_steps_tested", []),
             "anti_patterns_guarded_against": suite.get("anti_patterns_guarded_against", []),
@@ -156,11 +156,11 @@ def infer_regime(text: str) -> list[str]:
     return signals or ["unknown"]
 
 
-def metadata_only_result(suite: dict, benchmark_units: list[dict], suite_name: str) -> dict:
+def metadata_only_result(suite: dict, benchmark_target_groups: list[dict], suite_name: str) -> dict:
     result = {
         "suite": suite.get("suite_name", suite_name),
         "hard_rule": suite.get("hard_rule") or "; ".join(suite.get("hard_rules", [])),
-        "units": [],
+        "target_groups": [],
         "generic_contribution_results": [],
         "workbook_lint_results": [],
         "example_essay_docx_results": [],
@@ -168,40 +168,40 @@ def metadata_only_result(suite: dict, benchmark_units: list[dict], suite_name: s
         "pass": True,
         "mode": "metadata_only",
     }
-    if not benchmark_units:
+    if not benchmark_target_groups:
         result["pass"] = False
-        result["global_failures"].append({"type": "no_benchmark_units"})
+        result["global_failures"].append({"type": "no_benchmark_target_groups"})
         return result
 
-    seen_unit_keys = set()
-    for unit in benchmark_units:
-        unit_key = unit["unit_key"]
+    seen_target_group_keys = set()
+    for group in benchmark_target_groups:
+        target_group_key = group["target_group_key"]
         generic_contribution_failures = []
         qa_flags = []
         for field, flag in REQUIRED_CONTRIBUTION_FIELDS.items():
-            if not unit.get(field):
+            if not group.get(field):
                 generic_contribution_failures.append(flag)
                 qa_flags.append({"type": flag})
-        if unit_key in seen_unit_keys:
-            qa_flags.append({"type": "duplicate_unit_key"})
-        seen_unit_keys.add(unit_key)
+        if target_group_key in seen_target_group_keys:
+            qa_flags.append({"type": "duplicate_target_group_key"})
+        seen_target_group_keys.add(target_group_key)
 
         status = "pass" if not qa_flags else "fail"
         if status != "pass":
             result["pass"] = False
-        result["units"].append(
+        result["target_groups"].append(
             {
-                "unit_key": unit_key,
-                "unit_key_unique": not any(flag["type"] == "duplicate_unit_key" for flag in qa_flags),
-                "expected_regimes": unit.get("expected_regimes", []),
-                "required_archetypes": unit.get("required_archetypes", []),
-                "must_not": unit.get("must_not", []),
-                "generic_contribution": unit.get("generic_contribution"),
-                "transferable_rules": unit.get("transferable_rules", []),
-                "future_unit_diagnostic_questions": unit.get("future_unit_diagnostic_questions", []),
-                "non_transferable_content": unit.get("non_transferable_content", []),
-                "workflow_steps_tested": unit.get("workflow_steps_tested", []),
-                "anti_patterns_guarded_against": unit.get("anti_patterns_guarded_against", []),
+                "target_group_key": target_group_key,
+                "target_group_key_unique": not any(flag["type"] == "duplicate_target_group_key" for flag in qa_flags),
+                "expected_regimes": group.get("expected_regimes", []),
+                "required_archetypes": group.get("required_archetypes", []),
+                "must_not": group.get("must_not", []),
+                "generic_contribution": group.get("generic_contribution"),
+                "transferable_rules": group.get("transferable_rules", []),
+                "future_target_diagnostic_questions": group.get("future_target_diagnostic_questions", []),
+                "non_transferable_content": group.get("non_transferable_content", []),
+                "workflow_steps_tested": group.get("workflow_steps_tested", []),
+                "anti_patterns_guarded_against": group.get("anti_patterns_guarded_against", []),
                 "status": status,
                 "generic_contribution_status": "pass" if not generic_contribution_failures else "fail",
                 "generic_contribution_failures": generic_contribution_failures,
@@ -210,11 +210,11 @@ def metadata_only_result(suite: dict, benchmark_units: list[dict], suite_name: s
         )
         result["generic_contribution_results"].append(
             {
-                "source_unit": unit_key,
-                "contribution_tested": unit.get("generic_contribution"),
-                "transferable_rule": unit.get("transferable_rules", []),
-                "future_unit_applicability": unit.get("future_unit_diagnostic_questions", []),
-                "non_transferable_content_checked": bool(unit.get("non_transferable_content")),
+                "source_target_group": target_group_key,
+                "contribution_tested": group.get("generic_contribution"),
+                "transferable_rule": group.get("transferable_rules", []),
+                "future_target_applicability": group.get("future_target_diagnostic_questions", []),
+                "non_transferable_content_checked": bool(group.get("non_transferable_content")),
                 "pass_fail": "pass" if not generic_contribution_failures else "fail",
                 "failures": generic_contribution_failures,
             }
@@ -238,9 +238,9 @@ def main() -> int:
     args = parser.parse_args()
 
     suite = json.loads(args.suite.read_text())
-    benchmark_units = normalise_benchmark_units(suite)
+    benchmark_target_groups = normalise_benchmark_target_groups(suite)
     if args.metadata_only:
-        result = metadata_only_result(suite, benchmark_units, args.suite.stem)
+        result = metadata_only_result(suite, benchmark_target_groups, args.suite.stem)
         text = json.dumps(result, indent=2)
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -252,48 +252,48 @@ def main() -> int:
     result = {
         "suite": suite.get("suite_name", args.suite.stem),
         "hard_rule": suite.get("hard_rule") or "; ".join(suite.get("hard_rules", [])),
-        "units": [],
+        "target_groups": [],
         "generic_contribution_results": [],
         "workbook_lint_results": [],
         "example_essay_docx_results": [],
         "global_failures": [],
         "pass": True,
     }
-    if not benchmark_units:
+    if not benchmark_target_groups:
         result["pass"] = False
-        result["global_failures"].append({"type": "no_benchmark_units"})
+        result["global_failures"].append({"type": "no_benchmark_target_groups"})
 
-    seen_unit_keys = set()
-    for unit in benchmark_units:
-        unit_result = {
-            "unit_key": unit["unit_key"],
-            "unit_key_unique": unit["unit_key"] not in seen_unit_keys,
+    seen_target_group_keys = set()
+    for group in benchmark_target_groups:
+        group_result = {
+            "target_group_key": group["target_group_key"],
+            "target_group_key_unique": group["target_group_key"] not in seen_target_group_keys,
             "lecture_sources": [],
             "source_folders": [],
             "past_papers": [],
-            "expected_regimes": unit.get("expected_regimes", []),
-            "required_archetypes": unit.get("required_archetypes", []),
-            "must_not": unit.get("must_not", []),
-            "generic_contribution": unit.get("generic_contribution"),
-            "transferable_rules": unit.get("transferable_rules", []),
-            "future_unit_diagnostic_questions": unit.get("future_unit_diagnostic_questions", []),
-            "non_transferable_content": unit.get("non_transferable_content", []),
-            "workflow_steps_tested": unit.get("workflow_steps_tested", []),
-            "anti_patterns_guarded_against": unit.get("anti_patterns_guarded_against", []),
+            "expected_regimes": group.get("expected_regimes", []),
+            "required_archetypes": group.get("required_archetypes", []),
+            "must_not": group.get("must_not", []),
+            "generic_contribution": group.get("generic_contribution"),
+            "transferable_rules": group.get("transferable_rules", []),
+            "future_target_diagnostic_questions": group.get("future_target_diagnostic_questions", []),
+            "non_transferable_content": group.get("non_transferable_content", []),
+            "workflow_steps_tested": group.get("workflow_steps_tested", []),
+            "anti_patterns_guarded_against": group.get("anti_patterns_guarded_against", []),
             "status": "pass",
             "generic_contribution_status": "pass",
             "generic_contribution_failures": [],
             "qa_flags": [],
         }
-        seen_unit_keys.add(unit["unit_key"])
+        seen_target_group_keys.add(group["target_group_key"])
 
         for field, flag in REQUIRED_CONTRIBUTION_FIELDS.items():
-            if not unit.get(field):
-                unit_result["generic_contribution_status"] = "fail"
-                unit_result["generic_contribution_failures"].append(flag)
-                unit_result["qa_flags"].append({"type": flag})
+            if not group.get(field):
+                group_result["generic_contribution_status"] = "fail"
+                group_result["generic_contribution_failures"].append(flag)
+                group_result["qa_flags"].append({"type": flag})
 
-        for source in unit.get("lecture_source_examples", []):
+        for source in group.get("lecture_source_examples", []):
             path = Path(source)
             record = {"path": str(path), "exists": path.exists(), "slide_count": None, "extractable": False}
             if path.exists() and path.suffix.lower() == ".pptx":
@@ -308,11 +308,11 @@ def main() -> int:
             else:
                 record["error"] = "missing_or_unsupported"
             if not record["exists"] or not record["extractable"]:
-                unit_result["status"] = "fail"
-                unit_result["qa_flags"].append({"type": "lecture_source_not_extractable", "path": str(path)})
-            unit_result["lecture_sources"].append(record)
+                group_result["status"] = "fail"
+                group_result["qa_flags"].append({"type": "lecture_source_not_extractable", "path": str(path)})
+            group_result["lecture_sources"].append(record)
 
-        for folder_source in unit.get("source_folder_examples", []):
+        for folder_source in group.get("source_folder_examples", []):
             folder = Path(folder_source)
             record = {
                 "path": str(folder),
@@ -323,16 +323,16 @@ def main() -> int:
             if folder.exists() and folder.is_dir():
                 record["file_count"] = sum(1 for item in folder.rglob("*") if item.is_file())
             else:
-                unit_result["status"] = "fail"
-                unit_result["qa_flags"].append({"type": "source_folder_missing", "path": str(folder)})
-            unit_result["source_folders"].append(record)
+                group_result["status"] = "fail"
+                group_result["qa_flags"].append({"type": "source_folder_missing", "path": str(folder)})
+            group_result["source_folders"].append(record)
 
-        explicit_papers = [Path(path) for path in unit.get("past_paper_paths", [])]
+        explicit_papers = [Path(path) for path in group.get("past_paper_paths", [])]
         if explicit_papers:
             papers = explicit_papers
             paper_source_record = {"source": "explicit_paths", "count": len(explicit_papers)}
         else:
-            pattern = unit.get("past_paper_glob", "*")
+            pattern = group.get("past_paper_glob", "*")
             papers = sorted(args.past_papers.glob(pattern)) if args.past_papers else []
             paper_source_record = {
                 "source": "glob",
@@ -341,13 +341,13 @@ def main() -> int:
                 "past_papers_root": str(args.past_papers) if args.past_papers else None,
             }
         if not papers:
-            unit_result["status"] = "fail"
-            unit_result["qa_flags"].append({"type": "no_past_papers_found", **paper_source_record})
+            group_result["status"] = "fail"
+            group_result["qa_flags"].append({"type": "no_past_papers_found", **paper_source_record})
         for paper in papers:
             if not paper.exists():
-                unit_result["status"] = "fail"
-                unit_result["qa_flags"].append({"type": "past_paper_missing", "path": str(paper)})
-                unit_result["past_papers"].append({
+                group_result["status"] = "fail"
+                group_result["qa_flags"].append({"type": "past_paper_missing", "path": str(paper)})
+                group_result["past_papers"].append({
                     "path": str(paper),
                     "exists": False,
                     "year": year_from_name(paper.name),
@@ -355,30 +355,30 @@ def main() -> int:
                 })
                 continue
             text = pdf_text(paper) if paper.suffix.lower() == ".pdf" else ""
-            unit_result["past_papers"].append({
+            group_result["past_papers"].append({
                 "path": str(paper),
                 "exists": True,
                 "year": year_from_name(paper.name),
                 "regime_signals": infer_regime(text),
             })
 
-        if not unit_result["unit_key_unique"]:
-            unit_result["status"] = "fail"
-            unit_result["qa_flags"].append({"type": "duplicate_unit_key"})
+        if not group_result["target_group_key_unique"]:
+            group_result["status"] = "fail"
+            group_result["qa_flags"].append({"type": "duplicate_target_group_key"})
         result["generic_contribution_results"].append(
             {
-                "source_unit": unit["unit_key"],
-                "contribution_tested": unit.get("generic_contribution"),
-                "transferable_rule": unit.get("transferable_rules", []),
-                "future_unit_applicability": unit.get("future_unit_diagnostic_questions", []),
-                "non_transferable_content_checked": bool(unit.get("non_transferable_content")),
-                "pass_fail": unit_result["generic_contribution_status"],
-                "failures": unit_result["generic_contribution_failures"],
+                "source_target_group": group["target_group_key"],
+                "contribution_tested": group.get("generic_contribution"),
+                "transferable_rule": group.get("transferable_rules", []),
+                "future_target_applicability": group.get("future_target_diagnostic_questions", []),
+                "non_transferable_content_checked": bool(group.get("non_transferable_content")),
+                "pass_fail": group_result["generic_contribution_status"],
+                "failures": group_result["generic_contribution_failures"],
             }
         )
-        if unit_result["status"] != "pass" or unit_result["generic_contribution_status"] != "pass":
+        if group_result["status"] != "pass" or group_result["generic_contribution_status"] != "pass":
             result["pass"] = False
-        result["units"].append(unit_result)
+        result["target_groups"].append(group_result)
 
     contribution_failures = [
         item

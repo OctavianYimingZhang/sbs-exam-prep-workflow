@@ -12,8 +12,8 @@ Use `references/essay_generation_protocol.md` as the operative protocol for:
 - lecturer-intent analysis;
 - paragraph planning;
 - extra-reading insertion;
-- mechanism-heavy essay contribution checks demonstrated by the Developmental Biology benchmark;
-- comparison-axis and style-exemplar contribution checks demonstrated by the Genome Maintenance and Regulation benchmark;
+- mechanism-heavy essay contribution checks from benchmark fixtures;
+- comparison-axis and style-exemplar contribution checks from benchmark fixtures;
 - DOCX-first output for explicit Example Essay Mode;
 - paragraph-row Excel output only as an optional audit export when explicitly requested.
 

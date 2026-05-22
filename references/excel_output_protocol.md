@@ -4,7 +4,7 @@ The integrated workflow is Excel-first for default exam-prep workbooks. Old DOCX
 
 Explicit Example Essay Mode is the narrow exception: complete Example Essays are DOCX-first and follow `example_essay_docx_output_protocol.md`.
 
-Unit examples contribute layout adaptation rules, not fixed unit layouts. If a workbook layout decision is borrowed from a unit example, diagnostics must record the structural reason, such as `mixed-format current paper detected`, `old/current regime split detected`, `project/scenario long-answer detected`, or `slide-image alignment required`, not the source unit name alone.
+External examples contribute layout adaptation rules, not fixed course layouts. If a workbook layout decision is borrowed from an example, diagnostics must record the structural reason, such as `mixed-format current paper detected`, `old/current regime split detected`, `project/scenario long-answer detected`, or `slide-image alignment required`, not the example identity.
 
 ## Default Student-Facing Workbook
 
@@ -19,7 +19,7 @@ Default user-facing output is a single-sheet workbook with one visible table-lik
 
 ### Screenshot-Style Layout
 
-Use the screenshot logic for simple essay units:
+Use the screenshot logic for simple essay-style source sets:
 
 | Region | Columns | Required content |
 | --- | --- | --- |
@@ -28,7 +28,7 @@ Use the screenshot logic for simple essay units:
 | Explanation | H:J | Student-facing essay-style explanation in academic English. Use readable paragraphs, not dense unbroken text. |
 | Prediction / prep | K:N | If essay exam: predicted practice essay questions only by default. If short-answer exam: likely archetypes and mark-producing answer skeletons. If MCQ exam: discriminator axes, distractor families, and traps. |
 
-For mixed-format units, prefer the same minimal six-column layout when it can express the answer product clearly:
+For mixed-format source sets, prefer the same minimal six-column layout when it can express the answer product clearly:
 
 `Pages`, `Lecture / Module`, `Knowledge Point`, `Original PPT Page` or `Original Page Image`, `Essay-Style Synthesis`, and `Exam-Facing Prep`.
 
@@ -57,7 +57,7 @@ The label for O:Q must be selected automatically after exam-format parsing:
 - Problem/Data: `Likely Data-Problem Archetype / Graph-Reading Operation / Mechanism Inference`
 - Long-Answer Project: `Likely Project Operation / Method-Readout-Interpretation / Control`
 
-For mixed-format units, apply layout rules from parsed paper structure:
+For mixed-format source sets, apply layout rules from parsed paper structure:
 
 - If the paper contains mini-essay plus data/problem sections, O:Q must support both mini-essay prompts and data/problem archetypes.
 - If the paper contains a short conceptual section plus a major essay section, O:Q must distinguish short conceptual prompts from major essay prompts.
@@ -74,16 +74,16 @@ Every knowledge-point block should contain:
 Continue stacking blocks downward. Do not create a separate sheet per lecture for the default student-facing workbook.
 Do not include page-function labels such as `content`, KP-chain IDs, chain-order values, sequence-locator prose, raw extracted slide text, OCR status, slide titles, or provenance columns in the student-facing sheet.
 
-Contribution examples for layout, not content:
+Reusable layout lessons:
 
-- A visual-workbook regression benchmark validates slide-image alignment for visual essay/problem-essay workbooks.
-- The Plant Biology benchmark validates mixed mini-essay plus data/problem layout adaptation.
-- The Developmental Biology benchmark validates Section A versus Section B output distinction.
-- The Immunology benchmark validates old-regime schema versus current-regime prompt labelling without pooling evidence.
-- The BIOL21111 Proteins benchmark validates long-answer project operation/readout/control output.
+- Use slide-image alignment when explanations require visual source inspection.
+- Separate mini-essay and data/problem preparation when a paper contains both.
+- Separate short conceptual prompts from major essay prompts when section structure requires it.
+- Label old-regime schemas as coverage/schema evidence when old and current formats differ.
+- For project/scenario long answers, show operation, method principle, readout, interpretation, and control/limitation.
 - Paragraph-row splitting applies only to optional Excel/evidence audit exports when full Example Essays are explicitly requested; the primary full Example Essay deliverable is standalone DOCX.
 
-These lessons are reusable only when the target unit has the matching structural condition. Unit-specific topics from the benchmark must not appear in another unit workbook unless they are present in the target unit's own sources.
+These lessons are reusable only when target evidence has the matching structural condition. Benchmark topics and example content must not appear in a target workbook unless independently present in the target sources.
 
 ### Visual Formatting
 
@@ -116,7 +116,7 @@ These lessons are reusable only when the target unit has the matching structural
 - For short-answer and MCQ exams, show the operational preparation product: answer schemas or discriminator/trap banks.
 - For non-essay long-answer/project exams, show the project operation and answer logic: method choice, expected readout, interpretation, and control/limitation. Do not label it as a broad essay prompt.
 - Preserve lecture-slide order from first slide/page to last. The workbook may group several consecutive slides into one KP, but it must not jump only to high-yield slides and skip the rest.
-- KP blocks must not be too coarse or too fine: split by examinable mechanism, process chain, experimental-evidence block, data-operation block, or essay paragraph unit.
+- KP blocks must not be too coarse or too fine: split by examinable mechanism, process chain, experimental-evidence block, data-operation block, or essay paragraph block.
 - When adjacent slides have similar or repeated content, merge them into one KP block and write a fuller essay-style sequential explanation that synthesises the whole group rather than repeating one short explanation per slide.
 - The explanation cell must not narrate slide-by-slide using phrases such as `Page X shows...`; it should read like one coherent concept-first paragraph for the whole KP.
 - If the output is requested as Essay-Ready, the explanation must be directly writable as an exam paragraph: no meta-advice, no `strong answer should`, no `essay point`, and no references to the workbook or slide sequence.

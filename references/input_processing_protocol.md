@@ -8,9 +8,13 @@ Classify every file before analysis:
 - `lecture_note`
 - `annotated_lecture_slide`
 - `formal_past_paper`
+- `formal_past_paper_with_answers`
+- `example_paper`
 - `practice_paper`
+- `practice_answer_key`
 - `mock_exam`
 - `answer_key`
+- `practical_protocol`
 - `exemplar_answer`
 - `exemplar_image`
 - `marking_criteria`
@@ -19,6 +23,7 @@ Classify every file before analysis:
 - `extra_reading_chapter`
 - `citation_original_source`
 - `citation_reference_list`
+- `reading_list`
 - `docx_format_reference`
 - `source_policy`
 - `output_protocol`
@@ -29,14 +34,15 @@ Classify every file before analysis:
 Each file record must include:
 
 - file path;
-- normalized `unit_key`;
-- unit code;
-- unit name;
+- normalized `target_group_key`;
+- course/module code if detectable;
+- course/module name if detectable;
 - year if detectable;
 - exam regime if detectable;
 - source trust level;
 - extraction status;
 - allowed evidence use.
+- source feature flags, such as answer key, example paper, practical protocol, essay guidance, problem/data/case, and recommended reading.
 
 Student handwritten annotations on slides may be used as interpretation hints, but must not be treated as authoritative course facts unless supported by slide text, official notes, or reliable sources.
 
@@ -52,9 +58,13 @@ Student handwritten annotations on slides may be used as interpretation hints, b
 
 - `factual_course_content`
 - `formal_prediction_evidence`
+- `formal_prediction_and_answer_key_evidence`
 - `coverage_evidence_only`
+- `answer_rationale_evidence`
 - `answer_style_only`
 - `format_rule`
+- `practical_method_evidence`
+- `reading_recommendation`
 - `extra_reading`
 - `lecture_slide_core`
 - `lecture_slide_citation_original`
@@ -67,14 +77,14 @@ Every source must also be classified by `AnalysisContext` before it is used down
 
 ```yaml
 AnalysisContext:
-  target_unit_current_regime:
-    meaning: same unit, current formal evidence; allowed for blueprint and prediction
-  target_unit_old_or_different_regime:
-    meaning: same unit but old/different format; allowed for concept coverage and answer schema only
-  target_unit_auxiliary:
-    meaning: practice/mock/tutorial/answer key from same unit; allowed for coverage and style depending on role
-  cross_unit_example:
-    meaning: other unit material; transferable workflow logic only
+  target_current_regime:
+    meaning: same target source set, current formal evidence; allowed for blueprint and prediction
+  target_old_or_different_regime:
+    meaning: same target source set but old/different format; allowed for concept coverage and answer schema only
+  target_auxiliary:
+    meaning: practice/mock/tutorial/answer key from same target source set; allowed for coverage and style depending on role
+  cross_target_example:
+    meaning: non-target material; transferable workflow logic only
   style_exemplar:
     meaning: exemplar answer/image; style/structure/density only unless factual claims are verified
   layout_exemplar:
@@ -88,49 +98,51 @@ AnalysisContext:
 Hard rule:
 
 ```text
-Only `target_unit_current_regime` may directly control current blueprint prediction.
-Only target-unit lecture slides, official notes, and verified official materials may directly control factual content.
-Cross-unit examples must be converted into transferable workflow contributions, not content evidence.
+Only `target_current_regime` may directly control current blueprint prediction.
+Only target lecture slides, official notes, and verified official materials may directly control factual content.
+Cross-target examples must be converted into transferable workflow contributions, not content evidence.
 ```
 
 ## AllowedUseMatrix
 
 | Analysis Context | Factual content | Prediction blueprint | Coverage | Style | Layout | Regression |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `target_unit_current_regime` | yes | yes | yes | yes | yes | no |
-| `target_unit_old_or_different_regime` | yes if lecture/official | no unless comparability is proven | yes | limited | no | no |
-| `target_unit_auxiliary` | limited | no unless official says representative | yes | yes | no | no |
-| `cross_unit_example` | no | no | no | principle only | possible | no |
+| `target_current_regime` | yes | yes | yes | yes | yes | no |
+| `target_old_or_different_regime` | yes if lecture/official | no unless comparability is proven | yes | limited | no | no |
+| `target_auxiliary` | limited | no unless official says representative | yes | yes | no | no |
+| `cross_target_example` | no | no | no | principle only | possible | no |
 | `style_exemplar` | no unless verified | no | no | yes | no | no |
 | `layout_exemplar` | no | no | no | no | yes | no |
 | `benchmark_fixture` | no | no | no | no | no | yes |
 | `unsupported_or_unreadable` | no | no | no | no | no | no |
 
-## UnitExampleContribution Schema
+## ExampleContribution Schema
 
-Every non-target Unit example used by a protocol or benchmark must be represented as a contribution object:
+Every non-target example used by a protocol or benchmark must be represented as a contribution object:
 
 ```yaml
-UnitExampleContribution:
-  source_unit:
+ExampleContribution:
+  source_id:
   source_materials:
     - lecture_slides
     - lecture_notes
     - formal_past_papers
     - practice_materials
+    - answer_keys
+    - practical_protocols
     - marking_guidance
     - exemplar_answers
     - handwritten_or_image_examples
-  observed_unit_pattern:
+  observed_source_pattern:
   generic_skill_contribution:
   transferable_rule:
-  future_unit_diagnostic_questions:
+  future_source_diagnostic_questions:
     - question
   non_transferable_content:
     - topic/content/lecturer/year detail that must not be reused
   affected_workflows:
     - source_inventory
-    - unit_grouping_regime_split
+    - target_grouping_regime_split
     - question_type_gate
     - exam_format_diagnosis
     - lecture_segmentation
@@ -146,31 +158,23 @@ UnitExampleContribution:
     - qa
     - cross_subject_regression
   anti_patterns_prevented:
-    - pooling content across units
+    - pooling content across unrelated source sets
   validation_checks:
     - check
 ```
 
-## Unit Key And Regime Split
+## Target Group Key And Regime Split
 
-All question-pattern inference must be unit-internal. Normalize every filename before comparison:
+All question-pattern inference must stay inside the same target course/module group. Normalize every filename before comparison:
 
 1. remove year/date tokens;
-2. remove terms such as `mock`, `practice`, `with answers`, `answer key`, `May 29`, `combined`, `HCI copy`, and version suffixes;
+2. remove terms such as `mock`, `practice`, `with answers`, `answer key`, `guide answers`, `modified syllabus`, `CADMUS`, `PP1/PP2`, dates, `combined`, copies, and version suffixes;
 3. collapse whitespace and punctuation;
-4. retain the normalized course/unit name as `unit_key`.
+4. retain the normalized course/module group as `target_group_key`.
 
-Examples:
+Never use content from one `target_group_key` to predict the content of another target group. External examples may be used only as ExampleContribution records that teach reusable workflow logic, output structure, QA checks, or evidence-handling discipline.
 
-- `Chemistry for Bioscientists 2`
-- `Membrane Excitability`
-- `Clinical Drug Development`
-- `Cell Membrane Structure and Function`
-- `BIOL21332 Motor Systems`
-
-Never use content from one `unit_key` to predict the content of another unit. Cross-unit examples may be used only as UnitExampleContribution records that teach reusable workflow logic, output structure, QA checks, or evidence-handling discipline.
-
-Within the same unit, split formal papers into `exam_regime` groups when any of these change materially:
+Within the same target group, split formal papers into `exam_regime` groups when any of these change materially:
 
 - section structure;
 - answer-all vs answer-one/choose-one rule;
@@ -184,8 +188,10 @@ Old-regime papers may support concept coverage and possible slot fillers, but th
 ## Extraction Rules
 
 - PDF: extract page-by-page text; record image count and warn that diagram/image text may need visual inspection.
-- PPTX: extract slide XML text and notes XML when possible; record that diagrams and embedded images may not be text-extracted.
+- PPTX/PPTM/PPSX: extract slide XML text and notes XML when possible; record that diagrams and embedded images may not be text-extracted.
+- PPT: use legacy binary-string extraction only as approximate text; require original-file inspection for diagrams and exact wording.
 - DOCX: extract paragraphs and table text.
+- XLSX/XLSM: extract sheet names and text-like cell values; treat existing analysis spreadsheets as prior work with provenance, not source truth.
 - TXT/Markdown/YAML/Python: read as text.
 - Images: mark as image evidence; inspect manually or with OCR when it affects the answer.
 - Image exemplars: classify as `exemplar_image` when context indicates handwritten essays, model answers, example answers, or essay drafts. Evidence use is `answer_style_only`; status must include visual-inspection limits. Do not OCR repeatedly by default.
@@ -193,8 +199,11 @@ Old-regime papers may support concept coverage and possible slot fillers, but th
 - A standalone chapter or chapter extract supplied as additional reading must be classified as `extra_reading_chapter`.
 - A PDF or paper resolved from a citation on a lecture slide must be classified as `citation_original_source`.
 - A bibliography/reference-list file supplied to resolve slide citations may be classified as `citation_reference_list`.
-- A user-uploaded formatting PDF or screenshot must be classified as `docx_format_reference` and used only for layout/style, not biological content.
-- Essay style examples must be classified as `style_exemplar` or `exemplar_answer` and used only for paragraph structure, density, and tone unless factual claims are independently verified from target-unit materials.
+- A user-uploaded formatting PDF or screenshot must be classified as `docx_format_reference` and used only for layout/style, not factual content.
+- A reasoned answer key must be classified by provenance where possible: official/lecturer, paper-with-answer, student, generated, or unknown. Use it for answer schema, rationale, distractor traps, and marking expectations, not direct prediction.
+- A practical protocol must be routed to practical/data/problem logic: aim, method principle, steps, readout, interpretation, control, limitation.
+- A reading list, course handbook, programme/advisement document, or suggestions file may identify reading recommendations or administrative constraints; it must not replace lecture content.
+- Essay style examples must be classified as `style_exemplar` or `exemplar_answer` and used only for paragraph structure, density, and tone unless factual claims are independently verified from target materials.
 - Unsupported files: never infer hidden content.
 
 ### Extra Reading Book Extraction
@@ -205,7 +214,7 @@ For Extra Reading Books:
 - extract chapter headings;
 - extract section headings;
 - index searchable keywords;
-- map chapters to lecture KPs using lecture terms, gene/protein/pathway names, diseases, methods, model organisms, and essay question terms;
+- map chapters to lecture KPs using lecture terms, pathway names, diseases, methods, model systems, and essay question terms;
 - read only relevant chapters/sections before inserting yellow-highlighted content into Example Essays.
 
 ### Lecture-Slide Citation Extraction
@@ -222,7 +231,7 @@ For lecture-slide citations:
 
 For each formal paper or guidance source, parse:
 
-- unit_code;
+- course/module code if detectable;
 - year;
 - duration;
 - sections;
@@ -293,7 +302,7 @@ KnowledgePoint:
     comparative:
 ```
 
-Do not split by every slide. Split by examinable causal unit. A valid KP should work as an MCQ concept, a short-answer mark cluster, an essay paragraph, or one component of an essay plan.
+Do not split by every slide. Split by examinable causal block. A valid KP should work as an MCQ concept, a short-answer mark cluster, an essay paragraph, or one component of an essay plan.
 
 For essay-capable KPs, do not treat all slide facts equally. Prioritise the facts that can form a causal paragraph:
 
@@ -311,10 +320,10 @@ Do not:
 - skip middle lecture sections without a QA flag;
 - reorder KPs by predicted importance in the main student-facing workbook;
 - merge several unrelated mechanisms into one huge KP;
-- split one mechanism/evidence unit into isolated slide fragments.
+- split one mechanism/evidence block into isolated slide fragments.
 
 Allowed:
 
-- group several consecutive slides/pages into one KP when they form one mechanism, process chain, experimental-evidence block, data-operation block, or essay paragraph unit;
+- group several consecutive slides/pages into one KP when they form one mechanism, process chain, experimental-evidence block, data-operation block, or essay paragraph block;
 - mark a block low examinability, but still preserve its position;
 - place detailed evidence in diagnostics or an evidence workbook while keeping the student sheet clean.

@@ -14,6 +14,10 @@ Classify before prediction:
 - `short_answer_compare`
 - `short_answer_experiment`
 - `data_problem`
+- `practical_protocol`
+- `spotter_image`
+- `numerical_problem`
+- `case_study`
 - `essay_theory`
 - `essay_compare_contrast`
 - `essay_experimental_design`
@@ -32,7 +36,7 @@ MCQ extraction schema:
 
 ```yaml
 MCQPattern:
-  unit_key:
+  target_group_key:
   exam_regime:
   year:
   question_no:
@@ -50,7 +54,7 @@ MCQ pattern categories:
 - `definition`: terms likely to be confused.
 - `classification`: category boundaries.
 - `mechanism`: causal direction and sequence.
-- `calculation`: formula, units, order of magnitude.
+- `calculation`: formula, measurement convention, order of magnitude.
 - `exception_not`: common incorrect statements.
 - `graph_figure`: curve shape, graph reading, diagram logic.
 - `application`: correct explanation in a new scenario.
@@ -100,7 +104,7 @@ Short-answer extraction schema:
 
 ```yaml
 ShortAnswerPattern:
-  unit_key:
+  target_group_key:
   exam_regime:
   year:
   question_no:
@@ -151,6 +155,38 @@ Generate mark-length skeletons where relevant:
 
 Do not claim exact official mark allocation unless an official mark scheme is present.
 
+## Practical / Data / Problem Outputs
+
+Route practical protocols, problem papers, case studies, numerical assessments, spotters, graphs, figures, and worked solutions through `practical_data_problem_protocol.md`.
+
+Practical/data/problem extraction schema:
+
+```yaml
+ProblemOperationPattern:
+  target_group_key:
+  exam_regime:
+  year:
+  question_no:
+  input_type: graph | table | figure | image | protocol | case | calculation | structure | sequence | method_comparison
+  required_operation:
+  expected_inference:
+  answer_schema: []
+  controls_or_limitations: []
+  follow_up_action:
+  answer_key_alignment:
+    provenance: official | lecturer | paper_with_answer | student | generated | unknown
+    reusable_rationale:
+    non_authoritative_content: []
+```
+
+Preparation output must be operation-first:
+
+```text
+input -> operation -> inference -> limitation/control -> follow-up
+```
+
+Do not output only topic names for problem/data/practical exams. If an answer key exists, extract answer logic and traps; do not treat it as independent factual authority unless verified against lecture or practical material.
+
 ## Long-Answer Project / Scenario Outputs
 
 Use `long_answer_project` when the formal paper is non-essay but requires paragraph-style project, scenario, method-design, or research-proposal answers. This is separate from ordinary essay theory.
@@ -159,12 +195,12 @@ Long-answer project extraction schema:
 
 ```yaml
 LongAnswerProjectPattern:
-  unit_key:
+  target_group_key:
   exam_regime:
   year:
   question_no:
   project_context:
-  named_proteins_or_systems: []
+  named_systems_or_examples: []
   question_parts:
     - part_label:
       mark_weight:
@@ -178,16 +214,16 @@ LongAnswerProjectPattern:
   cross_module_links: []
 ```
 
-Method-driven long-answer project archetypes learned from the BIOL21111 benchmark:
+Method-driven long-answer project archetypes:
 
-Apply these archetypes to future units only when exam-format parsing confirms scenario, project, method-design, readout-interpretation, or control/limitation structure. Do not transfer protein-specific systems, techniques, or recurrence claims unless supplied in the new unit's sources.
+Apply these archetypes only when exam-format parsing confirms scenario, project, method-design, readout-interpretation, or control/limitation structure. Do not transfer subject-specific systems, techniques, or recurrence claims unless supplied in the target sources.
 
 - design purification strategy;
 - choose and justify characterisation methods;
 - assess folding, secondary, tertiary, or quaternary structure;
 - quantify binding affinity or dimerisation affinity;
 - interpret mutation effect;
-- determine protein-protein interface;
+- determine interaction interface;
 - determine atomic or high-resolution structure;
 - compare structural biology methods;
 - quantify enzyme activity or substrate specificity;
@@ -202,7 +238,7 @@ For each long-answer archetype, require:
 - interpretation;
 - limitation/control.
 
-When a user explicitly asks for a model answer or Example Essay for a project/scenario unit, route to `long_answer_example_protocol.md` and generate a `High-score example long answer`, not a generic essay. The answer must be structured by question parts, mark weights, method logic, readouts, interpretation, and controls.
+When a user explicitly asks for a model answer or Example Essay for a project/scenario exam, route to `long_answer_example_protocol.md` and generate a `High-score example long answer`, not a generic essay. The answer must be structured by question parts, mark weights, method logic, readouts, interpretation, and controls.
 
 Do not let old short-answer or coverage-only papers control the current long-answer project blueprint. They may support concept coverage only unless exam-format parsing proves the same regime.
 

@@ -17,6 +17,18 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
+try:
+    from example_essay_language_linter import lint_records as lint_language_records
+    from example_essay_language_linter import load_docx_records
+except Exception:  # pragma: no cover
+    sys.path.append(str(Path(__file__).resolve().parent))
+    try:
+        from example_essay_language_linter import lint_records as lint_language_records
+        from example_essay_language_linter import load_docx_records
+    except Exception:  # pragma: no cover
+        lint_language_records = None
+        load_docx_records = None
+
 
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?")
@@ -81,21 +93,17 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
 
     section = doc.sections[0]
     format_checks = {
-        "a4": close(emu_to_cm(section.page_width), 21.0, CM_TOL) and close(emu_to_cm(section.page_height), 29.7, CM_TOL),
         "margins_2_5_cm": all(
             close(emu_to_cm(value), 2.5, CM_TOL)
             for value in [section.top_margin, section.bottom_margin, section.left_margin, section.right_margin]
         ),
-        "arial_10": True,
+        "arial": True,
         "line_spacing_1_5": True,
-        "paragraph_spacing_zero": True,
         "body_justified": True,
         "title_centered": True,
         "subtitles_left": True,
         "no_empty_spacer_paragraphs": True,
     }
-    if not format_checks["a4"]:
-        failures.append({"type": "page_size_not_a4"})
     if not format_checks["margins_2_5_cm"]:
         failures.append({"type": "margins_not_2_5_cm"})
 
@@ -127,11 +135,6 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         kind = paragraph_kind_from_map(source_map, visible_paragraph_index)
         source_para = source_paragraphs[visible_paragraph_index - 1] if visible_paragraph_index - 1 < len(source_paragraphs) else {}
 
-        before = pt_value(paragraph.paragraph_format.space_before)
-        after = pt_value(paragraph.paragraph_format.space_after)
-        if not close(before if before is not None else 0.0, 0.0, PT_TOL) or not close(after if after is not None else 0.0, 0.0, PT_TOL):
-            format_checks["paragraph_spacing_zero"] = False
-            failures.append({"type": "paragraph_spacing_not_zero", "paragraph": visible_paragraph_index})
         if paragraph.paragraph_format.line_spacing != 1.5:
             format_checks["line_spacing_1_5"] = False
             failures.append({"type": "line_spacing_not_1_5", "paragraph": visible_paragraph_index, "line_spacing": paragraph.paragraph_format.line_spacing})
@@ -154,12 +157,8 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         visible_runs = [run for run in paragraph.runs if run.text]
         for r_idx, run in enumerate(visible_runs, start=1):
             if run_font_name(run) != "Arial":
-                format_checks["arial_10"] = False
+                format_checks["arial"] = False
                 failures.append({"type": "run_font_not_arial", "paragraph": visible_paragraph_index, "run": r_idx, "font": run_font_name(run)})
-            size = run_font_size_pt(run)
-            if not close(size, 10.0, PT_TOL):
-                format_checks["arial_10"] = False
-                failures.append({"type": "run_font_size_not_10", "paragraph": visible_paragraph_index, "run": r_idx, "size": size})
 
             source_run = source_runs[r_idx - 1] if r_idx - 1 < len(source_runs) else {}
             wc = len(words(run.text))
@@ -233,6 +232,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Lint Example Essay DOCX formatting and source highlighting.")
     parser.add_argument("paths", nargs="+", type=Path)
     parser.add_argument("--source-map", type=Path)
+    parser.add_argument("--check-language", action="store_true", help="Also run the complete Example Essay language linter.")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
@@ -240,7 +240,19 @@ def main() -> int:
     for path in args.paths:
         for docx_path in collect_docx(path):
             try:
-                reports.append(lint_docx(docx_path, args.source_map))
+                report = lint_docx(docx_path, args.source_map)
+                if args.check_language:
+                    if lint_language_records is None or load_docx_records is None:
+                        report["status"] = "fail"
+                        report.setdefault("qa_flags", []).append("example_essay_language_linter_unavailable")
+                        report["language"] = {"pass": False, "fail_reasons": ["example_essay_language_linter_unavailable"]}
+                    else:
+                        language_report = lint_language_records(load_docx_records(docx_path))
+                        report["language"] = language_report
+                        if not language_report.get("pass"):
+                            report["status"] = "fail"
+                            report.setdefault("qa_flags", []).append("example_essay_language_lint_failed")
+                reports.append(report)
             except Exception as exc:
                 reports.append({"docx": str(docx_path), "status": "fail", "qa_flags": ["docx_lint_error"], "error": str(exc)})
 

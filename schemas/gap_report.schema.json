@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/gap_report.schema.json",
+  "title": "GapReport",
+  "type": "object",
+  "required": ["status", "high_gaps", "medium_gaps", "low_gaps", "checks"],
+  "properties": {
+    "status": { "enum": ["pass", "fail"] },
+    "high_gaps": { "type": "array", "items": { "type": "object" } },
+    "medium_gaps": { "type": "array", "items": { "type": "object" } },
+    "low_gaps": { "type": "array", "items": { "type": "object" } },
+    "checks": { "type": "array", "items": { "type": "object" } }
+  },
+  "additionalProperties": true
+}

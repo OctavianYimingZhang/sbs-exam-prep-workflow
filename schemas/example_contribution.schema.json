@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/example_contribution.schema.json",
+  "title": "ExampleContribution",
+  "type": "object",
+  "required": ["example_id", "source_type", "observed_problem", "transferable_rule", "structural_trigger", "non_transferable_content", "affected_protocols", "validation_check", "confidence"],
+  "properties": {
+    "example_id": { "type": "string" },
+    "source_type": { "type": "string" },
+    "observed_problem": { "type": "string" },
+    "transferable_rule": { "type": "string" },
+    "structural_trigger": { "type": "string" },
+    "applies_to": { "type": "array", "items": { "type": "string" } },
+    "non_transferable_content": { "type": "array", "items": { "type": "string" } },
+    "affected_protocols": { "type": "array", "items": { "type": "string" } },
+    "validation_check": { "type": "string" },
+    "confidence": { "enum": ["High", "Medium", "Low"] }
+  },
+  "additionalProperties": false
+}

@@ -20,10 +20,10 @@ EssayRunSourceType = Literal[
 EssayRunHighlight = Literal["none", "yellow", "green"]
 Saturation = Literal["fresh", "partially_tested", "saturated", "unknown"]
 AnalysisContext = Literal[
-    "target_unit_current_regime",
-    "target_unit_old_or_different_regime",
-    "target_unit_auxiliary",
-    "cross_unit_example",
+    "target_current_regime",
+    "target_old_or_different_regime",
+    "target_auxiliary",
+    "cross_target_example",
     "style_exemplar",
     "layout_exemplar",
     "benchmark_fixture",
@@ -32,13 +32,13 @@ AnalysisContext = Literal[
 
 
 @dataclass
-class UnitExampleContribution:
-    source_unit: str
+class ExampleContribution:
+    source_target_group: str
     source_materials: list[str]
-    observed_unit_pattern: str
+    observed_example_pattern: str
     generic_skill_contribution: str
     transferable_rule: str
-    future_unit_diagnostic_questions: list[str]
+    future_target_diagnostic_questions: list[str]
     non_transferable_content: list[str]
     affected_workflows: list[str]
     anti_patterns_prevented: list[str]
@@ -51,7 +51,7 @@ class UnitExampleContribution:
 @dataclass
 class QuestionArchetype:
     archetype_id: str
-    unit_key: str
+    target_group_key: str
     exam_regime: str
     question_family: QuestionFamily
     task_verbs: list[str]
@@ -64,7 +64,7 @@ class QuestionArchetype:
     seen_in: list[dict[str, str | int]]
     saturation: Saturation = "unknown"
     confidence: Confidence = "Medium"
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -75,7 +75,7 @@ class QuestionArchetype:
 
 @dataclass
 class MCQPattern:
-    unit_key: str
+    target_group_key: str
     exam_regime: str
     year: int | None
     question_no: str
@@ -85,7 +85,7 @@ class MCQPattern:
     distractor_families: list[str]
     trap: str
     compatible_kps: list[str] = field(default_factory=list)
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -96,7 +96,7 @@ class MCQPattern:
 
 @dataclass
 class ShortAnswerPattern:
-    unit_key: str
+    target_group_key: str
     exam_regime: str
     year: int | None
     question_no: str
@@ -109,7 +109,7 @@ class ShortAnswerPattern:
     operation: list[str]
     answer_schema: list[str]
     archetype_id: str
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -120,7 +120,7 @@ class ShortAnswerPattern:
 
 @dataclass
 class EssayQuestionAnalysis:
-    unit_key: str
+    target_group_key: str
     question: str
     question_type: str
     task_verbs: list[str]
@@ -131,7 +131,7 @@ class EssayQuestionAnalysis:
     required_comparison_axes: list[str]
     required_kps: list[str]
     excluded_kps: list[str]
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -183,7 +183,7 @@ class ExtraReadingInsert:
 
 @dataclass
 class KnowledgeUseInventory:
-    unit_key: str
+    target_group_key: str
     lecture_block: str
     must_use_core: list[str]
     should_use_if_space: list[str]
@@ -194,7 +194,7 @@ class KnowledgeUseInventory:
     cross_module_links: list[str]
     outside_module_but_relevant: list[str]
     exclude: list[str]
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -205,19 +205,19 @@ class KnowledgeUseInventory:
 
 @dataclass
 class LongAnswerProjectPattern:
-    unit_key: str
+    target_group_key: str
     exam_regime: str
     year: int | None
     question_no: str
     project_context: str
-    named_proteins_or_systems: list[str]
+    named_systems_or_examples: list[str]
     question_parts: list[dict]
     core_archetype: str
     slot_grammar: list[str]
     required_answer_mode: str
     cross_module_links: list[str]
     confidence: Confidence = "Medium"
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -241,7 +241,7 @@ class LongAnswerParagraphPlan:
     extra_reading_use: str | None
     excluded_content: list[str]
     word_budget: int
-    derived_from_unit_example: str | None = None
+    derived_from_external_example: str | None = None
     transferable_rule: str | None = None
     non_transferable_content: list[str] = field(default_factory=list)
     format_match_required: str | None = None
@@ -337,7 +337,7 @@ class ExampleEssayDocumentPlan:
     question: str
     title: str
     subtitle: str | None
-    unit_key: str
+    target_group_key: str
     lecture_anchors: list[LectureAnchor]
     paragraphs: list[EssayParagraph]
     total_word_target: int | None = None

@@ -42,7 +42,7 @@ Outputs:
 
 - source inventory JSON/table;
 - file roles;
-- unit keys;
+- target group keys;
 - extraction status;
 - trust/evidence-use classification;
 - QA flags for unreadable or unsupported files.
@@ -51,7 +51,29 @@ Standalone behaviour:
 
 - stop after inventory unless the user requests analysis.
 
-### 2. Unit Grouping / Regime Split
+### 2. Automatic Example Analysis
+
+Trigger:
+
+- user supplies examples, answer keys, feedback, screenshots, existing analysis files, benchmark outputs, or asks to improve Skill logic from examples.
+
+Minimum inputs:
+
+- source inventory or example folder path.
+
+Outputs:
+
+- example category counts;
+- `ExampleContribution` records;
+- `LanguageDelta` records;
+- non-transferable content notes;
+- protocol/script gap list.
+
+Standalone behaviour:
+
+- do not use example factual content for target predictions.
+
+### 3. Target Grouping / Regime Split
 
 Trigger:
 
@@ -63,7 +85,7 @@ Minimum inputs:
 
 Outputs:
 
-- unit-key grouping;
+- target-group-key grouping;
 - exam-regime split;
 - evidence-use labels for each regime;
 - conflicts or missing years.
@@ -72,7 +94,7 @@ Standalone behaviour:
 
 - do not generate predictions unless requested.
 
-### 3. Question-Type Gate / Exam-Format Diagnosis
+### 4. Question-Type Gate / Exam-Format Diagnosis
 
 Trigger:
 
@@ -92,7 +114,7 @@ Standalone behaviour:
 
 - return diagnosis and recommended next modules.
 
-### 4. Lecture Segmentation
+### 5. Lecture Segmentation
 
 Trigger:
 
@@ -113,7 +135,7 @@ Standalone behaviour:
 
 - do not infer exam predictions unless requested.
 
-### 5. Knowledge-Point Optimisation
+### 6. Knowledge-Point Optimisation
 
 Trigger:
 
@@ -135,7 +157,7 @@ Standalone behaviour:
 
 - do not generate workbook unless requested.
 
-### 6. KP Essay Synthesis
+### 7. KP Essay Synthesis
 
 Trigger:
 
@@ -155,7 +177,7 @@ Standalone behaviour:
 
 - only rewrite/lint the requested KP explanations.
 
-### 7. Archetype / Past-Paper / Pattern Analysis
+### 8. Archetype / Past-Paper / Pattern Analysis
 
 Trigger:
 
@@ -176,7 +198,7 @@ Standalone behaviour:
 
 - do not generate workbook unless requested.
 
-### 8. Question-Type Output Generation
+### 9. Question-Type Output Generation
 
 Trigger:
 
@@ -198,7 +220,7 @@ Standalone behaviour:
 
 - output only the requested question-type product.
 
-### 9. Default Excel Workbook Generation
+### 10. Default Excel Workbook Generation
 
 Trigger:
 
@@ -218,7 +240,7 @@ Standalone behaviour:
 
 - if supplied with valid intermediate JSON/KP records, build the workbook without rerunning upstream modules.
 
-### 10. Example Essay DOCX Mode
+### 11. Example Essay DOCX Mode
 
 Trigger:
 
@@ -244,7 +266,7 @@ Standalone behaviour:
 - if a valid `ExampleEssayDocumentPlan` is supplied, generate/lint DOCX files without rerunning prediction.
 - if no lecture slides are supplied or identifiable, do not draft a polished essay; request the missing lecture evidence or flag the blocker.
 
-### 11. Citation Resolver
+### 12. Citation Resolver
 
 Trigger:
 
@@ -265,7 +287,7 @@ Standalone behaviour:
 
 - do not insert citation-derived essay content unless the source is resolved and read.
 
-### 12. Extra Reading Matcher
+### 13. Extra Reading Matcher
 
 Trigger:
 
@@ -287,7 +309,7 @@ Standalone behaviour:
 
 - stop after matching unless the user asks to write or update an essay.
 
-### 13. QA / Linting
+### 14. QA / Linting
 
 Trigger:
 
@@ -308,7 +330,7 @@ Standalone behaviour:
 
 - do not rewrite files unless explicitly requested.
 
-### 14. Cross-Subject Regression
+### 15. Cross-Subject Regression
 
 Trigger:
 
@@ -327,21 +349,65 @@ Standalone behaviour:
 
 - do not make content predictions.
 
+### 16. Gap Closure Report
+
+Trigger:
+
+- user asks to keep improving until no major gaps remain, or asks for final Skill readiness.
+
+Minimum inputs:
+
+- lint reports, regression results, source-audit reports, external review notes, or generated outputs.
+
+Outputs:
+
+- high/medium/low gap report;
+- pass/fail completion decision;
+- required follow-up edits.
+
+Standalone behaviour:
+
+- do not claim completion while high or medium gaps remain unresolved.
+
+### 17. GitHub Ready QA
+
+Trigger:
+
+- user asks to push, publish, release, or update GitHub.
+
+Minimum inputs:
+
+- repository checkout.
+
+Outputs:
+
+- GitHub-ready QA report;
+- identity-trigger scan;
+- public safety scan;
+- synced installed-Skill check.
+
+Standalone behaviour:
+
+- do not commit or push if GitHub-ready QA fails.
+
 ## Full Workflow Composition
 
 When the user requests the complete exam-prep workflow, run modules in this order:
 
 1. Source Inventory.
-2. Unit Grouping / Regime Split.
-3. Question-Type Gate / Exam-Format Diagnosis.
-4. Lecture Segmentation.
-5. Knowledge-Point Optimisation.
-6. KP Essay Synthesis.
-7. Archetype / Past-Paper / Pattern Analysis.
-8. Question-Type Output Generation.
-9. Default Excel Workbook Generation.
-10. QA / Linting.
-11. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
+2. Automatic Example Analysis when examples, answer keys, feedback, existing analyses, or external review notes are supplied.
+3. Target Grouping / Regime Split.
+4. Question-Type Gate / Exam-Format Diagnosis.
+5. Lecture Segmentation.
+6. Knowledge-Point Optimisation.
+7. KP Essay Synthesis.
+8. Archetype / Past-Paper / Pattern Analysis.
+9. Question-Type Output Generation.
+10. Default Excel Workbook Generation.
+11. QA / Linting.
+12. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
+13. Gap Closure Report when modifying the Skill itself.
+14. GitHub Ready QA before commit or push.
 
 If the user also explicitly requests complete Example Essays, run Example Essay DOCX Mode as a separate branch after lecture-source grounding and question selection:
 
@@ -355,18 +421,21 @@ If the user also explicitly requests complete Example Essays, run Example Essay 
 8. DOCX Format Linting.
 9. Render/Structural QA.
 10. Source Audit.
+11. Complete Example Essay Language Linting.
 
 ## Reuse Of Intermediate Outputs
 
 If the user supplies a valid intermediate artefact, prefer using it directly:
 
-- source inventory JSON can feed unit grouping;
+- source inventory JSON can feed target grouping;
 - lecture segmentation can feed KP optimisation;
 - KP map can feed synthesis, predictions, or workbook generation;
 - workbook can feed essay-style linter;
 - ExampleEssayDocumentPlan can feed DOCX generation;
 - DOCX + source map can feed DOCX format linter;
-- source audit can feed regression.
+- source audit can feed regression;
+- automatic example analysis can feed gap closure;
+- gap reports can feed GitHub-ready QA.
 
 Do not recompute upstream analysis unless the supplied artefact is missing, stale, incompatible, or the user asks for a full rerun.
 

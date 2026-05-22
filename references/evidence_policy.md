@@ -50,24 +50,24 @@ If Extra Reading Books are uploaded, locate the relevant chapter/section before 
 Formatting reference PDFs are layout/style evidence only and must not supply biological claims.
 ```
 
-## Unit Example Evidence Use
+## Example Evidence Use
 
-Unit-specific examples are not reusable factual evidence for other units. Classify every example source into one of these source-use classes before it can influence a workflow:
+External examples and benchmark fixtures are not reusable factual evidence for a new target source set. Classify every example source into one of these source-use classes before it can influence workflow design:
 
-- `unit_content_evidence_only`: target-unit lecture slides, official notes, formal papers, or guidance that may support factual content for that same target unit.
-- `unit_regression_example`: named benchmark material used to test whether the Skill behaves correctly on a known fixture.
-- `generic_workflow_contribution`: a non-target unit example distilled into a transferable workflow rule, output pattern, QA check, or evidence-handling discipline.
+- `target_content_evidence_only`: target lecture slides, official notes, formal papers, or guidance that may support factual content for the same target source set.
+- `benchmark_regression_example`: named benchmark material used to test whether the Skill behaves correctly on a known fixture.
+- `generic_workflow_contribution`: an external example distilled into a transferable workflow rule, output pattern, QA check, or evidence-handling discipline.
 - `style_only_exemplar`: exemplar answer, essay draft, handwritten example, or image used only for wording, structure, density, answer organisation, and paragraph logic.
-- `non_transferable_content`: unit topics, named systems, lecturer-specific preferences, exact year recurrence, or biological details that must not be reused outside the source unit unless independently present in the target unit's own sources.
+- `non_transferable_content`: topics, named systems, lecturer-specific preferences, exact year recurrence, case details, or subject facts that must not be reused unless independently present in the target source set.
 
 Hard rule:
 
 ```text
-Do not use a Unit example as content evidence for another Unit.
-A Unit example may only contribute workflow logic, output style, archetype structure, QA checks, or evidence-handling discipline.
+Do not use an external example as content evidence for a target source set.
+An example may only contribute workflow logic, output style, archetype structure, QA checks, or evidence-handling discipline.
 ```
 
-If a workflow applies a lesson learned from a benchmark unit, record the structural trigger from the target unit evidence, not the benchmark unit name alone. For example, record `current paper contains mini-essay plus data/problem sections`, not `Plant Biology-like`.
+If a workflow applies a lesson learned from a benchmark, record the structural trigger from target evidence, not the benchmark identity. For example, record `current paper contains mini-essay plus data/problem sections`, not a named-example comparison.
 
 ## ExtraReadingVerifier
 
@@ -79,7 +79,7 @@ If a workflow applies a lesson learned from a benchmark unit, record the structu
 Extra Reading source priority:
 
 1. official recommended reading listed in lecture slides, Canvas reading list, course notes, or lecturer guidance;
-2. textbook or book chapter used by the unit if explicitly supplied;
+2. textbook or book chapter used by the course/module if explicitly supplied;
 3. papers, reviews, datasets, methods, or book chapters explicitly named in the lecture slides;
 4. if no official book/reading is supplied, ask whether the user has a recommended book or reading list;
 5. if unavailable, use peer-reviewed reviews, primary papers, textbooks, PubMed, Google Scholar, DOI pages, or publisher pages.
@@ -105,7 +105,7 @@ Use exemplar answers for:
 - density and tone;
 - strong vs weak answer pattern detection.
 
-Do not use exemplar biological claims as factual authority unless verified from lectures or reliable sources.
+Do not use exemplar subject claims as factual authority unless verified from lectures or reliable sources.
 
 For handwritten/image exemplars:
 
@@ -120,7 +120,7 @@ For handwritten/image exemplars:
 
 Do not:
 
-- pool content prediction evidence across different units;
+- pool content prediction evidence across different course/module groups;
 - pool old and new exam regimes as if they were one statistical distribution;
 - treat topic frequency as sufficient evidence when archetype/slot grammar contradicts it;
 - infer lecture deck years from citation/reference years embedded in slide text;
@@ -132,9 +132,9 @@ Do not:
 - let Section A contaminate essay prediction;
 - use short-answer papers as direct essay prediction evidence;
 - use exemplar answers as factual authority;
-- use a Unit example as content prediction for another Unit;
-- write a Unit-specific instruction outside an explicit regression context;
-- apply a Unit example without a matching target-unit evidence condition;
+- use an external example as content prediction for a target source set;
+- write a benchmark-specific instruction outside an explicit regression context;
+- apply an example lesson without a matching target evidence condition;
 - insert unverified citations;
 - insert extra reading that is not directly relevant to the exact essay question;
 - let extra reading replace lecture logic;
@@ -167,11 +167,11 @@ Use these flags when applicable:
 - `extra_reading_overused`
 - `recommended_reading_missing`
 - `unsupported_mechanism_claim`
-- `unit_example_used_as_content_prediction`
-- `unit_example_missing_transferable_contribution`
-- `unit_example_non_transferable_content_not_marked`
-- `cross_unit_content_leakage`
-- `unit_specific_instruction_outside_regression_context`
+- `example_used_as_content_prediction`
+- `example_missing_transferable_contribution`
+- `example_non_transferable_content_not_marked`
+- `cross_source_content_leakage`
+- `benchmark_specific_instruction_outside_regression_context`
 - `example_claim_used_without_verification`
 - `regime_example_applied_without_format_match`
 - `question_type_example_applied_without_question_type_match`

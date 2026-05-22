@@ -2,7 +2,7 @@
 
 ## Core Model
 
-The primary prediction unit is not a repeated topic. It is:
+The primary prediction object is not a repeated topic. It is:
 
 ```text
 fixed examiner operation + replaceable knowledge slots + reusable mark-scheme skeleton
@@ -16,7 +16,7 @@ Use three layers:
 
 The workflow must ask:
 
-- Is the unit blueprint stable?
+- Is the target exam blueprint stable?
 - Which archetypes are reused?
 - Which variables rotate inside those archetypes?
 - Which untested or partly tested KPs can fill the same slots?
@@ -24,25 +24,25 @@ The workflow must ask:
 
 KP posterior/hotness is auxiliary and must not override a stronger archetype/regime signal.
 
-## Unit-Internal Comparison Rule
+## Target-Internal Comparison Rule
 
-Only compare papers within the same normalized `unit_key`. Do not use MCQ, short-answer, or content patterns from one unit to predict another unit's content.
+Only compare papers within the same normalized `target_group_key` or compatible source group. Do not use MCQ, short-answer, or content patterns from one source group to predict another source group's content.
 
-Allowed cross-unit use:
+Allowed external-example use:
 
 - identifying a generic question-writing structure;
 - borrowing an Excel layout or annotation style;
 - learning how a good short-answer/MCQ explanation is phrased.
 
-Forbidden cross-unit use:
+Forbidden external-example use:
 
 - pooling KP frequency;
-- claiming a topic is high-yield in one unit because it appears in another;
-- importing another unit's distractor bank as content prediction.
+- claiming a topic is high-yield because it appears in an external example;
+- importing another source set's distractor bank as content prediction.
 
-## Unit Example Contribution Transfer
+## Example Contribution Transfer
 
-Unit examples may transfer only operation grammar, workflow discipline, output layout logic, or QA checks. They may not transfer content, lecturer assumptions, repeated topics, or direct prediction evidence into another unit.
+External examples may transfer only operation grammar, workflow discipline, output layout logic, or QA checks. They may not transfer content, lecturer assumptions, repeated topics, or direct prediction evidence into a target source set.
 
 Allowed example transfer:
 
@@ -53,7 +53,7 @@ This benchmark shows that when data figures recur, predict graph-reading operati
 Forbidden example transfer:
 
 ```text
-Because one benchmark used a specific molecule, crop, protein, disease, pathway, or case study, another unit should expect that same content.
+Because one benchmark used a specific molecule, crop, disease, pathway, company, theory, or case study, a new source set should expect that same content.
 ```
 
 Transferable archetypes must record the condition under which the lesson may be reused:
@@ -70,7 +70,7 @@ TransferableArchetypePattern:
 
 ## Exam-Regime Split
 
-Within a unit, split papers into separate regimes when exam format changes. Examples of regime-breaking changes include:
+Within a target source group, split papers into separate regimes when exam format changes. Examples of regime-breaking changes include:
 
 - MCQ + short-note becomes short-answer + case-study;
 - answer-all becomes answer-one;
@@ -92,7 +92,7 @@ Each KP must be labelled across five task dimensions:
 - `factual`: definition, list, name, identify;
 - `mechanistic`: pathway, causal explanation, sequence;
 - `structural`: draw, label, topology, molecular/circuit structure;
-- `quantitative`: calculate, graph, table interpretation, units;
+- `quantitative`: calculate, graph, table interpretation, measurement conventions;
 - `comparative`: compare, rank, contrast, choose best.
 
 This matrix is how the Skill expands from seen questions to all plausible examinable variants.
@@ -102,10 +102,10 @@ This matrix is how the Skill expands from seen questions to all plausible examin
 Use:
 
 - `formal_high`: recent formal paper with same or very similar format.
-- `formal_medium`: formal paper with same unit but older or materially different constraints.
+- `formal_medium`: formal paper with same target group but older or materially different constraints.
 - `formal_low`: formal paper with different question style; useful for coverage only unless configured otherwise.
 - `auxiliary_practice`: practice paper, mock, quiz, answer key, tutorial, exemplar, or problem sheet.
-- `excluded`: wrong unit, inaccessible, unsupported, duplicate, or not relevant.
+- `excluded`: wrong target group, inaccessible, unsupported, duplicate, or not relevant.
 
 Formal past papers drive retention and examiner-pattern inference. Practice materials support coverage and answer style only unless explicitly configured.
 
@@ -204,7 +204,7 @@ EssayLecturerIntentResult:
   likely_lecturer:
   evidence_for_lecturer: []
   contradicted_evidence: []
-  likely_scope: one_kp | one_lecture | one_module | several_lectures_same_lecturer | cross_module | whole_unit
+  likely_scope: one_kp | one_lecture | one_module | several_lectures_same_lecturer | cross_module | whole_source_set
   expected_answer_shape:
     - mechanism_detail
     - compare_contrast
@@ -249,7 +249,7 @@ LongAnswerSlotPatternResult:
 
 When the recent formal regime is project/scenario-based, older short-answer, take-home, or different-format papers may inform the concept pool only. They must not control current answer style, paragraph structure, or predicted project-question structure.
 
-For method-driven project/scenario papers structurally similar to the BIOL21111 benchmark, consequence for answer generation should normally be:
+For method-driven project/scenario papers, consequence for answer generation should normally be:
 
 ```text
 Generate a compact experimental argument: question goal -> lecture method principle -> scenario-specific application -> expected readout -> interpretation -> limitation/control.
@@ -262,7 +262,7 @@ Do not write separate lecturer blocks unless the question itself asks for that s
 ```yaml
 QuestionArchetype:
   archetype_id:
-  unit_key:
+  target_group_key:
   exam_regime:
   question_family: mcq | short_answer | essay | case_study | data_problem | long_answer_project
   task_verbs: []
@@ -272,12 +272,12 @@ QuestionArchetype:
   mark_scheme_structure:
   compatible_kp_families: []
   slots: []
-  derived_from_unit_example:
+  derived_from_external_example:
   transferable_rule:
   non_transferable_content: []
   format_match_required:
   seen_in:
-    - unit:
+    - source_group:
       year:
       question_no:
   saturation: fresh | partially_tested | saturated | unknown

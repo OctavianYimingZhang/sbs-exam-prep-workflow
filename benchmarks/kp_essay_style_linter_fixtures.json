@@ -3,10 +3,10 @@
   "purpose": "Validate that default workbook KP explanations are concept-first essay-style synthesis rather than page/slide narration or writing instructions.",
   "cases": [
     {
-      "id": "plant_style_page_trace_bad",
+      "id": "energy_storage_page_trace_bad",
       "column": "explanation",
       "expected": "fail",
-      "text": "Pages 8-9 should be read as one connected exam paragraph. Page 8 first establishes the crop-production problem. Page 9 then develops the environmental pressure and Page 10 then closes with a food-security implication."
+      "text": "Pages 8-9 should be read as one connected exam paragraph. Page 8 first establishes the operating problem. Page 9 then develops the degradation pressure and Page 10 then closes with a performance implication."
     },
     {
       "id": "metabolism_style_meta_bad",
@@ -21,10 +21,10 @@
       "text": "Glycolysis should be understood as a connected metabolic process rather than a list of isolated reactions. This knowledge block is mainly an argument about metabolic control and is best written as a pathway summary."
     },
     {
-      "id": "immunology_style_slide_sequence_bad",
+      "id": "measurement_style_slide_sequence_bad",
       "column": "explanation",
       "expected": "fail",
-      "text": "KP01 covers pages 15-24. The slide sequence should be read as a connected overview of innate recognition, with the remaining linked pages providing examples of inflammatory mediators and cell recruitment."
+      "text": "KP01 covers pages 15-24. The slide sequence should be read as a connected overview of measurement reliability, with the remaining linked pages providing examples of calibration, bias and repeated observations."
     },
     {
       "id": "prep_column_turn_pages_bad",
@@ -33,16 +33,16 @@
       "text": "Turn pages 15-24 into one paragraph."
     },
     {
-      "id": "plant_concept_first_good",
+      "id": "energy_storage_concept_first_good",
       "column": "explanation",
       "expected": "pass",
-      "text": "Sustainable intensification frames crop improvement as a trade-off between yield, land use and environmental cost. Rising CO2 and climate instability increase the pressure to produce more food without simply expanding agricultural land, so plant science has to connect physiological traits, genetic variation and breeding tools to resource-efficient production. This matters because future crop improvement must raise productivity while limiting greenhouse-gas emissions and preserving ecological capacity."
+      "text": "Battery degradation is best framed as an interaction between electrode chemistry, ion transport and operating conditions rather than as a single failure mode. High current, repeated cycling and temperature stress can accelerate side reactions or structural change, reducing the active material available for reversible charge storage. This matters because performance loss is mechanistic: operating choices alter microscopic processes, and those processes accumulate into measurable capacity fade."
     },
     {
-      "id": "immunology_concept_first_good",
+      "id": "measurement_concept_first_good",
       "column": "explanation",
       "expected": "pass",
-      "text": "Innate immunity begins with pattern recognition rather than antigen-specific memory. Phagocytes and other innate cells use receptors such as PRRs to detect microbial PAMPs or damage-associated DAMPs, allowing a rapid response to infection or tissue injury. This broad recognition triggers cytokine production, phagocytosis and inflammatory recruitment before adaptive immunity is fully established. The concept is important because PRR signalling explains how host defence can be fast and general while still linking to later immune specificity and inflammatory pathology."
+      "text": "Measurement reliability depends on separating systematic bias from random error. Bias shifts observations in a consistent direction, while random error widens the spread of repeated measurements, so calibration and replication solve different problems. The distinction matters because a precise instrument can still be wrong if it is miscalibrated, whereas an unbiased but noisy instrument may require more repeated observations before the underlying signal is clear."
     },
     {
       "id": "metabolism_concept_first_good",

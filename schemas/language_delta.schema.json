@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/language_delta.schema.json",
+  "title": "LanguageDelta",
+  "type": "object",
+  "required": ["delta_id", "bad_pattern", "improved_pattern", "reasoning", "applies_to", "linter_signal", "severity"],
+  "properties": {
+    "delta_id": { "type": "string" },
+    "bad_pattern": { "type": "string" },
+    "improved_pattern": { "type": "string" },
+    "reasoning": { "type": "string" },
+    "applies_to": { "type": "array", "items": { "type": "string" } },
+    "linter_signal": { "type": "string" },
+    "severity": { "enum": ["high", "medium", "low"] }
+  },
+  "additionalProperties": false
+}

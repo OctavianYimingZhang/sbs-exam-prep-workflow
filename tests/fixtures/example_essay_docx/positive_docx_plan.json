@@ -5,7 +5,7 @@
       "question": "Explain how a lecture-defined signal controls a physiological response.",
       "title": "Signal Control of Physiological Response",
       "subtitle": "Example fixture for DOCX formatting and source mapping",
-      "unit_key": "fixture_unit",
+      "target_group_key": "fixture_target_group",
       "lecture_anchors": [
         {
           "file": "fixture_lecture_slides.pdf",
@@ -142,7 +142,7 @@
               "citation_original_read": true
             },
             {
-              "text": "The consequence is that the physiological response can be explained as regulated conversion of signal information into a coordinated output, rather than as an isolated endpoint. This keeps the essay close to the lecture sequence: the biological problem is introduced first, the mechanism is then developed, and the final paragraph links that mechanism to functional interpretation.",
+              "text": "The consequence is that the physiological response can be explained as regulated conversion of signal information into a coordinated output, rather than as an isolated endpoint. The answer therefore stays focused on the causal chain from signal detection to pathway selection and functional interpretation, including the threshold logic that makes weak and strong stimulation produce different outcomes.",
               "source_type": "lecture_slide_core",
               "source_anchor": "fixture_lecture_slides.pdf slide 14",
               "highlight": "none",

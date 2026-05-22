@@ -53,8 +53,6 @@ def paragraph_kind(paragraph: dict[str, Any]) -> str:
 
 def normalize_paragraph(paragraph, kind: str) -> None:
     pf = paragraph.paragraph_format
-    pf.space_before = Pt(0)
-    pf.space_after = Pt(0)
     pf.line_spacing = 1.5
     if kind == "title":
         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -68,15 +66,12 @@ def normalize_paragraph(paragraph, kind: str) -> None:
 
 def normalize_run(run) -> None:
     run.font.name = "Arial"
-    run.font.size = Pt(10)
     if run._element.rPr is not None:
         run._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial")
 
 
 def set_document_defaults(doc: Document) -> None:
     section = doc.sections[0]
-    section.page_width = Cm(21.0)
-    section.page_height = Cm(29.7)
     section.top_margin = Cm(2.5)
     section.bottom_margin = Cm(2.5)
     section.left_margin = Cm(2.5)
@@ -85,9 +80,6 @@ def set_document_defaults(doc: Document) -> None:
     styles = doc.styles
     normal = styles["Normal"]
     normal.font.name = "Arial"
-    normal.font.size = Pt(10)
-    normal.paragraph_format.space_before = Pt(0)
-    normal.paragraph_format.space_after = Pt(0)
     normal.paragraph_format.line_spacing = 1.5
 
     for style_name in ["EssayTitle", "EssaySubtitle", "EssayHeading", "EssayBody"]:
@@ -95,9 +87,6 @@ def set_document_defaults(doc: Document) -> None:
             styles.add_style(style_name, 1)
         style = styles[style_name]
         style.font.name = "Arial"
-        style.font.size = Pt(10)
-        style.paragraph_format.space_before = Pt(0)
-        style.paragraph_format.space_after = Pt(0)
         style.paragraph_format.line_spacing = 1.5
 
 
@@ -161,7 +150,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, index: int) -> dict[str, A
         "essay_id": essay_id,
         "question": essay.get("question"),
         "docx_filename": filename,
-        "unit_key": essay.get("unit_key"),
+        "target_group_key": essay.get("target_group_key"),
         "lecture_anchors": essay.get("lecture_anchors", []),
         "extra_reading_status": essay.get("extra_reading_status", "not_supplied"),
         "paragraphs": [],
@@ -265,6 +254,7 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--zip", action="store_true", dest="make_zip")
     parser.add_argument("--clean", action="store_true")
+    parser.add_argument("--strict", action="store_true", help="Fail if any generated essay records validation QA flags")
     args = parser.parse_args()
 
     if args.clean and args.output_dir.exists():
@@ -308,8 +298,25 @@ def main() -> int:
         manifest["zip"] = str(zip_path)
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-    print(json.dumps({"status": "ok", "manifest": str(manifest_path), "audit": str(audit_path), "documents": manifest["documents"]}, indent=2))
-    return 0
+    strict_failures = [
+        {"essay_id": doc["essay_id"], "qa_flags": doc["qa_flags"]}
+        for doc in manifest["documents"]
+        if doc.get("qa_flags")
+    ]
+    status = "fail" if args.strict and strict_failures else "ok"
+    print(
+        json.dumps(
+            {
+                "status": status,
+                "manifest": str(manifest_path),
+                "audit": str(audit_path),
+                "documents": manifest["documents"],
+                "strict_failures": strict_failures,
+            },
+            indent=2,
+        )
+    )
+    return 1 if status == "fail" else 0
 
 
 if __name__ == "__main__":

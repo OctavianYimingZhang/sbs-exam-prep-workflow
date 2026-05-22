@@ -5,7 +5,7 @@
       "question": "Negative source-control fixture.",
       "title": "Negative Source Control",
       "subtitle": "Expected DOCX linter failure",
-      "unit_key": "fixture_unit",
+      "target_group_key": "fixture_target_group",
       "lecture_anchors": [
         {
           "file": "fixture_lecture_slides.pdf",

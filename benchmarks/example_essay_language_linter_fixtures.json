@@ -1,0 +1,36 @@
+{
+  "suite_name": "example_essay_language_linter_fixtures",
+  "purpose": "Validate complete Example Essay language quality against the shared language contract.",
+  "cases": [
+    {
+      "id": "metacommentary_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "This essay will discuss how measurement reliability works. It will first explain bias and then explain random error before considering examples."
+    },
+    {
+      "id": "source_trace_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Slides 4-6 should be read as the main paragraph. Slide 4 first establishes the reliability problem, then Slide 5 develops calibration and Slide 6 closes with replication."
+    },
+    {
+      "id": "citation_stack_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Reliability is important because repeated observations can vary across instruments (Smith, 2020) (Jones, 2021) (Patel, 2022). The paragraph lists authority but does not explain which source proves which mechanism."
+    },
+    {
+      "id": "claim_mechanism_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "Measurement reliability depends on separating systematic bias from random error. Bias shifts observations in a consistent direction, whereas random error widens the spread of repeated measurements, so calibration and replication solve different problems. This distinction matters because a precise instrument can still be wrong if it is miscalibrated, while an unbiased but noisy instrument may require repeated observations before the underlying signal is clear."
+    },
+    {
+      "id": "comparison_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "The two models answer different parts of the same control problem. A feedback model explains how output is corrected after sensory evidence shows a mismatch, whereas a feedforward model explains how an expected demand can be prepared before error occurs. The contrast is therefore not whether one model replaces the other, but which timing assumption best explains the behaviour being tested."
+    }
+  ]
+}

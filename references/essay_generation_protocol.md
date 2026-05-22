@@ -1,93 +1,37 @@
 # Essay Generation Protocol
 
-Example Essay generation is a first-class branch of the workflow. It is used only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents. Requests for workbook KP explanations or single essay-style paragraphs do not by themselves trigger DOCX-first Example Essay Mode.
+Example Essay generation is a DOCX-first branch used only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents. Workbook KP explanations and single essay-style paragraphs do not trigger this branch unless the user asks for full Example Essays.
 
-Default Excel-first behaviour is unchanged for prediction workbooks. Predicted practice questions and essay-style KP explanations appear by default; full Example Essays are generated only on request.
+The protocol applies across biological and non-biological science-style essays. The factual source base changes by subject; the writing discipline does not.
 
-When Example Essay Mode is explicitly requested, the final output is DOCX-first: one standalone Word document per complete essay. Use `example_essay_docx_output_protocol.md`.
+Use `language_quality_contract.md` as the source of truth for prose quality. This file defines Example Essay orchestration, source grounding, and planning.
 
-## Default KP Workbook Synthesis
+## Core Principle
 
-Default KP workbook explanations are not full Example Essays, but they must obey the same low-level writing discipline:
-
-```text
-claim -> mechanism -> evidence/example -> consequence
-```
-
-For each visible workbook explanation cell:
-
-- write the paragraph itself, not instructions about how to write it;
-- start with the concept, biological problem, or argument;
-- explain the causal mechanism or comparison axis;
-- include only the most useful named lecture examples or evidence;
-- end with a consequence, interpretation, or exam-relevant link-back;
-- do not summarise slides or pages;
-- do not use isolated fact lists;
-- do not use generic textbook introductions;
-- do not use instructions masquerading as explanation, such as `In an essay answer...` or `use these pages`;
-- do not preserve coverage by narrating page order.
-
-Use `kp_essay_synthesis_protocol.md` as the operative protocol for default workbook KP explanations. This default pass does not trigger full Example Essay Mode.
-
-## Unit Examples As Essay-Writing Contribution Sources
-
-Unit examples used in this protocol are contribution and regression sources, not content templates for future units. They teach essay-writing operations such as paragraph planning, causal explanation, comparison-axis design, evidence placement, exemplar handling, and extra-reading discipline.
-
-Do not transfer biological content, named molecules, named organisms, lecturer recurrence, or topic recurrence from one unit example into another target unit unless the target unit's own supplied sources contain that content.
-
-Mechanism-heavy essay benchmark principle:
+An Example Essay is not a longer summary of lecture slides. It is a controlled answer to a question:
 
 ```text
-When target lecture and paper evidence require causal biological explanation plus experimental support, each essay KP should combine:
-mechanism -> evidence/experiment -> biological consequence.
+question demand -> relevant source scope -> lecture/source logic -> paragraph function -> concise evidence-backed argument
 ```
 
-Comparison essay benchmark principle:
+Every paragraph must earn its place by advancing the answer. Do not pad to reach a word count.
 
-```text
-When a question asks compare or contrast, paragraph structure should use shared comparison axes. Each body paragraph compares both sides on one axis. Do not write disconnected topic blocks.
-```
+## Required Internal Pipeline
 
-Exemplar style principle:
-
-```text
-Exemplars teach opening strategy, paragraph density, causal phrasing, comparison strategy, and link-back sentences. They do not supply factual content unless independently verified from target-unit lecture material or reliable academic sources.
-```
-
-## A. Read Sources First
-
-Before planning or drafting, read the supplied lecture slides, relevant lecture notes, official guidance, formal past-paper stems, marking criteria, and exemplar pages/images.
-
-Hard rule:
-
-```text
-No Example Essay may be written from predicted questions alone. The relevant lecture slides must be read first. If relevant lecture slides cannot be identified or read, do not generate a polished essay; emit a QA flag and ask for the required lecture slides.
-```
-
-For image-based exemplars:
-
-- use them only for answer structure, paragraph logic, density, comparison strategy, and academic style;
-- do not treat biological claims inside handwritten exemplars as factual authority unless verified from slides or reliable academic sources;
-- ignore student Chinese annotations unless the user explicitly asks to use them;
-- record `visual_inspection_required` if OCR was not performed or handwriting is ambiguous.
-
-## B. Example Essay Mode Pipeline
-
-Run this sequence before producing any essay:
+Run this sequence before drafting:
 
 ```yaml
 ExampleEssayMode:
   question_analysis:
-  lecture_slide_scope_detection:
-  lecture_slide_reading:
-  lecture_logic_reconstruction:
-  citation_detection_from_relevant_lecture_slides:
+  source_scope_detection:
+  lecture_or_material_reading:
+  source_logic_reconstruction:
+  citation_detection:
   citation_original_source_resolution_and_reading:
-  extra_reading_book_chapter_matching:
-  extra_reading_chapter_reading:
-  lecturer_intent_analysis:
+  extra_reading_book_or_academic_search:
   knowledge_inventory:
   paragraph_plan:
+  language_compression_plan:
   highlight_plan:
   source_to_run_mapping:
   high_score_example_essay:
@@ -98,160 +42,53 @@ ExampleEssayMode:
   examiner_fit_checklist:
 ```
 
-The final answer may expose only the parts the user requested, but the essay must visibly follow the internal plan.
+The final user-facing answer may expose only requested artefacts, but the essay must visibly follow the internal plan.
 
 Do not:
 
 - write from memory;
-- write from a past-paper question without reading slides;
-- use citations copied from slides without reading the original cited source;
-- add Extra Reading material without finding the relevant uploaded book chapter or section;
+- write from predicted questions alone;
+- write from a past-paper stem without reading the relevant lecture/source material;
+- copy citations printed in slides without resolving and reading the original source when source-derived content is used;
+- add extra reading without locating the relevant chapter, section, paper, DOI, PubMed record, publisher page, or textbook source;
 - hide all source logic in diagnostics while outputting an ungrounded essay;
-- create one Excel sheet containing all essays as the primary deliverable;
-- produce multiple complete essays in one Word document.
+- produce several complete essays in one Word document;
+- use benchmark/example content as factual content for a new source set.
 
-## C. Extract Lecture Logic
+## Source Grounding
 
-For every lecture/module relevant to the question, extract:
+Before planning or drafting, read the supplied lecture slides, official lecture notes, formal questions, practical materials, marking criteria, exemplars, extra reading recommendations, and recommended books relevant to the question.
 
-- lecture title;
-- lecturer name;
-- learning objectives;
-- module order;
-- slide sequence;
-- repeated mechanisms;
-- summary or take-home messages;
-- worked examples;
-- recommended reading;
-- comparison axes;
-- named proteins, pathways, genes, molecules, experiments, or model organisms.
+Source priority:
 
-Do not merely extract facts. Infer the teaching sequence:
+1. Relevant lecture slides and official notes.
+2. Formal question wording and official exam guidance.
+3. Practical materials, mocks, answer keys, and exemplars for format and answer-style support.
+4. Original sources cited by relevant lecture material, only after they are resolved and read.
+5. Uploaded extra-reading books, only matched chapters or sections.
+6. Other peer-reviewed papers, textbooks, DOI/PubMed/publisher pages, or Google Scholar results when no official reading is supplied or citation resolution requires it.
 
-```text
-biological problem -> molecular architecture or constraint -> mechanism -> named example -> consequence -> comparison or synthesis
-```
+If relevant lecture/source material cannot be identified or read, do not generate a polished essay. Emit a QA flag and ask for the missing material.
 
-Slide order informs the lecture storyline, but paragraph order is determined by the question command word and examiner expectation.
+## Example And Exemplar Use
 
-## D. Lecture Knowledge Compiler
+Examples from other essays, images, courses, or benchmark runs teach structure only:
 
-For every lecture/module, compile a knowledge inventory before writing:
+- paragraph function;
+- density;
+- opening strategy;
+- comparison strategy;
+- citation placement;
+- compression method;
+- sector/system-level abstraction;
+- answer organisation;
+- DOCX layout.
 
-```yaml
-LectureKnowledgeInventory:
-  lecture_number:
-  lecture_title:
-  lecturer:
-  module_block:
-  central_question:
-  slide_order_logic:
-  must_write_knowledge:
-    - mechanism:
-      molecules_or_genes:
-      biological_stage_or_context:
-      organism_or_model:
-      experimental_evidence:
-      phenotype_or_consequence:
-      why_exam_relevant:
-  conditional_knowledge:
-    - use_when:
-      knowledge:
-      reason:
-  optional_extra_reading_candidates:
-    - source:
-      author_year:
-      claim_or_extension:
-      where_it_could_fit:
-      verification_status:
-  excluded_or_low_value_content:
-    - content:
-      why_excluded:
-  essay_transition_phrases:
-    - from_previous_topic:
-      to_next_topic:
-      logical_bridge:
-```
+They do not supply factual content, topic recurrence, citation authority, lecturer preference, or prediction evidence.
 
-The Developmental Biology benchmark demonstrates this transferable mechanism-heavy essay rule:
+## Question Analysis
 
-```text
-A useful essay knowledge point = one mechanism + one experimental/evidence basis + one developmental consequence.
-```
-
-The Genome Maintenance and Regulation benchmark demonstrates this transferable regulatory/comparison essay rule:
-
-```text
-A useful essay knowledge point = one regulatory or maintenance problem + one molecular constraint + one mechanism + one named lecture example + one biological consequence.
-```
-
-## E. Module Storyline Graph
-
-Build a storyline graph for every module. Use it to preserve the lecturer's logic, not as a rigid essay order.
-
-Genome benchmark contribution example (regression-only content):
-
-```text
-prokaryotic global regulation
--> sigma factors, CRP/catabolite repression, two-component systems, SOS
--> RNA-level prokaryotic control by termination, attenuation, riboswitches
--> eukaryotic transcription initiation by GTFs and specific TFs
--> chromatin/nucleosome constraints and histone modification
--> developmental gradients and transcription cascades where relevant
--> DNA replication in prokaryotes
--> DNA replication in eukaryotes and cell-cycle licensing
--> protein synthesis: prokaryotic initiation, eukaryotic initiation, global and specific translational control
--> RNA processing, alternative splicing, turnover, surveillance, RNAi
--> non-coding RNA, transposons, organellar gene expression
-```
-
-Use this Genome storyline only to learn module-boundary extraction and lecture-logic preservation. Do not transfer Genome molecular content into another target unit.
-
-Developmental Biology benchmark contribution example (regression-only content):
-
-```text
-cleavage and early cell-cycle control
--> fate maps, potency, commitment, determination
--> asymmetric determinants and induction
--> lateral inhibition
--> morphogens and serial signalling
--> Drosophila segmentation: maternal gradients -> gap genes -> pair-rule genes -> segment-polarity genes
--> segment identity: Hox genes, GOF/LOF evidence, posterior prevalence, chromatin maintenance
--> vertebrate segmentation: somite clock, wavefront, Notch/FGF/RA
--> axis formation and gastrulation
--> developmental principles in stem cells and disease
--> plant developmental parallels when relevant
-```
-
-Use this Developmental Biology storyline only to learn mechanism-heavy causal ordering and evidence placement. Do not transfer Developmental Biology content into another target unit.
-
-## F. Knowledge Inventory
-
-Before essay writing, classify content:
-
-```yaml
-EssayKnowledgeInventory:
-  must_use_lecture_content:
-    - content directly required by the question and central to slides/objectives
-  supportive_lecture_content:
-    - useful but not essential detail
-  cross_module_content:
-    - relevant content from another lecture/module in the same unit
-  extra_reading_candidates:
-    - source-backed material outside slides
-  excluded_content:
-    - facts omitted because irrelevant, too detailed, unsupported, or outside scope
-```
-
-Prioritise:
-
-```text
-learning objectives and summaries > repeated mechanisms > named lecture examples > background definitions > extra reading
-```
-
-## G. Question Analysis
-
-Classify the essay question before planning:
+Classify the question before planning:
 
 - describe;
 - explain;
@@ -260,83 +97,95 @@ Classify the essay question before planning:
 - mechanism;
 - experimental evidence;
 - scenario/application;
-- cross-module synthesis.
+- data/problem;
+- sector/system-level analysis;
+- cross-topic synthesis.
 
-Infer likely scope:
+Infer likely scope from the question and supplied evidence:
 
-- one detailed KP inside a lecture;
-- one lecture;
-- several lectures by one lecturer;
-- one module;
-- several modules;
-- whole-unit integration.
-
-Do not infer lecturer preference from one question alone unless labelled low confidence.
+- one detailed knowledge point;
+- one lecture or practical block;
+- several lectures inside one module;
+- a whole source set;
+- a cross-module synthesis.
 
 ```yaml
 EssayQuestionDeconstruction:
   question:
   command_verb:
   expected_scope:
-  included_lectures:
-  excluded_lectures:
-  likely_lecturer_or_module:
+  included_sources:
+  excluded_sources:
   question_archetype:
-  required_core_mechanisms:
-  required_experimental_evidence:
+  required_core_claims:
+  required_mechanisms_or_processes:
+  required_evidence_or_examples:
   useful_comparisons:
   optional_extra_reading:
-  paragraph_plan:
-    - paragraph_number:
-      paragraph_function:
-      core_claim:
-      lecture_knowledge_used:
-      evidence_used:
-      extra_reading_used:
-      why_this_paragraph_is_needed:
-      what_is_excluded:
+  expected_answer_shape:
 ```
 
-## H. Lecturer-Intent Analysis
+## Source Logic Reconstruction
 
-Use lecturer name, module title, repeated slide wording, learning objectives, formal past-paper patterns, and question wording to infer examiner expectation.
+Extract factual content and teaching/argument sequence separately.
 
-Test whether the lecturer tends to ask for:
+For lecture-heavy biological material, common logic patterns include:
 
-- one detailed mechanism;
-- compare/contrast between systems;
-- a lecture-specific example;
-- module-level synthesis;
-- experimental evidence;
-- disease/application;
-- regulatory principle across examples.
+```text
+biological problem -> molecular/cellular constraint -> mechanism -> evidence/example -> consequence
+```
 
-Do not assume one lecturer always sets one question.
+For method, practical, or project material:
+
+```text
+problem -> method principle -> experimental design -> readout -> interpretation -> control -> limitation
+```
+
+For non-biological science or sector-level essays:
+
+```text
+sector/system problem -> theoretical frame -> examples as evidence -> implementation mechanism -> wider implication
+```
+
+Slide/source order informs the storyline, but paragraph order is determined by question command word and examiner expectation.
+
+## Knowledge Inventory
+
+Before writing, classify material:
 
 ```yaml
-LecturerIntentModel:
-  likely_lecturer_or_module:
-  evidence:
-  contradicted_evidence:
-  question_style:
-  expected_answer_shape:
-  likely_required_experiments:
-  likely_required_named_examples:
-  likely_extra_reading_tolerance: low | medium | high
-  confidence:
+EssayKnowledgeInventory:
+  must_use:
+    - source-backed claims without which the answer is incomplete
+  should_use_if_space:
+    - useful mechanisms, examples, data points, comparisons, or caveats
+  optional_extra_reading:
+    - verified extensions that improve precision or sophistication
+  exclude:
+    - irrelevant details
+    - repeated low-value case facts
+    - unsupported claims
+    - excessive background
+    - content outside question scope
 ```
 
-## I. Paragraph Plan
+Prioritise:
 
-Every Example Essay must be planned paragraph-by-paragraph before drafting.
+```text
+question-relevant core claims > source objectives/summaries > repeated mechanisms > named evidence/examples > background definitions > extra reading
+```
+
+## Paragraph Plan
+
+Every complete Example Essay must be planned paragraph-by-paragraph.
 
 ```yaml
 EssayParagraphPlan:
   paragraph_number:
-  function: thesis | mechanism | comparison | example | evidence | extra_reading_insert | synthesis
+  function: thesis | mechanism | comparison | example | evidence | application | limitation | synthesis
   core_claim:
-  lecture_content_used:
-  cross_module_link:
+  source_content_used:
+  evidence_or_example_used:
   extra_reading_used:
   why_this_paragraph_is_needed:
   link_back_to_question:
@@ -345,264 +194,242 @@ EssayParagraphPlan:
 Each body paragraph must contain:
 
 - one clear claim;
-- one causal mechanism chain;
-- one or two named examples if relevant;
-- one sentence linking back to the question.
-
-Default causal writing pattern:
-
-```text
-condition / signal / cellular constraint
--> sensor / regulator / molecular feature
--> molecular action
--> output change in transcription / translation / replication / repair / expression
--> biological consequence
-```
+- one mechanism, process, comparison axis, evidence operation, or implementation logic;
+- one or two examples/evidence items where useful;
+- a link back to the question.
 
 Default paragraph logic:
 
 ```text
-Claim -> mechanism -> evidence/example -> consequence -> link back to question.
+Claim -> mechanism/process/evidence -> scope or limitation -> consequence -> link back.
 ```
 
-Avoid:
+## Language Compression Plan
 
-- slide-by-slide summaries;
-- isolated fact lists;
-- generic textbook introductions;
-- disconnected prokaryote/eukaryote blocks in comparison essays;
-- long historical background;
-- padding to reach a word count.
+Before drafting the final version, run a compression pass. Compression means removing repeated or low-value wording while preserving the academic mechanism.
 
-## J. Comparison Essay Structure
+Remove:
 
-For comparison essays, do not use this weak structure:
+- repeated definitions;
+- repeated claim restatements;
+- repeated case descriptions;
+- firm/example-level details that do not support the question;
+- vague metacommentary such as `this essay will explore`;
+- decorative transitions;
+- unnecessary historical background;
+- unsupported statistics;
+- overlong citation stacks;
+- examples that are not converted into a wider argument.
+
+Keep:
+
+- mechanisms;
+- causal links;
+- named evidence where it proves the point;
+- necessary definitions;
+- scope limitations;
+- examiner-relevant contrasts;
+- verified citations for non-obvious claims.
+
+Do not compress by simply shortening every sentence. Compress by deciding what function each sentence performs.
+
+## High-Quality Essay Language Rules
+
+Use the following style discipline for every Example Essay:
+
+1. Start with the answer. The first paragraph should define the problem or thesis, not announce that the essay will discuss a topic.
+2. If there is a debate or competing model, state the dispute first, then introduce each model in logical order.
+3. A paragraph should move from claim to evidence and then to implication. Do not list facts and leave the inference unstated.
+4. Use examples as proof of a broader mechanism or sector/system pattern. Do not let examples become disconnected mini-case studies.
+5. Make contrasts explicit. Avoid ambiguous `rather than` sentences unless both sides of the contrast are named precisely.
+6. Prefer precise upper-level terms when a list is only illustrative, but keep the list when the listed mechanisms are examiner-relevant.
+7. End paragraphs with a consequence, limitation, or direct answer to the question.
+8. End the essay with synthesis, not new evidence.
+
+Strong paragraph shape:
 
 ```text
-Paragraph 1: all prokaryote facts.
-Paragraph 2: all eukaryote facts.
-Paragraph 3: unrelated example.
+Rhythmic locomotion is centrally generated only in a restricted sense.
+The key issue is what initiates repeated flexor-extensor alternation.
+The reflex-chain model treats sensory reafference as the trigger for the next phase.
+The central-pattern-generator model makes the stronger claim that spinal circuits can generate the core rhythm internally, while sensory input regulates its expression.
+The evidence supports central timing but also limits the claim because balance, load regulation, and terrain adaptation still require feedback.
 ```
 
-Prefer:
+This pattern is transferable: define the claim, locate the alternative or limitation, use evidence, then state scope.
+
+## Essay-Level Structure
+
+Introduction:
+
+- state the question's core problem;
+- define only terms required for the answer;
+- state the thesis;
+- preview the organising logic, not a list of all facts.
+
+Body paragraphs:
+
+- each paragraph has one function;
+- examples support the function;
+- citations support non-obvious factual or theoretical claims;
+- paragraphs are sequenced by logic, not by slide/page order.
+
+Conclusion:
+
+- answer the question directly;
+- synthesise the main mechanisms or comparisons;
+- do not add new examples or unsupported claims.
+
+## Comparison Essays
+
+Do not write disconnected blocks:
 
 ```text
-Paragraph 1: shared biological problem and thesis.
-Paragraph 2: first comparison axis, comparing both systems directly.
-Paragraph 3: second comparison axis, with named examples.
-Paragraph 4: extra-reading or cross-module refinement only if useful.
+Paragraph 1: all facts about A.
+Paragraph 2: all facts about B.
+Paragraph 3: unrelated comment.
+```
+
+Prefer comparison axes:
+
+```text
+Paragraph 1: shared problem and thesis.
+Paragraph 2: axis 1, comparing both sides.
+Paragraph 3: axis 2, comparing both sides.
+Paragraph 4: evidence or limitation.
 Paragraph 5: synthesis.
 ```
 
-Comparison-axis categories demonstrated by the Genome benchmark; transfer an axis only when the target unit's own evidence supports it:
+Each axis must be supported by target-source evidence.
 
-- cellular compartmentalisation;
-- transcription-translation coupling versus separation;
-- genome architecture;
-- chromatin/nucleosome constraint;
-- origin selection;
-- regulatory speed;
-- energy cost;
-- cell-cycle control;
-- environmental responsiveness;
-- global versus specific regulation;
-- direct molecular sensing versus signalling cascades;
-- mRNA selection and translation-initiation control versus transcriptional control.
+## Sector/System-Level Essays
 
-## K. Exemplar-Derived Style Rules
+When a question asks for sector-level, system-level, or broader scientific significance:
 
-Handwritten/example essays teach style, not factual authority.
+- state the level of analysis explicitly;
+- demote firms/cases/examples to evidence;
+- replace excessive case detail with the shared mechanism;
+- conclude each section by explaining what the example proves about the wider system.
 
-Imitate these strong features:
+Strong abstraction pattern:
 
-- start with a broad biological problem, then narrow to the precise contrast;
-- state the biological context early;
-- use topic sentences that make an argument;
-- explain mechanisms as causal sequences;
-- compare systems using shared axes;
-- show why a difference exists, not just what differs;
-- use named molecular examples as evidence for a broader claim;
-- place experimental or mechanistic evidence immediately after the claim it supports;
-- convert phenotype or mechanism descriptions into inference: `This shows that...`;
-- end paragraphs by returning to the question;
-- conclude by synthesising the contrast rather than introducing new facts.
+```text
+example detail -> operational mechanism -> wider sector/system implication
+```
 
-Do not copy weak exemplar features:
+If the essay starts to read as separate case studies, rewrite the paragraph around the shared mechanism.
 
-- vague openings such as `this essay explores`;
-- repeated informal transitions such as `what's more`;
-- unsupported statistics;
-- unverified biological claims;
-- excessive background;
-- Chinese annotations unless explicitly requested.
+## Citation Discipline
 
-## L. Extra Reading Insert Plan
+Use citations minimally and sufficiently.
 
-Extra reading source priority:
+Cite:
 
-1. official recommended reading listed in lecture slides, Canvas reading list, course notes, or lecturer guidance;
-2. textbook or book chapter used by the unit if explicitly supplied;
-3. if no official book/reading is supplied, ask whether the unit has a recommended book or reading list;
-4. if unavailable, use peer-reviewed reviews, primary papers, textbooks, PubMed, Google Scholar, DOI pages, or publisher pages.
+- non-obvious factual claims;
+- theory/framework definitions;
+- mechanisms;
+- experimental evidence;
+- quantitative claims;
+- sector-level generalisations;
+- source-derived extra-reading additions.
 
-Verify author surname, year, source type, and the exact lecture claim being supported before use.
+Do not cite:
 
-Extra reading may be used only as:
+- obvious transitions;
+- the same claim repeatedly;
+- unsupported sources copied from another essay;
+- a slide citation unless the original source has been resolved and read when source-derived content is used.
 
-- one short enrichment paragraph;
-- one precise sentence inside a mechanism paragraph;
-- one comparison point that sharpens the lecture argument;
-- one evidence-based example that strengthens the lecture mechanism.
+Avoid citation stacking. If several sources support the same general claim, keep the most directly relevant source(s). If evidence is insufficient, omit the claim or mark it uncertain in QA.
+
+## Extra Reading
+
+Use extra reading only if it directly improves the answer to this exact question.
+
+Allowed use:
+
+- one mechanism deepener;
+- one experimental support point;
+- one comparison refinement;
+- one modern application or method if directly relevant;
+- one theoretical frame for a sector/system claim.
 
 Extra reading must not:
 
-- replace lecture content;
-- exceed roughly 10-15% of the essay;
-- introduce an unrelated mechanism;
-- create a new topic that cannot be explained within the word limit;
-- contradict slides without explaining the distinction;
-- appear without verified author surname and year.
+- replace lecture/source logic;
+- exceed roughly 10-15% of essay body words unless instructed;
+- introduce unrelated mechanisms;
+- contradict official sources without explaining the distinction;
+- appear without verified author/year/source details.
 
-Internal insertion test:
+If no supplied extra reading exists, perform targeted academic search only when it improves accuracy or citation quality. Prefer peer-reviewed papers, textbooks, DOI/PubMed/publisher pages, and official academic sources.
+
+## Highlight And Source Mapping
+
+For DOCX output:
+
+- ordinary lecture/source content is not highlighted;
+- uploaded extra-reading book content is yellow-highlighted;
+- read original sources cited by lecture material are green-highlighted and include author-year citations;
+- every highlighted run must map to a source anchor in the source map JSON.
+
+Do not highlight content whose source has not been verified.
+
+## Default KP Workbook Synthesis
+
+Workbook KP explanations are not complete Example Essays, but they must follow the same low-level prose rules:
 
 ```text
-Does this extra-reading point directly improve the answer to this exact essay question?
-Does it extend the lecture logic rather than distract from it?
-Can it be stated accurately in one or two sentences?
+claim -> mechanism/process/evidence -> consequence
 ```
 
-If any answer is no, omit it.
+Write the answer paragraph itself, not instructions about writing. Do not narrate slides or pages. Do not preserve coverage by page-by-page summary.
 
-Allowed use types:
+## QA Flags
 
-```yaml
-ExtraReadingUseType:
-  mechanism_deepener:
-    purpose: explains a lecture mechanism at slightly higher molecular resolution
-  experimental_support:
-    purpose: adds one strong experiment or assay supporting the lecture claim
-  conservation_or_comparison:
-    purpose: connects the lecture mechanism to another organism or context
-  modern_extension:
-    purpose: adds a recent method/application only if directly relevant
-```
+Add QA flags when needed:
 
-## M. Must Use / Can Use / Do Not Use
+- `essay_question_scope_uncertain`;
+- `source_scope_uncertain`;
+- `paragraph_plan_missing`;
+- `source_logic_not_preserved`;
+- `causal_chain_missing`;
+- `comparison_axis_missing`;
+- `sector_level_abstraction_missing`;
+- `essay_exceeds_word_limit`;
+- `example_used_as_fact`;
+- `citation_original_unreadable`;
+- `extra_reading_unverified`;
+- `extra_reading_not_question_relevant`;
+- `extra_reading_too_large`;
+- `extra_reading_replaces_core_sources`;
+- `recommended_reading_missing`;
+- `unsupported_claim`;
+- `citation_stack_or_overcitation`;
+- `case_detail_overload`;
+- `slide_or_page_narration_present`.
 
-For every essay question:
+Fail safe by omitting uncertain material rather than inventing mechanisms, citations, mark schemes, dates, names, statistics, or lecturer preferences.
 
-```yaml
-KnowledgeUseDecision:
-  must_use:
-    - lecture-core facts without which the answer is incomplete
-  should_use_if_space:
-    - useful experiments, examples, or contrasts
-  optional_extra_reading:
-    - one verified extension that improves sophistication
-  do_not_use:
-    - unrelated lecture material
-    - unsupported student notes
-    - excessive background
-    - unverified citations
-    - details outside the question scope
-```
+## Output Contract
 
-The aim is not to reach 1000 words. The aim is to answer efficiently with all relevant unit content.
-
-## N. Genome Essay-Quality Contribution Benchmark
-
-When the Genome benchmark fixture is supplied, the workflow must use it to validate generic Example Essay Mode behaviour:
-
-- extract BIOL21101 lecture/module structure from the deck title, unit code, slide titles, and learning objectives;
-- preserve first-to-last lecture order;
-- identify lecturer/module boundaries;
-- distinguish transcription regulation, chromatin regulation, replication, mutation/repair, protein synthesis, RNA processing/turnover/interference, non-coding RNA, transposons, and organellar gene expression;
-- produce essay-style knowledge paragraphs, not slide summaries;
-- use exemplar images only for style and paragraph logic;
-- ignore Chinese annotations in images;
-- use additional reading only when verified and directly useful.
-
-These questions and molecular details are regression assertions only. They must not become default content or prediction evidence for another unit.
-
-Benchmark questions:
-
-1. `Contrast prokaryotic and eukaryotic responses to environmental signals.`
-2. `Contrast DNA replication initiation between humans and E. coli.`
-3. `Explain how eukaryotic translation initiation is regulated.`
-4. `Explain how chromatin structure contributes to regulation of transcription.`
-
-Regression-only Genome logic checks:
-
-- Environmental-response comparison should compare direct prokaryotic transcriptional control and coupled transcription-translation with eukaryotic compartmentalisation, signalling cascades, mRNA selection, and translation-initiation control. Lecture examples may include CRP/catabolite repression, OmpC/OmpF/EnvZ/OmpR/micF, trp attenuation, mTOR/4E-BP/eIF4E, and AAP-mediated Arg-2 control if verified from slides.
-- Replication initiation comparison should compare E. coli OriC/Dam/SeqA/DnaA/DnaB/DnaG/DNA polymerase III logic with eukaryotic ORC/Cdc6/Cdt1/MCM licensing, CDK/DDK activation, chromatin-dependent origin selection, replication timing, and polymerase specialisation where slide-supported.
-- Translation initiation essays should distinguish scanning/AUG selection, eIF2 activity, eIF4E/4E-BP, mTOR signalling, uORFs, and mRNA-specific repression when relevant.
-- Chromatin transcription essays should explain nucleosome constraint, histone modification, chromatin remodelling, FACT, locus control regions, insulators/barriers, and transcription factories only when within question scope.
-
-## O. Developmental Biology Essay-Quality Contribution Benchmark
-
-When the Developmental Biology benchmark fixture is supplied, the workflow must use it to validate mechanism-evidence-consequence essay construction, experimental evidence placement, and Section A/B separation. The Drosophila, Hox, segmentation, and vertebrate examples below are non-transferable content outside this regression context.
-
-Test A: `Explain how Drosophila segmentation is established and refined during embryogenesis.`
-
-Expected order:
-
-1. segmentation as an early AP patterning problem;
-2. syncytial blastoderm context;
-3. maternal determinants, including Bicoid, Nanos, and Hunchback;
-4. Bicoid as maternal anterior morphogen with maternal-effect evidence;
-5. gap genes converting gradients into broad domains through activation/repression and cross-regulation;
-6. pair-rule genes converting broad domains into periodic parasegmental stripes, including stripe-specific enhancers such as even-skipped stripe 2 if appropriate;
-7. segment-polarity genes stabilising parasegment boundaries and anterior/posterior compartments;
-8. conclusion linking transient parasegments to later segmental patterning.
-
-Hard checks:
-
-- do not say segment-polarity genes directly convert parasegments into true segments;
-- do not say Hox genes create the segments;
-- do not omit experimental evidence;
-- do not treat Bicoid as the only AP determinant;
-- include Hunchback's maternal and zygotic sources when relevant;
-- include Nanos repression of maternal hunchback translation when relevant.
-
-Test B: `Discuss how Hox genes regulate segment identity, using GOF and LOF evidence.`
-
-Hard checks:
-
-- do not say Hox genes are segmentation genes;
-- do not imply all homeobox genes are Hox genes;
-- do not imply all homeotic genes are homeobox genes;
-- do not say Ubx merely cooperates with Antp in T3; Ubx rewrites/represses anterior Hox programmes and specifies T3/haltere identity;
-- if using `C1-C3`, call them cephalic/head segments;
-- explain posterior prevalence as posterior Hox dominance over anterior Hox function through repression/co-regulation of downstream targets.
-
-Test C: `Compare Drosophila and vertebrate segmentation.`
-
-Expected logic:
-
-- Drosophila: simultaneous subdivision of existing space; maternal gradients; gap/pair-rule/segment-polarity hierarchy.
-- Vertebrates: sequential somite budding; segmentation clock; Notch/Hairy oscillation; FGF8/RA wavefront; Eph/Ephrin and N-cadherin for physical boundary formation when slide-supported.
-- Similar gene families may appear in different mechanistic contexts.
-- Do not present vertebrate segmentation as a direct copy of Drosophila segmentation.
-
-## P. Output Contract For Example Essays
-
-When explicitly requested, output:
+When explicitly requested, generate:
 
 ```yaml
 ExampleEssayOutput:
-  predicted_or_requested_question:
+  requested_or_predicted_question:
   question_deconstruction:
-  lecturer_intent_analysis:
   knowledge_inventory:
   paragraph_plan:
+  language_compression_plan:
   extra_reading_insert:
   high_score_example_essay:
   paragraph_function_map:
-  lecture_knowledge_used:
+  source_content_used:
   excluded_content:
   examiner_fit_checklist:
-    - lecture_objectives_covered:
-    - named_examples_used:
+    - source_scope_covered:
+    - examples_used_as_evidence:
     - causal_logic_clear:
     - comparison_explicit:
     - evidence_use_controlled:
@@ -627,110 +454,18 @@ ExampleEssayDOCXOutput:
   optional_zip: Example_Essays_DOCX.zip
 ```
 
-Every DOCX must use A4, 2.5 cm margins on all sides, Arial 10 pt body, 1.5 line spacing, 0 pt paragraph spacing before/after, justified body text, centered title, and left-aligned subtitles/headings.
+For Excel, never place a complete essay into one cell. Excel paragraph-row output is an optional audit export only when explicitly requested.
 
-For Excel, never place the whole essay into one cell. Excel paragraph-row output is an optional audit export only when explicitly requested, not the primary Example Essay deliverable.
+## Success Condition
 
-## P2. DOCX-First Example Essay Mode
+The workflow passes if every Example Essay:
 
-When Example Essay Mode is explicitly requested, the final output must be standalone Word documents, not Excel essay rows.
+- answers the exact question;
+- is traceable to read source material;
+- compresses low-value repetition without losing required academic detail;
+- uses examples as evidence for a broader claim;
+- handles citations conservatively;
+- separates source-grounded content from extra-reading enrichment;
+- follows the required DOCX output contract.
 
-For each essay, run this internal sequence:
-
-1. Question Analysis.
-2. Lecture Slide Scope Detection.
-3. Lecture Slide Reading.
-4. Lecture Logic Reconstruction.
-5. Citation Detection from relevant lecture slides.
-6. Citation Original Source Resolution and Reading.
-7. Extra Reading Book Chapter Matching.
-8. Extra Reading Chapter Reading.
-9. Paragraph Plan.
-10. Highlight Plan.
-11. Draft Essay.
-12. Source-to-run Mapping.
-13. DOCX Generation.
-14. DOCX Format Linting.
-15. Render / visual QA.
-16. Source Audit JSON.
-
-The final essay must visibly follow the lecture's biological logic.
-
-Lecture logic means:
-
-- the essay begins from the biological problem or principle established by the lecture;
-- body paragraphs follow the mechanism / evidence / consequence sequence taught by the lecture;
-- named examples are those emphasised in the lecture;
-- experimental evidence is placed where the lecture uses it to support a claim;
-- conclusions synthesise the lecture argument rather than adding unrelated external material.
-
-Do not write a generic essay from general knowledge.
-
-Every body paragraph must have:
-
-- at least one lecture-slide anchor;
-- one clear claim;
-- mechanism or evidence development;
-- a link back to the essay question.
-
-Extra Reading may contribute only 10-15% of total essay words and must be highlighted yellow.
-
-Citation-original-source material must include an in-text citation and be highlighted green.
-
-Before generating a Word document, the essay text must pass content checks:
-
-1. Lecture-source check: every main claim is traceable to lecture slides or official course material, and every paragraph has lecture anchors.
-2. Lecture-logic check: essay order reflects lecture logic unless the question requires comparison/evaluation reordering; if reordered, the source audit records why.
-3. Citation check: all green source claims are based on read citation originals and contain in-text citation.
-4. Extra Reading check: relevant chapter found, 10-15% yellow-highlighted content, no unrelated external content.
-5. Essay style check: no slide-by-slide narration, no bullet list as essay body, no generic textbook introduction, no unsupported claims, no overuse of external reading.
-
-Default direct-chat summary after DOCX generation:
-
-```text
-Generated:
-- Example_Essays_DOCX/EE01_<title>.docx
-- Example_Essays_DOCX/example_essay_manifest.json
-- Example_Essays_DOCX/example_essay_source_audit.json
-
-QA:
-- DOCX format lint: pass/fail
-- lecture grounding: pass/fail
-- citation-source status: resolved/unresolved/not supplied
-- extra-reading status: used/not supplied/chapter not found
-```
-
-## Q. QA Flags
-
-Add QA flags when needed:
-
-- `essay_question_scope_uncertain`;
-- `lecturer_intent_low_confidence`;
-- `paragraph_plan_missing`;
-- `lecture_logic_not_preserved`;
-- `causal_chain_missing`;
-- `comparison_axis_missing`;
-- `essay_exceeds_word_limit`;
-- `example_used_as_fact`;
-- `extra_reading_unverified`;
-- `extra_reading_not_question_relevant`;
-- `extra_reading_too_large`;
-- `extra_reading_replaces_lecture_content`;
-- `extra_reading_not_integrated`;
-- `extra_reading_overused`;
-- `recommended_reading_missing`;
-- `unsupported_mechanism_claim`.
-
-Fail safe by omitting uncertain material rather than inventing mechanisms, citations, mark schemes, or lecturer preferences.
-
-## R. Success Condition
-
-The workflow passes if Example Essays can explain:
-
-- what the shared biological problem is;
-- why different systems solve it differently;
-- which molecular mechanisms prove the point;
-- how each paragraph advances the question;
-- why any extra-reading point was included.
-
-It fails if it lists lecture facts without reconstructing the lecture's biological logic.
+It fails if it lists facts without reconstructing the argument, uses benchmark/example content as fact, or writes a generic essay from general knowledge.

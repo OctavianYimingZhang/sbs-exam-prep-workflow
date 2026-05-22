@@ -17,8 +17,9 @@ Predictions must be labelled as predicted practice questions, never official exa
 ## Repository Contents
 
 - `SKILL.md`: top-level Skill instructions and output contract.
-- `references/`: protocol documents for input processing, question-type routing, scoring, essay synthesis, Excel output, evidence policy, and regression checks.
-- `scripts/`: helper CLIs for source extraction, unit grouping, archetype models, workbook language linting, example-essay DOCX generation, DOCX linting, citation resolution, extra-reading matching, and regression checks.
+- `references/`: protocol documents for input processing, question-type routing, scoring, shared language quality, example analysis, gap closure, Excel/DOCX output, evidence policy, and regression checks.
+- `scripts/`: helper CLIs for source extraction, target grouping, archetype models, example-corpus analysis, workbook and Example Essay language linting, DOCX generation/linting, citation resolution, extra-reading matching, gap reporting, identity scanning, GitHub-ready QA, and regression checks.
+- `schemas/`: JSON schemas for language deltas, example contributions, Example Essay plans, and gap reports.
 - `benchmarks/`: sanitized benchmark metadata and lint fixtures. These files preserve transferable regression rules only; they do not contain private source files.
 - `agents/`: optional Skill interface metadata.
 
@@ -37,13 +38,13 @@ The scripts are plain Python files. Optional document extraction quality depends
 Inventory sources:
 
 ```bash
-python scripts/extract_sources.py /path/to/input_dir --output /path/to/output_dir --target-unit "Target Unit"
+python scripts/extract_sources.py /path/to/input_dir --output /path/to/output_dir --target "Target Course"
 ```
 
-Group sources by unit/regime after inventory:
+Group sources by target/regime after inventory:
 
 ```bash
-python scripts/unit_grouper.py /path/to/output_dir/source_manifest.json --output /path/to/output_dir/unit_groups.json
+python scripts/target_grouper.py /path/to/output_dir/source_scan.json --output /path/to/output_dir/target_groups.json
 ```
 
 Lint generated workbook prose:
@@ -52,11 +53,23 @@ Lint generated workbook prose:
 python scripts/essay_style_linter.py --workbook /path/to/workbook.xlsx
 ```
 
+Lint complete Example Essay language:
+
+```bash
+python scripts/example_essay_language_linter.py --plan /path/to/example_essay_plan.json
+```
+
+Analyse external examples into transferable deltas:
+
+```bash
+python scripts/analyze_example_corpus.py /path/to/examples --output /path/to/example_analysis.json
+```
+
 Run public metadata-only regression checks:
 
 ```bash
 python scripts/cross_subject_regression_check.py --metadata-only --suite benchmarks/cross_subject_regression_suite.json
-python scripts/cross_subject_regression_check.py --metadata-only --suite benchmarks/biol21111_long_answer_suite.json
+python scripts/cross_subject_regression_check.py --metadata-only --suite benchmarks/method_long_answer_suite.json
 ```
 
 Run full regression checks against private local materials:
@@ -67,9 +80,15 @@ python scripts/cross_subject_regression_check.py \
   --past-papers /path/to/private/past_papers
 ```
 
+Run the full GitHub-ready local gate:
+
+```bash
+python scripts/github_ready_check.py
+```
+
 ## Benchmark Sanitization
 
-The benchmark files are contribution and regression fixtures. They preserve generic workflow lessons such as regime splitting, question-type routing, workbook layout adaptation, and cross-unit leakage prevention.
+The benchmark files are contribution and regression fixtures. They preserve generic workflow lessons such as regime splitting, question-type routing, workbook layout adaptation, and cross-target leakage prevention.
 
 They intentionally exclude real lecture slides, past papers, notes, mocks, student files, generated workbooks, local absolute paths, and cached run outputs.
 

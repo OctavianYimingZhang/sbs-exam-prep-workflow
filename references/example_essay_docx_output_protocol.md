@@ -30,11 +30,10 @@ Do not place a complete essay into one Excel cell. Do not merge multiple complet
 
 ## Word Document Formatting
 
-Apply these settings to every generated DOCX.
+Apply these settings to every generated DOCX. Leave all other Word settings at their defaults unless the user specifies otherwise.
 
 Page:
 
-- A4.
 - Top margin: 2.5 cm.
 - Bottom margin: 2.5 cm.
 - Left margin: 2.5 cm.
@@ -43,21 +42,18 @@ Page:
 Font:
 
 - Arial.
-- Body size: 10 pt.
-- Title: Arial 10 pt, bold allowed, centered.
-- Subtitle / section heading: Arial 10 pt, bold allowed, left aligned.
-- Body: Arial 10 pt.
+- Font size: Word default unless the user specifies a size.
+- Title: Arial, bold allowed, centered.
+- Subtitle / section heading: Arial, bold allowed, left aligned.
+- Body: Arial.
 
 Paragraph:
 
 - Line spacing: 1.5.
-- Space before: 0 pt.
-- Space after: 0 pt.
 - Body alignment: justified.
 - Title alignment: centered.
 - Subtitle / section heading alignment: left.
 - No empty spacer paragraphs.
-- No automatic paragraph spacing from Word default styles.
 
 Structure:
 
@@ -71,6 +67,27 @@ Structure:
   - `4 Conclusion`
 - Body paragraphs written as continuous essay prose.
 - Figure captions only if figures are explicitly included or requested.
+
+## Essay Language Contract
+
+Every generated essay must pass the shared prose-quality rules in `language_quality_contract.md` and the orchestration checks in `essay_generation_protocol.md`.
+
+Required paragraph logic:
+
+```text
+claim -> mechanism/process/evidence -> scope or limitation -> consequence -> link back
+```
+
+Language rules:
+
+- Start with the answer, not with generic metacommentary.
+- Compress repeated or low-value detail without deleting required academic mechanisms.
+- Use examples as evidence for a broader claim, not as disconnected case descriptions.
+- Make contrasts explicit and non-ambiguous.
+- Keep citations minimal and sufficient; support theory, mechanisms, data, experiments, or non-obvious generalisations.
+- Do not cite-stack.
+- Omit unsupported claims rather than inventing citations.
+- Conclude by synthesis, not by adding new content.
 
 ## Highlighting Rules
 
@@ -176,8 +193,9 @@ Fail DOCX generation or mark the essay as non-compliant if:
 - yellow-highlighted content lacks an Extra Reading source anchor;
 - green-highlighted content lacks an in-text citation;
 - green-highlighted content is not linked to a read original citation source;
-- margins, font, spacing, title alignment, subtitle alignment, or body justification fail the DOCX linter;
+- margins, font family, line spacing, title alignment, subtitle alignment, or body justification fail the DOCX linter;
 - the essay is generic and not traceable to lecture logic;
+- the essay contains slide/page narration, repeated filler, unsupported claims, citation stacking, or examples used as standalone case detail rather than evidence for the answer;
 - a citation printed on a slide is copied into the essay without resolving and reading the original source;
 - an uploaded formatting PDF or style exemplar is used as biological content.
 

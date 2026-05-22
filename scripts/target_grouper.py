@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Normalize unit keys and split papers into exam regimes.
+"""Normalize target group keys and split papers into exam regimes.
 
 This helper is intentionally conservative. It groups only by filename/course
 signals and emits review flags instead of forcing uncertain files into a
@@ -15,34 +15,65 @@ from pathlib import Path
 
 
 NOISE = re.compile(
-    r"\b(20\d{2}|19\d{2}|mock|practice|with answers?|answer key|may \d+|"
+    r"\b(20\d{2}|19\d{2}|mock|practice|with answers?|answers? only|"
+    r"answer key|guide answers?|solutions?|modified|syllabus|cadmus|pp[12]|"
+    r"essay|problem|case studies|case study|numerical assessment|may \d+|"
     r"combined|copy|final|canvas|blackboard|minus seats|seat|pre-seat|"
     r"paper|exam|questions?)\b",
     re.IGNORECASE,
 )
-
-# These aliases support regression examples and filename normalization only.
-# They must not limit the Skill to these Units or control question-type routing,
-# prediction, or output-mode decisions.
-UNIT_ALIASES = [
-    ("Motor Systems", ["biol21332", "biol22332", "motor system", "motor systems"]),
-    ("Genome Maintenance and Regulation", ["biol21101", "genome maintenance", "genome maintenance and regulation"]),
-    ("Proteins", ["biol21111", "proteins"]),
-    ("Principles of Developmental Biology", ["biol21172", "biol21172t", "principles of developmental biology"]),
-    ("Plants for the Future", ["biol21202", "biol21202t", "plants for the future"]),
-    ("Immunology", ["biol21242", "biol21242t", "immunology"]),
-]
+COURSE_CODE_RE = re.compile(r"\b([A-Z]{4}\d{5}[A-Z]?)\b", re.IGNORECASE)
+COURSE_CODE_FULL_RE = re.compile(r"[A-Z]{4}\d{5}[A-Z]?", re.IGNORECASE)
 
 
-def normalize_unit_key(name: str, text: str = "") -> str:
-    haystack = f"{name}\n{text[:5000]}".lower()
-    for canonical, aliases in UNIT_ALIASES:
-        if any(alias in haystack for alias in aliases):
-            return canonical
-    code_match = re.search(r"\b([A-Z]{4}\d{5}[A-Z]?)\b", f"{name}\n{text[:5000]}", flags=re.IGNORECASE)
-    if code_match:
-        return code_match.group(1).upper()
+def detect_course_code(*values: str | None) -> str | None:
+    for value in values:
+        if not value:
+            continue
+        match = COURSE_CODE_RE.search(value)
+        if match:
+            return match.group(1).upper()
+    return None
+
+
+def clean_target_label(value: str | None) -> str | None:
+    if not value:
+        return None
+    label = COURSE_CODE_RE.sub(" ", value)
+    label = label.replace("_", " ").replace("-", " ")
+    label = re.sub(r"\s+", " ", label).strip()
+    if not label or COURSE_CODE_FULL_RE.fullmatch(label):
+        return None
+    return label
+
+
+def normalize_target_group_key(
+    name: str,
+    text: str = "",
+    *,
+    target_code: str | None = None,
+    target_name: str | None = None,
+    target_hint: str | None = None,
+    target_label: str | None = None,
+    required_target_code: str | None = None,
+) -> str:
+    record_code = detect_course_code(target_code, target_name)
+    if record_code:
+        return record_code
+    record_name = clean_target_label(target_name)
+    if record_name:
+        return record_name
+    detected_code = detect_course_code(f"{name}\n{text[:5000]}")
+    if detected_code:
+        return detected_code
+    hint_code = detect_course_code(required_target_code, target_hint, target_label)
+    if hint_code:
+        return hint_code
+    hint_name = clean_target_label(target_label) or clean_target_label(target_hint)
+    if hint_name:
+        return hint_name
     stem = Path(name).stem
+    stem = stem.replace("&", " and ")
     stem = stem.replace("_", " ").replace("-", " ")
     stem = re.sub(r"\([^)]*\)", " ", stem)
     stem = NOISE.sub(" ", stem)
@@ -50,24 +81,30 @@ def normalize_unit_key(name: str, text: str = "") -> str:
     return stem or Path(name).stem
 
 
-def unit_metadata(unit_key: str) -> dict:
-    code_match = re.fullmatch(r"[A-Z]{4}\d{5}[A-Z]?", unit_key)
+def group_metadata(target_group_key: str) -> dict:
+    code_match = COURSE_CODE_FULL_RE.fullmatch(target_group_key)
     return {
-        "unit_code": unit_key if code_match else None,
-        "unit_name": None if code_match else unit_key,
-        "confidence": "medium" if unit_key else "low",
-        "grouping_evidence": ["unit code, known alias, title text, or filename normalization"],
+        "target_code": target_group_key if code_match else None,
+        "target_name": None if code_match else target_group_key,
+        "confidence": "medium" if target_group_key else "low",
+        "grouping_evidence": ["course code, user-provided hint, title text, or filename normalization"],
         "possible_conflicts": [],
     }
 
 
 def detect_year(name: str) -> int | None:
-    match = re.search(r"\b(20\d{2}|19\d{2})\b", name)
+    match = re.search(r"(?<!\d)(20\d{2}|19\d{2})(?!\d)", name)
     return int(match.group(1)) if match else None
 
 
-def infer_regime(text: str) -> str:
-    lower = text.lower()
+def infer_regime(text: str, name: str = "") -> str:
+    lower = f"{name}\n{text}".lower()
+    if "problem paper" in lower or "case stud" in lower or "numerical assessment" in lower:
+        return "problem_or_data"
+    if "essay paper" in lower:
+        return "essay"
+    if "example paper" in lower or "mock paper" in lower:
+        return "example_or_mock"
     if "section a" in lower and "section b" in lower:
         if "answer one" in lower and ("project" in lower or "scenario" in lower):
             return "section-a-plus-section-b mixed_project_or_long_answer"
@@ -107,9 +144,17 @@ def main() -> int:
         text_path = record.get("text_path")
         if text_path and Path(text_path).exists():
             text = Path(text_path).read_text(errors="ignore")[:20000]
-        unit_key = normalize_unit_key(record.get("name", ""), text)
+        target_group_key = normalize_target_group_key(
+            record.get("name", ""),
+            text,
+            target_code=record.get("target_code"),
+            target_name=record.get("target_name"),
+            target_hint=scan.get("target_hint"),
+            target_label=scan.get("target_label"),
+            required_target_code=scan.get("target_code"),
+        )
         year = record.get("year") or detect_year(record.get("name", ""))
-        regime = infer_regime(text)
+        regime = infer_regime(text, record.get("name", ""))
         item = {
             "file": record.get("path"),
             "name": record.get("name"),
@@ -118,10 +163,10 @@ def main() -> int:
             "exam_regime": regime,
         }
         group = groups.setdefault(
-            unit_key,
+            target_group_key,
             {
-                "unit_key": unit_key,
-                **unit_metadata(unit_key),
+                "target_group_key": target_group_key,
+                **group_metadata(target_group_key),
                 "files": [],
                 "regimes": {},
             },

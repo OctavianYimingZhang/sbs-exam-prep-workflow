@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/example_essay_plan.schema.json",
+  "title": "ExampleEssayPlan",
+  "type": "object",
+  "required": ["essays"],
+  "properties": {
+    "essays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["essay_id", "question", "title", "lecture_anchors", "paragraphs"],
+        "properties": {
+          "essay_id": { "type": "string" },
+          "question": { "type": "string" },
+          "title": { "type": "string" },
+          "subtitle": { "type": ["string", "null"] },
+          "target_group_key": { "type": ["string", "null"] },
+          "lecture_anchors": { "type": "array" },
+          "paragraphs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["paragraph_id", "function", "text_runs"],
+              "properties": {
+                "paragraph_id": { "type": "string" },
+                "function": { "type": "string" },
+                "is_title": { "type": "boolean" },
+                "is_subtitle": { "type": "boolean" },
+                "is_heading": { "type": "boolean" },
+                "lecture_anchors": { "type": "array" },
+                "text_runs": { "type": "array" }
+              },
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}
