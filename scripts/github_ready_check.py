@@ -91,12 +91,58 @@ def main() -> int:
         bad_public_dir = tmp_dir / "bad_public_output"
         citation_fallback_dir = tmp_dir / "citation_fallback"
         past_paper_extract_dir = tmp_dir / "past_paper_question_extract"
+        fragment_index_dir = tmp_dir / "fragment_index"
         bad_public_dir.mkdir(parents=True, exist_ok=True)
         (bad_public_dir / "example_essay_manifest.json").write_text("{}", encoding="utf-8")
         checks.extend(
             [
                 run_command("compile_scripts", [py, "-m", "compileall", "-q", "scripts"]),
                 run_command("ontology_contract", [py, "scripts/ontology_linter.py"]),
+                run_command(
+                    "fragment_index_fixture",
+                    [
+                        py,
+                        "scripts/build_fragment_index.py",
+                        "--source-scan",
+                        "tests/fixtures/control_plane/source_scan.json",
+                        "--output-dir",
+                        str(fragment_index_dir),
+                    ],
+                ),
+                run_command(
+                    "ontology_runtime_fixture",
+                    [
+                        py,
+                        "scripts/ontology_validator.py",
+                        "--objects-dir",
+                        "tests/fixtures/control_plane/runtime_good/ontology_objects",
+                        "--links",
+                        "tests/fixtures/control_plane/runtime_good/ontology_links/links.jsonl",
+                    ],
+                ),
+                run_command(
+                    "ontology_runtime_rejects_cross_target_support",
+                    [
+                        py,
+                        "scripts/ontology_validator.py",
+                        "--objects-dir",
+                        "tests/fixtures/control_plane/runtime_bad/ontology_objects",
+                        "--links",
+                        "tests/fixtures/control_plane/runtime_bad/ontology_links/links.jsonl",
+                    ],
+                    expect_failure=True,
+                ),
+                run_command(
+                    "run_manifest_lineage_fixture",
+                    [
+                        py,
+                        "scripts/run_manifest_linter.py",
+                        "--manifest",
+                        "tests/fixtures/control_plane/run_manifest.json",
+                        "--lineage-events",
+                        "tests/fixtures/control_plane/lineage_events.jsonl",
+                    ],
+                ),
                 run_command("workbook_language_fixture", [py, "scripts/essay_style_linter.py", "--fixture", "benchmarks/kp_essay_style_linter_fixtures.json"]),
                 run_command("example_essay_language_fixture", [py, "scripts/example_essay_language_linter.py", "--fixture", "benchmarks/example_essay_language_linter_fixtures.json"]),
                 run_command("essay_theme_prediction_language", [py, "scripts/essay_theme_prediction_linter.py"]),

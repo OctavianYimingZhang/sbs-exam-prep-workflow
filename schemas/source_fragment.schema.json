@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/source_fragment.schema.json",
+  "title": "SourceFragment",
+  "type": "object",
+  "required": ["fragment_id", "source_id", "fragment_type", "locator", "text", "image_anchor", "extraction_confidence"],
+  "properties": {
+    "object_type": { "const": "SourceFragment" },
+    "fragment_id": { "type": "string" },
+    "source_id": { "type": "string" },
+    "fragment_type": { "type": "string" },
+    "locator": { "type": "string" },
+    "text": { "type": "string" },
+    "image_anchor": { "type": ["string", "null"] },
+    "extraction_confidence": { "enum": ["High", "Medium", "Low"] }
+  },
+  "additionalProperties": true
+}

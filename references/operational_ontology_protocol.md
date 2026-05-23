@@ -15,6 +15,32 @@ The ontology exists to make exam preparation evidence-bound and auditable:
 - actions write back objects, links, artifacts, and QA flags;
 - validators block unsupported claims, wrong-regime evidence, unverified citations, and helper artifacts in public output.
 
+## Internal Lakehouse Layers
+
+Treat each exam-prep run as a small auditable data product, not a one-off response. The internal layers are:
+
+```text
+Bronze layer
+Raw source inventory:
+SourceDocument, extraction status, source hash, raw extracted text, slide/page images.
+
+Silver layer
+Normalized fragments:
+SourceFragment, FragmentPartition, PastPaperQuestion, AssessmentRegime, ExamBlueprint.
+
+Gold layer
+Validated semantic objects:
+KnowledgePoint, ExaminerOperation, QuestionArchetype, SlotGrammar,
+EvidenceClaim, ReadingSource, MethodBlock, QAFlag.
+
+Serving layer
+Student-facing artifacts:
+Exam_Prep_Map workbook, Example Essay DOCX, direct answer,
+plus hidden diagnostics, lineage, and source audit when requested.
+```
+
+Student-visible output may only be generated from Gold objects whose support links pass validation.
+
 ## Object Layer
 
 Use `ontology/ontology.json` as the machine-readable contract for object types.
@@ -23,6 +49,7 @@ Core objects:
 
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
+- `FragmentPartition`: metadata partition used to prune irrelevant fragments before expensive reasoning or generation.
 - `AssessmentRegime` and `ExamBlueprint`: current versus old exam structures.
 - `PastPaperQuestion`: question-level record extracted from a paper.
 - `KnowledgePoint`: examinable reasoning block, not a raw topic label.
@@ -34,6 +61,43 @@ Core objects:
 - `PrepArtifact`: student-facing or internal output.
 - `QAFlag`: blocking or warning condition.
 - `WorkflowRun`: modules run, modules skipped, outputs created, and QA summary.
+- `RunManifest`: persisted run-level source hashes, actions, object-store paths, artifact list, and QA summary.
+- `LineageEvent`: append-only action event linking input objects, output objects, artifacts, and QA flags.
+
+## Fragment Partitioning
+
+Build `FragmentPartition` objects when the run contains multiple source roles, multiple years/regimes, any past-paper prediction, any Example Essay source audit, or any large source set.
+
+Partition metadata should include:
+
+```yaml
+FragmentPartition:
+  partition_id:
+  source_id:
+  fragment_ids: []
+  source_role:
+  analysis_context:
+  target_group_key:
+  exam_regime:
+  year:
+  lecture_or_module:
+  question_type:
+  concept_type:
+  command_verbs: []
+  input_format:
+  image_count:
+  extraction_confidence:
+  allowed_evidence_use: []
+  source_hash:
+```
+
+Use partitions as a pruning layer:
+
+- MCQ prep reads MCQ-compatible KPs, MCQ past-paper questions, definition/classification/mechanism/calculation partitions, and visible scoring-policy evidence.
+- Example Essay mode reads the relevant lecture scope, citation candidates, verified reading, and essay-relevant evidence partitions; it does not read unrelated answer keys by default.
+- Data/problem prep reads graph, table, protocol, case, calculation, readout, control, and limitation partitions.
+- QA/lint-only requests read output artifacts and lineage before rerunning upstream analysis.
+- Source-inventory-only requests stop at Bronze unless the user asks for deeper processing.
 
 ## Link Layer
 
@@ -43,6 +107,8 @@ Allowed examples:
 
 ```text
 SourceDocument CONTAINS SourceFragment
+SourceDocument PARTITIONED_AS FragmentPartition
+FragmentPartition GROUPS_FRAGMENT SourceFragment
 SourceFragment SUPPORTS_KP KnowledgePoint
 KnowledgePoint SUPPORTS_CLAIM EvidenceClaim
 PastPaperQuestion INSTANTIATES QuestionArchetype
@@ -50,6 +116,8 @@ QuestionArchetype USES_OPERATION ExaminerOperation
 KnowledgePoint COMPATIBLE_WITH QuestionArchetype
 ReadingSource ENRICHES_KP KnowledgePoint
 QAFlag BLOCKS PrepArtifact
+WorkflowRun HAS_MANIFEST RunManifest
+WorkflowRun EMITS_LINEAGE LineageEvent
 ```
 
 Forbidden examples:
@@ -68,6 +136,7 @@ Every workflow step should be expressible as an action that reads objects and wr
 ```text
 CreateSourceInventory
 ExtractFragments
+BuildFragmentIndex
 NormalizeTargetGroup
 SplitExamRegime
 ExtractPastPaperQuestions
@@ -77,6 +146,8 @@ SegmentKnowledgePoints
 MapKPToArchetype
 VerifyReadingSource
 GeneratePrepArtifact
+ValidateOntologyRuntime
+WriteRunManifest
 RunDeliverableQA
 ApproveStudentOutput
 ```
@@ -118,10 +189,13 @@ When an implementation persists ontology outputs, use JSONL or JSON under an int
 ```text
 internal_qa/ontology_objects/source_documents.jsonl
 internal_qa/ontology_objects/source_fragments.jsonl
+internal_qa/ontology_objects/fragment_partitions.jsonl
 internal_qa/ontology_objects/past_paper_questions.jsonl
 internal_qa/ontology_objects/question_archetypes.json
 internal_qa/ontology_objects/evidence_claims.jsonl
 internal_qa/ontology_links/links.jsonl
+internal_qa/run_manifest.json
+internal_qa/lineage_events.jsonl
 ```
 
 These files are helper artifacts. They must not be mixed into the final user-facing output unless the user explicitly requests an audit package.
@@ -137,4 +211,21 @@ Fail or block student-facing output when:
 - a citation or extra-reading source is not verified/read where required;
 - output mode does not match the detected question type;
 - a prediction claims exact future wording, guarantee, or fake numerical precision;
+- a student-facing artifact has no valid Gold-object lineage;
+- a blocking QA flag is unresolved;
+- a publish action has no run manifest or lineage event;
 - public output contains helper artifacts.
+
+## Control-Plane Invariants
+
+Use these as hard publish gates:
+
+```text
+No object -> no link.
+No valid link -> no claim.
+No verified claim -> no student-facing synthesis.
+No lineage -> no reproducible publish.
+No QA pass -> no publish.
+```
+
+Do not implement distributed compute, warehouses, or platform-specific services. The transferable idea is local metadata, pruning, validation, lineage, and reproducibility.

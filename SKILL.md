@@ -46,6 +46,17 @@ The ontology is not a topic taxonomy. It is an evidence-permission graph. Links 
 - verified reading may enrich a knowledge point, not replace lecture logic;
 - public artifacts must be generated only after QA-passed object and link checks.
 
+Use a small internal control plane when a run has more than one source role, any past-paper prediction, any Example Essay source audit, or any generated public artifact. The control plane has four layers:
+
+```text
+Bronze: SourceDocument, raw extraction metadata, source hashes
+Silver: SourceFragment, FragmentPartition, PastPaperQuestion, AssessmentRegime
+Gold: KnowledgePoint, ExaminerOperation, QuestionArchetype, EvidenceClaim, QAFlag
+Serving: student-facing workbook, Example Essay DOCX, direct answer, optional audit package
+```
+
+Student-visible output may be generated only from Gold objects whose support links pass ontology validation. Build `FragmentPartition` metadata before deep reasoning when it can prune irrelevant slides, papers, books, answer keys, or examples. Record run manifests and lineage events for reproducibility when helper scripts create artifacts.
+
 ## Mandatory References
 
 - `references/input_processing_protocol.md`: source roles, trust levels, evidence use, extraction, and format fields.
@@ -69,7 +80,7 @@ The ontology is not a topic taxonomy. It is an evidence-permission graph. Links 
 - `references/cross_subject_regression_protocol.md`: benchmark rules that validate generic behaviour without becoming production triggers.
 - `references/github_release_protocol.md`: local QA, sync, commit, and push requirements.
 
-Use helper scripts where available for source extraction, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
+Use helper scripts where available for source extraction, fragment indexing, runtime ontology validation, run-manifest and lineage linting, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
 
 When past-paper prediction is requested, generate or conceptually maintain question-level records before ranking. The required internal path is:
 
@@ -109,6 +120,8 @@ For every supplied or discovered file, record:
 - unresolved extraction or OCR risks.
 
 Never infer hidden content from failed extraction, unsupported files, weak OCR, or unreadable images.
+
+After inventory, create or conceptually maintain `FragmentPartition` metadata when downstream work needs selective reading. Partition by source role, analysis context, target group, regime, year, question type, concept type, input format, extraction confidence, allowed evidence use, and source hash. Use this metadata to skip irrelevant sources before deep analysis.
 
 ### 2. Split Exam Regimes
 
@@ -320,6 +333,9 @@ Produce diagnostics for:
 - unverified citation;
 - old-regime evidence excluded from prediction;
 - low-confidence prediction;
+- missing runtime object or invalid ontology link;
+- student-facing artifact without valid Gold-object lineage;
+- missing run manifest or lineage event for generated artifacts;
 - exact future-question wording claimed;
 - fake precise probability from a small paper set;
 - MCQ official answer claimed without answer-key evidence;
@@ -349,6 +365,8 @@ Benchmarks validate generic behaviour only:
 - no cross-source factual leakage;
 - ontology contract integrity;
 - past-paper prediction hard failures;
+- runtime object-store validation;
+- manifest and lineage reproducibility;
 
 Any benchmark-specific content, name, lecturer, example, year, topic, or recurrence pattern is non-transferable unless the new target sources independently contain and verify it.
 
@@ -360,6 +378,7 @@ When modifying the Skill itself, completion requires:
 - workbook and Example Essay language checks pass where scripts exist;
 - DOCX Example Essays, when requested or fixture-tested, pass formatting and source audits;
 - no production logic uses source-set identity, benchmark names, or course names as triggers;
+- runtime object-store, manifest, and lineage checks pass when control-plane artifacts are generated;
 - installed Skill copy and repository copy are synced;
 - GitHub-ready QA passes before commit and push.
 

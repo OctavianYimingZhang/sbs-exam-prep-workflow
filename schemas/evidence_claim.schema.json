@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/evidence_claim.schema.json",
+  "title": "EvidenceClaim",
+  "type": "object",
+  "required": ["claim_id", "claim_text", "support_level", "verification_status", "source_anchors", "claim_strength"],
+  "properties": {
+    "object_type": { "const": "EvidenceClaim" },
+    "claim_id": { "type": "string" },
+    "claim_text": { "type": "string" },
+    "support_level": { "type": "string" },
+    "verification_status": { "type": "string" },
+    "source_anchors": { "type": "array" },
+    "claim_strength": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/source_document.schema.json",
+  "title": "SourceDocument",
+  "type": "object",
+  "required": ["source_id", "path", "file_role", "trust_level", "analysis_context", "allowed_evidence_use", "extraction_status"],
+  "properties": {
+    "object_type": { "const": "SourceDocument" },
+    "source_id": { "type": "string" },
+    "path": { "type": "string" },
+    "file_role": { "type": "string" },
+    "trust_level": { "type": "string" },
+    "analysis_context": { "type": "string" },
+    "allowed_evidence_use": { "type": "array", "items": { "type": "string" } },
+    "extraction_status": { "type": "string" },
+    "source_hash": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

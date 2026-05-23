@@ -29,6 +29,29 @@ This matters because exam preparation needs evidence permissions, not only retri
 
 The machine-readable ontology contract lives in [`ontology/ontology.json`](ontology/ontology.json). The workflow protocol is in [`references/operational_ontology_protocol.md`](references/operational_ontology_protocol.md).
 
+## Runtime Control Plane
+
+The Skill now treats each non-trivial run as a small auditable data product. Internal helper artifacts stay out of the student-facing folder, but they can be generated under `internal_qa/` to make the run reproducible:
+
+```text
+Bronze: source inventory, extraction status, source hashes
+Silver: source fragments, fragment partitions, past-paper question records
+Gold: knowledge points, examiner operations, archetypes, evidence claims, QA flags
+Serving: workbook, Example Essay DOCX, direct answer, optional audit package
+```
+
+The publish gate is:
+
+```text
+No object -> no link.
+No valid link -> no claim.
+No verified claim -> no student-facing synthesis.
+No lineage -> no reproducible publish.
+No QA pass -> no publish.
+```
+
+This is implemented with a fragment metadata index, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
+
 ## What It Produces
 
 Default output is an Excel-first revision workbook. Complete Example Essays are generated only when explicitly requested.
@@ -215,7 +238,7 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
 | `references/` | Protocols for evidence handling, routing, scoring, language quality, Example Essays, Excel output, regression, and release. |
 | `scripts/` | Helper CLIs for extraction, grouping, language linting, DOCX generation, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
-| `schemas/` | JSON schemas for Example Essay plans, language deltas, example contributions, and gap reports. |
+| `schemas/` | JSON schemas for Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
 | `tests/fixtures/` | Small public fixtures for DOCX, source-grounding, and citation-fallback checks. |
 | `agents/` | Optional Skill interface metadata. |
@@ -226,7 +249,7 @@ Clone as a Codex Skill:
 
 ```bash
 mkdir -p ~/.codex/skills
-git clone https://github.com/OctavianYimingZhang/sbs-exam-prep-workflow.git ~/.codex/skills/sbs-exam-prep-workflow
+git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/sbs-exam-prep-workflow
 ```
 
 Install Python dependencies for helper scripts:
@@ -261,6 +284,30 @@ python scripts/extract_past_paper_questions.py /path/to/past_papers \
   --target-group-key "Target Course" \
   --current-regime-key "current_regime" \
   --output-dir /path/to/internal_qa
+```
+
+Build a fragment metadata index:
+
+```bash
+python scripts/build_fragment_index.py \
+  --source-scan /path/to/internal_qa/source_scan.json \
+  --output-dir /path/to/internal_qa
+```
+
+Validate runtime ontology objects and links:
+
+```bash
+python scripts/ontology_validator.py \
+  --objects-dir /path/to/internal_qa/ontology_objects \
+  --links /path/to/internal_qa/ontology_links/links.jsonl
+```
+
+Lint a run manifest and lineage events:
+
+```bash
+python scripts/run_manifest_linter.py \
+  --manifest /path/to/internal_qa/run_manifest.json \
+  --lineage-events /path/to/internal_qa/lineage_events.jsonl
 ```
 
 Lint ontology and past-paper prediction outputs:
@@ -324,7 +371,7 @@ python scripts/github_ready_check.py --ci
 
 ## Benchmark Sanitization
 
-The public benchmark files are regression fixtures. They test generic behaviours such as regime splitting, question-type routing, workbook layout adaptation, source-boundary discipline, Example Essay language quality, ontology contract integrity, past-paper prediction hard failures, and cross-source leakage prevention.
+The public benchmark files are regression fixtures. They test generic behaviours such as regime splitting, question-type routing, workbook layout adaptation, source-boundary discipline, Example Essay language quality, ontology contract integrity, runtime object-store validation, run-manifest lineage, past-paper prediction hard failures, and cross-source leakage prevention.
 
 They intentionally exclude private lecture slides, past papers, notes, mocks, student files, generated workbooks, local absolute paths, and cached run outputs.
 

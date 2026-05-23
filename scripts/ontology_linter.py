@@ -12,6 +12,7 @@ from typing import Any
 REQUIRED_OBJECT_TYPES = {
     "SourceDocument",
     "SourceFragment",
+    "FragmentPartition",
     "AssessmentRegime",
     "ExamBlueprint",
     "PastPaperQuestion",
@@ -29,10 +30,14 @@ REQUIRED_OBJECT_TYPES = {
     "PrepArtifact",
     "QAFlag",
     "WorkflowRun",
+    "RunManifest",
+    "LineageEvent",
 }
 
 REQUIRED_LINK_TYPES = {
     "CONTAINS",
+    "PARTITIONED_AS",
+    "GROUPS_FRAGMENT",
     "SUPPORTS_KP",
     "SUPPORTS_CLAIM",
     "INSTANTIATES",
@@ -44,11 +49,14 @@ REQUIRED_LINK_TYPES = {
     "TESTS_KP",
     "GENERATED_FROM",
     "BLOCKS",
+    "HAS_MANIFEST",
+    "EMITS_LINEAGE",
 }
 
 REQUIRED_ACTION_TYPES = {
     "CreateSourceInventory",
     "ExtractFragments",
+    "BuildFragmentIndex",
     "NormalizeTargetGroup",
     "SplitExamRegime",
     "ExtractPastPaperQuestions",
@@ -58,6 +66,8 @@ REQUIRED_ACTION_TYPES = {
     "MapKPToArchetype",
     "VerifyReadingSource",
     "GeneratePrepArtifact",
+    "ValidateOntologyRuntime",
+    "WriteRunManifest",
     "RunDeliverableQA",
     "ApproveStudentOutput",
 }
@@ -69,6 +79,8 @@ REQUIRED_VALIDATION_RULES = {
     "external_reading_claim_requires_verified_source",
     "old_regime_evidence_cannot_raise_current_confidence_above_medium",
     "student_output_excludes_internal_helper_artifacts",
+    "lineage_required_for_publish",
+    "blocking_qa_flag_blocks_publish",
 }
 
 

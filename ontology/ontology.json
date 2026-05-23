@@ -12,6 +12,10 @@
       "description": "A page, slide, question, figure, table, protocol step, chapter, or section extracted from a source document.",
       "required_properties": ["fragment_id", "source_id", "fragment_type", "locator", "text", "image_anchor", "extraction_confidence"]
     },
+    "FragmentPartition": {
+      "description": "Metadata partition over source fragments used for request-time pruning before deep analysis.",
+      "required_properties": ["partition_id", "source_id", "fragment_ids", "source_role", "analysis_context", "target_group_key", "exam_regime", "year", "question_type", "concept_type", "command_verbs", "input_format", "image_count", "extraction_confidence", "allowed_evidence_use", "source_hash"]
+    },
     "AssessmentRegime": {
       "description": "A stable exam format inside one target source group.",
       "required_properties": ["regime_id", "target_group_key", "year_range", "current_or_old", "comparability", "format_summary"]
@@ -79,10 +83,20 @@
     "WorkflowRun": {
       "description": "One execution trace of requested modules, skipped modules, generated artifacts, and QA status.",
       "required_properties": ["run_id", "requested_module", "actions_run", "actions_skipped", "created_outputs", "qa_summary"]
+    },
+    "RunManifest": {
+      "description": "Persisted run-level manifest containing source hashes, actions, object-store paths, artifacts, and QA summary.",
+      "required_properties": ["run_id", "created_at", "request_scope", "source_hashes", "actions", "object_store", "artifacts", "qa_summary"]
+    },
+    "LineageEvent": {
+      "description": "Append-only action event linking input objects, output objects, artifacts, and QA flags.",
+      "required_properties": ["event_id", "run_id", "action_id", "action_type", "input_object_ids", "output_object_ids", "artifact_ids", "qa_flag_ids", "timestamp", "status"]
     }
   },
   "link_types": {
     "CONTAINS": {"from": "SourceDocument", "to": "SourceFragment"},
+    "PARTITIONED_AS": {"from": "SourceDocument", "to": "FragmentPartition"},
+    "GROUPS_FRAGMENT": {"from": "FragmentPartition", "to": "SourceFragment"},
     "SUPPORTS_KP": {"from": "SourceFragment", "to": "KnowledgePoint"},
     "SUPPORTS_CLAIM": {"from": "KnowledgePoint", "to": "EvidenceClaim"},
     "INSTANTIATES": {"from": "PastPaperQuestion", "to": "QuestionArchetype"},
@@ -93,7 +107,9 @@
     "ENRICHES_KP": {"from": "ReadingSource", "to": "KnowledgePoint"},
     "TESTS_KP": {"from": "PracticalOperation", "to": "KnowledgePoint"},
     "GENERATED_FROM": {"from": "PrepArtifact", "to": "KnowledgePoint"},
-    "BLOCKS": {"from": "QAFlag", "to": "PrepArtifact"}
+    "BLOCKS": {"from": "QAFlag", "to": "PrepArtifact"},
+    "HAS_MANIFEST": {"from": "WorkflowRun", "to": "RunManifest"},
+    "EMITS_LINEAGE": {"from": "WorkflowRun", "to": "LineageEvent"}
   },
   "forbidden_links": [
     {
@@ -120,6 +136,7 @@
   "action_types": {
     "CreateSourceInventory": ["SourceDocument"],
     "ExtractFragments": ["SourceFragment", "QAFlag"],
+    "BuildFragmentIndex": ["FragmentPartition"],
     "NormalizeTargetGroup": ["SourceDocument"],
     "SplitExamRegime": ["AssessmentRegime", "ExamBlueprint"],
     "ExtractPastPaperQuestions": ["PastPaperQuestion"],
@@ -129,11 +146,14 @@
     "MapKPToArchetype": ["COMPATIBLE_WITH"],
     "VerifyReadingSource": ["ReadingSource", "EvidenceClaim"],
     "GeneratePrepArtifact": ["PrepArtifact"],
+    "ValidateOntologyRuntime": ["QAFlag"],
+    "WriteRunManifest": ["RunManifest", "LineageEvent"],
     "RunDeliverableQA": ["QAFlag"],
     "ApproveStudentOutput": ["PrepArtifact"]
   },
   "validation_rules": [
     "every_student_visible_artifact_has_source_links",
+    "student_visible_artifact_requires_valid_gold_objects",
     "question_type_controls_output_template",
     "exact_future_question_wording_not_claimed",
     "short_answer_variants_require_slot_grammar",
@@ -141,6 +161,9 @@
     "external_reading_claim_requires_verified_source",
     "old_regime_evidence_cannot_raise_current_confidence_above_medium",
     "lecturer_style_cannot_raise_confidence_above_medium_without_repeated_current_regime_support",
+    "fragment_partition_pruning_precedes_deep_reasoning",
+    "lineage_required_for_publish",
+    "blocking_qa_flag_blocks_publish",
     "student_output_excludes_internal_helper_artifacts"
   ],
   "query_templates": {

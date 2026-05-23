@@ -1,0 +1,42 @@
+{
+  "object_type": "RunManifest",
+  "run_id": "RUN001",
+  "created_at": "2026-05-24T00:00:00Z",
+  "request_scope": "fixture_control_plane",
+  "source_hashes": {
+    "SRC001": "hash001"
+  },
+  "actions": [
+    {
+      "action_id": "ACT001",
+      "action_type": "BuildFragmentIndex",
+      "status": "pass",
+      "inputs": ["SRC001"],
+      "outputs": ["PART001"]
+    },
+    {
+      "action_id": "ACT002",
+      "action_type": "ApproveStudentOutput",
+      "status": "pass",
+      "inputs": ["ART001"],
+      "outputs": ["outputs/Exam_Prep_Map.xlsx"]
+    }
+  ],
+  "object_store": {
+    "objects_dir": "internal_qa/ontology_objects",
+    "links": "internal_qa/ontology_links/links.jsonl"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART001",
+      "path": "outputs/Exam_Prep_Map.xlsx",
+      "student_visible": true,
+      "qa_status": "pass"
+    }
+  ],
+  "qa_summary": {
+    "blocking": 0,
+    "warning": 0,
+    "info": 1
+  }
+}
