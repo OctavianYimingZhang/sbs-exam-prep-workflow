@@ -8,6 +8,12 @@ The primary prediction object is not a repeated topic. It is:
 fixed examiner operation + replaceable knowledge slots + reusable mark-scheme skeleton
 ```
 
+When formal past papers are supplied, build this from question-level records rather than prose impressions:
+
+```text
+PastPaperQuestion -> QuestionArchetype -> SlotGrammar -> compatible KnowledgePoint -> confidence band -> PrepArtifact
+```
+
 Use three layers:
 
 1. `Exam blueprint`: section structure, required/optional questions, marks, timing, question-type balance, data/figure/calculation/case-study frequency, and fixed Q-slot themes.
@@ -163,16 +169,16 @@ A conceptual ranking formula is allowed:
 
 ```text
 Score =
-  BlueprintFit
-+ ArchetypeReuse
-+ MarkSchemeReuse
-+ KPRecurrence
-+ Recency
-+ CoverageGap
-+ LectureCentrality
-+ AssessmentEase
-- SaturationPenalty
-- RegimeMismatchPenalty
+  2.0 * BlueprintFit
++ 2.0 * ArchetypeReuse
++ 1.5 * MarkSchemeReuse
++ 1.0 * KPRecurrence
++ 1.0 * Recency
++ 1.0 * LectureCentrality
++ 0.8 * CoverageGap
++ 0.7 * AssessmentEase
+- 1.2 * SaturationPenalty
+- 2.0 * RegimeMismatchPenalty
 ```
 
 For small paper sets, do not report precise numeric probabilities such as `72.4%`. Use confidence bands:
@@ -180,6 +186,14 @@ For small paper sets, do not report precise numeric probabilities such as `72.4%
 - `High confidence`: archetype likely, exact instantiation uncertain.
 - `Medium confidence`: KP family likely, question form uncertain.
 - `Low confidence`: possible fresh coverage, evidence weak.
+
+Student-facing priority may additionally consider expected value:
+
+```text
+priority = confidence_band * mark_value * student_weakness * transferability / prep_time
+```
+
+If student weakness or preparation time is unknown, omit those terms and state that the ranking is evidence-only.
 
 ## LecturerModuleSlotDetector
 
@@ -228,6 +242,8 @@ EssayLecturerIntentResult:
 ```
 
 Do not infer lecturer preference from one question alone unless labelled `Low` confidence. Combine learning objectives, repeated examples, formal past-paper patterns, module boundaries, and question wording.
+
+Lecturer or source-block style cannot raise confidence above `Medium` unless it is supported in the same current exam regime by at least two formal papers, aligned with lecture objectives or summary material, and not contradicted by recent papers.
 
 For Example Essay Mode, lecturer intent controls paragraph planning. It does not override source accuracy or question wording.
 

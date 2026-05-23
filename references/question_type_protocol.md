@@ -85,6 +85,27 @@ Required `MCQ_HighFrequency` fields:
 
 If no answer key exists, do not invent official answers. Mark answers as `inferred_from_lecture`.
 
+If a visible MCQ regime includes negative marking, multiple-response marking, or statement-level scoring, extract an `MCQScoringPolicy`:
+
+```yaml
+MCQScoringPolicy:
+  mode: single_best | multiple_true_false | statement_judgement
+  option_count:
+  correct_value:
+  wrong_value:
+  unanswered_value:
+  positive_ev_threshold:
+  action_rule:
+```
+
+If unanswered answers score zero, correct answers score `c`, and wrong answers lose `d`, the internal positive expected-value threshold is:
+
+```text
+p > d / (c + d)
+```
+
+This policy supports answer strategy. It must not be used to invent official answers.
+
 MCQ preparation output should be:
 
 - term-pair contrast table;
@@ -99,6 +120,12 @@ Do not output `X will be tested` when the stronger claim is `X is a likely discr
 ## Short-Answer Mark-Point Generator
 
 For short-answer questions, predict `question archetype -> mark-producing answer schema`, not only topic labels.
+
+Do not generate unbounded lists of possible questions. Generate bounded variants from:
+
+```text
+archetype + slot grammar + source-linked KP + mark scale
+```
 
 Short-answer extraction schema:
 
@@ -127,6 +154,22 @@ Short-answer prediction output must say how a KP can be asked. For example:
 - draw/label a structure;
 - list named examples;
 - build a stepwise causal chain.
+
+For high-reuse families, a variant record should include:
+
+```yaml
+ShortAnswerVariant:
+  family_id:
+  kp_id:
+  variant_type: define | list | compare | explain_mechanism | draw_label | calculate | interpret_graph | design_experiment
+  likely_stem_template:
+  required_mark_points:
+  concise_exam_answer:
+  reference_expansion:
+  allowed_examples:
+  source_anchor:
+  confidence: High | Medium | Low
+```
 
 Generate two answer layers:
 
@@ -238,6 +281,21 @@ For each long-answer archetype, require:
 - interpretation;
 - limitation/control.
 
+When the surface system or case rotates but the operation remains stable, prepare a reusable `MethodBlock` library:
+
+```yaml
+MethodBlock:
+  method_family:
+  principle:
+  when_to_use:
+  expected_readout:
+  interpretation_logic:
+  required_control:
+  main_limitation:
+  compatible_question_parts:
+  source_anchor:
+```
+
 When a user explicitly asks for a model answer or Example Essay for a project/scenario exam, route to `long_answer_example_protocol.md` and generate a `High-score example long answer`, not a generic essay. The answer must be structured by question parts, mark weights, method logic, readouts, interpretation, and controls.
 
 Do not let old short-answer or coverage-only papers control the current long-answer project blueprint. They may support concept coverage only unless exam-format parsing proves the same regime.
@@ -285,6 +343,8 @@ EssayThemePrediction:
 ```
 
 Use `Predicted essay theme` as the student-facing label. If a practice stem is useful, label it `Practice variant from predicted theme`.
+
+For answer-one essay sections with several options, add an `EssayCoveragePlan`. The aim is to prepare enough lecture blocks for at least one high-quality answer, not to claim exact future titles or force equal-depth preparation for every source block unless requested.
 
 When Example Essay Mode is triggered, follow `essay_generation_protocol.md`.
 

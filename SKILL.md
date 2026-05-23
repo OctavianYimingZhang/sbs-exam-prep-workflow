@@ -28,12 +28,32 @@ Classify every input before analysis:
 - Student annotations and image examples can teach style or interpretation, but they are not factual authority unless verified against official course material or reliable academic sources.
 - Cross-course examples and benchmark fixtures are tests and style references only. They must be abstracted into transferable workflow rules and never used as factual content or prediction evidence for a new source set.
 
+## Operational Ontology Boundary
+
+Use the operational ontology contract in `ontology/ontology.json` and `references/operational_ontology_protocol.md` when source complexity is high, past-paper prediction is requested, or multiple source roles must be reconciled.
+
+The runtime model is:
+
+```text
+SourceDocument -> SourceFragment -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
+```
+
+The ontology is not a topic taxonomy. It is an evidence-permission graph. Links must encode what each source is allowed to support:
+
+- external examples may contribute workflow rules, not factual claims;
+- old or structurally different regimes may support coverage, not current blueprint prediction;
+- unreadable or weakly extracted sources may create QA flags, not hidden content;
+- verified reading may enrich a knowledge point, not replace lecture logic;
+- public artifacts must be generated only after QA-passed object and link checks.
+
 ## Mandatory References
 
 - `references/input_processing_protocol.md`: source roles, trust levels, evidence use, extraction, and format fields.
+- `references/operational_ontology_protocol.md`: object-link-action graph, evidence-permission links, actions, query discipline, and ontology validation.
 - `references/modular_entrypoints_protocol.md`: standalone and full-workflow entry points.
 - `references/question_type_protocol.md`: MCQ, short-answer, essay, and long-answer routing.
 - `references/scoring_and_pattern_protocol.md`: pattern inference, retention, recency, and confidence rules.
+- `references/past_paper_prediction_protocol.md`: question-level past-paper extraction, archetype registry, scoring bands, type-specific prediction targets, and hard failures.
 - `references/kp_essay_synthesis_protocol.md`: workbook explanation synthesis.
 - `references/language_quality_contract.md`: shared prose-quality rules for KP synthesis, Example Essays, and long-answer prose.
 - `references/example_analysis_protocol.md`: how examples and external reviews become transferable rules without becoming factual content.
@@ -50,6 +70,12 @@ Classify every input before analysis:
 - `references/github_release_protocol.md`: local QA, sync, commit, and push requirements.
 
 Use helper scripts where available for source extraction, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
+
+When past-paper prediction is requested, generate or conceptually maintain question-level records before ranking. The required internal path is:
+
+```text
+past papers -> current exam regime -> PastPaperQuestion records -> QuestionArchetype registry -> slot grammar -> KP compatibility -> confidence band -> PrepArtifact
+```
 
 ## Workflow
 
@@ -90,6 +116,8 @@ Compare papers only inside the same target course/module group. Split regimes wh
 
 Old or structurally different papers can support concept coverage and answer-schema practice. They must not control current blueprint prediction unless comparability is proven.
 
+If formal papers are supplied, extract question-level records before scoring patterns. Each record should capture year, section, question number, marks, answer rule, question type, command verbs, input format, candidate options when visible, negative marking policy when visible, and extraction confidence. If a field is not visible, leave it unknown and flag review instead of inventing.
+
 ### 3. Classify Question Type
 
 Classify each question before prediction:
@@ -124,10 +152,10 @@ Parse:
 The selected preparation strategy follows the exam strategy:
 
 - Stable essay or problem-essay regime: predict examinable themes by lecture scope, then build paragraph plans and essay-ready KP synthesis. Do not make exact question wording the default prediction product.
-- MCQ-heavy regime: build discriminator axes, contrast tables, exception lists, mechanism-order traps, and wrong-option diagnosis.
-- Short-answer regime: build 2/4/6/8-mark answer schemas with concise exam answers and reference expansions.
+- MCQ-heavy regime: build discriminator axes, contrast tables, exception lists, mechanism-order traps, wrong-option diagnosis, and a scoring policy when negative marking or multiple-response marking is visible.
+- Short-answer regime: build bounded family variants from archetype, slot grammar, source-linked knowledge points, and mark scale; do not generate unbounded question lists.
 - Data/problem regime: build input -> operation -> inference -> limitation -> follow-up logic.
-- Project/scenario long-answer regime: build method -> readout -> interpretation -> control -> caveat answers.
+- Project/scenario long-answer regime: build reusable method blocks: method -> readout -> interpretation -> control -> caveat. Do not predict exact rotating scenarios when the stable signal is an operation.
 - Mixed regime: keep one workbook but separate prep logic by section and question type.
 - Practical/protocol regime: build aim -> method principle -> steps -> readout -> interpretation -> control -> limitation outputs.
 
@@ -193,6 +221,7 @@ Short answer:
 Essay / problem-essay:
 
 - predicted examinable themes, with lecture scope, examiner operation, and optional practice angles;
+- essay coverage plans for answer-one-from-several-options sections, prioritising enough lecture blocks for at least one high-quality answer rather than equal-depth exhaustive coverage unless requested;
 - paragraph plans;
 - essay-style knowledge-point explanations;
 - no complete essays unless explicitly requested.
@@ -200,7 +229,7 @@ Essay / problem-essay:
 Long answer / project / scenario:
 
 - question deconstruction;
-- method families;
+- method block library;
 - expected readouts;
 - interpretation logic;
 - controls, caveats, limitations;
@@ -291,11 +320,18 @@ Produce diagnostics for:
 - unverified citation;
 - old-regime evidence excluded from prediction;
 - low-confidence prediction;
+- exact future-question wording claimed;
+- fake precise probability from a small paper set;
+- MCQ official answer claimed without answer-key evidence;
+- short-answer variant generated without source-linked KP or bounded slot grammar;
+- lecturer style used as strong evidence without repeated current-regime support;
 - extra reading not found or not verified;
 - benchmark/example content leaking into production content;
 - generated prose failing language lint.
 
 Predictions must be labelled conservatively. For essay/problem-essay exams, label the default output as `Predicted essay theme`, not as an official question or guaranteed stem. Optional practice stems may be included only as practice variants derived from the theme.
+
+Lecturer/source-block style is auxiliary. It cannot raise confidence above `Medium` unless supported by the same current exam regime across at least two formal papers, aligned with lecture objectives or summary material, and not contradicted by recent papers.
 
 Before delivery, lint generated workbook prose and Example Essay prose where scripts exist. Rewrite or fail if the output contains slide-by-slide narration, page-tracing language, unsupported claims, how-to-write instructions inside answer prose, or repeated low-value filler.
 
@@ -310,7 +346,9 @@ Benchmarks validate generic behaviour only:
 - lecture-order coverage;
 - essay language quality;
 - workbook layout adaptation;
-- no cross-source factual leakage.
+- no cross-source factual leakage;
+- ontology contract integrity;
+- past-paper prediction hard failures;
 
 Any benchmark-specific content, name, lecturer, example, year, topic, or recurrence pattern is non-transferable unless the new target sources independently contain and verify it.
 

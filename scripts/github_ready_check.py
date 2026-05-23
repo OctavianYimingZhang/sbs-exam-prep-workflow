@@ -90,11 +90,13 @@ def main() -> int:
         deliverable_qa_dir = tmp_dir / "deliverable_docx_internal_qa"
         bad_public_dir = tmp_dir / "bad_public_output"
         citation_fallback_dir = tmp_dir / "citation_fallback"
+        past_paper_extract_dir = tmp_dir / "past_paper_question_extract"
         bad_public_dir.mkdir(parents=True, exist_ok=True)
         (bad_public_dir / "example_essay_manifest.json").write_text("{}", encoding="utf-8")
         checks.extend(
             [
                 run_command("compile_scripts", [py, "-m", "compileall", "-q", "scripts"]),
+                run_command("ontology_contract", [py, "scripts/ontology_linter.py"]),
                 run_command("workbook_language_fixture", [py, "scripts/essay_style_linter.py", "--fixture", "benchmarks/kp_essay_style_linter_fixtures.json"]),
                 run_command("example_essay_language_fixture", [py, "scripts/example_essay_language_linter.py", "--fixture", "benchmarks/example_essay_language_linter_fixtures.json"]),
                 run_command("essay_theme_prediction_language", [py, "scripts/essay_theme_prediction_linter.py"]),
@@ -113,6 +115,32 @@ def main() -> int:
                 run_command("citation_fallback_lint", [py, "scripts/citation_fallback_linter.py", "--dir", str(citation_fallback_dir), "--require-classic-plan"]),
                 run_command("cross_subject_metadata", [py, "scripts/cross_subject_regression_check.py", "--metadata-only", "--suite", "benchmarks/cross_subject_regression_suite.json"]),
                 run_command("method_long_answer_metadata", [py, "scripts/cross_subject_regression_check.py", "--metadata-only", "--suite", "benchmarks/method_long_answer_suite.json"]),
+                run_command("past_paper_prediction_metadata", [py, "scripts/cross_subject_regression_check.py", "--metadata-only", "--suite", "benchmarks/past_paper_prediction_suite.json"]),
+                run_command(
+                    "past_paper_question_extract_fixture",
+                    [
+                        py,
+                        "scripts/extract_past_paper_questions.py",
+                        "tests/fixtures/past_paper_question_extraction/fake_mixed_paper_2025.txt",
+                        "--target-group-key",
+                        "Benchmark_Generic",
+                        "--current-regime-key",
+                        "current_2025",
+                        "--output-dir",
+                        str(past_paper_extract_dir),
+                    ],
+                ),
+                run_command(
+                    "past_paper_prediction_lint",
+                    [
+                        py,
+                        "scripts/past_paper_prediction_linter.py",
+                        "--input",
+                        str(past_paper_extract_dir / "past_paper_questions.json"),
+                        "--suite",
+                        "benchmarks/past_paper_prediction_suite.json",
+                    ],
+                ),
                 run_command("identity_trigger_scan", [py, "scripts/no_identity_trigger_linter.py"]),
                 run_command(
                     "positive_docx_generate_strict",

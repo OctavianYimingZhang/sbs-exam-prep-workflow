@@ -1,0 +1,152 @@
+{
+  "name": "sbs_exam_prep_operational_ontology",
+  "version": "0.1.0",
+  "purpose": "Typed object-link-action model for evidence-bound exam preparation workflows.",
+  "core_principle": "Source files are converted into typed objects and links before they can produce student-facing preparation artifacts.",
+  "object_types": {
+    "SourceDocument": {
+      "description": "Every supplied or discovered file.",
+      "required_properties": ["source_id", "path", "file_role", "trust_level", "analysis_context", "allowed_evidence_use", "extraction_status"]
+    },
+    "SourceFragment": {
+      "description": "A page, slide, question, figure, table, protocol step, chapter, or section extracted from a source document.",
+      "required_properties": ["fragment_id", "source_id", "fragment_type", "locator", "text", "image_anchor", "extraction_confidence"]
+    },
+    "AssessmentRegime": {
+      "description": "A stable exam format inside one target source group.",
+      "required_properties": ["regime_id", "target_group_key", "year_range", "current_or_old", "comparability", "format_summary"]
+    },
+    "ExamBlueprint": {
+      "description": "Exam structure defined by a formal assessment regime.",
+      "required_properties": ["blueprint_id", "regime_id", "duration", "sections", "question_count", "marks", "answer_rule", "citation_rule"]
+    },
+    "PastPaperQuestion": {
+      "description": "One question or subquestion extracted from a formal paper or practice source.",
+      "required_properties": ["question_id", "source_file", "target_group_key", "year", "section", "question_no", "raw_stem", "marks", "question_type", "command_verbs", "input_format", "negative_marking"]
+    },
+    "KnowledgePoint": {
+      "description": "An examinable reasoning block, not a raw topic label.",
+      "required_properties": ["kp_id", "source_anchors", "concept_type", "mechanism_chain", "task_dimensions", "likely_question_types", "examinability"]
+    },
+    "ExaminerOperation": {
+      "description": "The cognitive operation a question asks the student to perform.",
+      "required_properties": ["operation_id", "task_verb", "input_format", "cognitive_operation", "expected_answer_shape", "marking_logic"]
+    },
+    "QuestionArchetype": {
+      "description": "Reusable question-family skeleton with replaceable slots.",
+      "required_properties": ["archetype_id", "target_group_key", "regime_id", "question_family", "recurrent_operation", "slot_grammar", "mark_scheme_skeleton", "confidence"]
+    },
+    "SlotGrammar": {
+      "description": "Replaceable variables inside an archetype.",
+      "required_properties": ["slot_grammar_id", "archetype_id", "slot_types", "allowed_fillers", "forbidden_fillers", "source_scope"]
+    },
+    "EvidenceClaim": {
+      "description": "A claim eligible for workbook or essay prose only after support and source permissions are verified.",
+      "required_properties": ["claim_id", "claim_text", "support_level", "verification_status", "source_anchors", "claim_strength"]
+    },
+    "ReadingSource": {
+      "description": "Recommended book, paper, DOI, PubMed record, publisher page, or verified academic source.",
+      "required_properties": ["reading_id", "source_type", "verification_status", "matched_chapter_or_section", "matched_kp_ids", "use_decision"]
+    },
+    "PracticalOperation": {
+      "description": "Operation-first representation for practical, data, case, numerical, image, and protocol tasks.",
+      "required_properties": ["operation_id", "input_type", "required_operation", "expected_inference", "control", "limitation", "follow_up_action", "linked_kps"]
+    },
+    "MethodBlock": {
+      "description": "Reusable method/readout/control block for project or scenario long-answer preparation.",
+      "required_properties": ["method_family", "principle", "when_to_use", "expected_readout", "interpretation_logic", "required_control", "main_limitation", "source_anchor"]
+    },
+    "MCQScoringPolicy": {
+      "description": "Expected-value policy for single-best, multiple-true-false, or statement-judgement MCQ regimes.",
+      "required_properties": ["mode", "option_count", "correct_value", "wrong_value", "unanswered_value", "positive_ev_threshold", "action_rule"]
+    },
+    "ShortAnswerVariant": {
+      "description": "Bounded short-answer variant produced from archetype, slot grammar, lecture KP, and mark scale.",
+      "required_properties": ["family_id", "kp_id", "variant_type", "likely_stem_template", "required_mark_points", "concise_exam_answer", "reference_expansion", "source_anchor", "confidence"]
+    },
+    "EssayCoveragePlan": {
+      "description": "Coverage plan for essay sections where the student needs at least one high-quality answer among several options.",
+      "required_properties": ["theme_id", "lecture_scope_type", "likely_command_verbs", "argument_skeleton", "evidence_bank", "diagram_bank", "comparison_axes", "coverage_role", "confidence"]
+    },
+    "PrepArtifact": {
+      "description": "Student-facing or internal output generated from eligible objects.",
+      "required_properties": ["artifact_id", "artifact_type", "output_mode", "student_visible", "source_links", "qa_status"]
+    },
+    "QAFlag": {
+      "description": "A blocking or warning condition attached to an object, link, action, or artifact.",
+      "required_properties": ["flag_id", "severity", "reason", "blocked_object", "resolution_status"]
+    },
+    "WorkflowRun": {
+      "description": "One execution trace of requested modules, skipped modules, generated artifacts, and QA status.",
+      "required_properties": ["run_id", "requested_module", "actions_run", "actions_skipped", "created_outputs", "qa_summary"]
+    }
+  },
+  "link_types": {
+    "CONTAINS": {"from": "SourceDocument", "to": "SourceFragment"},
+    "SUPPORTS_KP": {"from": "SourceFragment", "to": "KnowledgePoint"},
+    "SUPPORTS_CLAIM": {"from": "KnowledgePoint", "to": "EvidenceClaim"},
+    "INSTANTIATES": {"from": "PastPaperQuestion", "to": "QuestionArchetype"},
+    "USES_OPERATION": {"from": "QuestionArchetype", "to": "ExaminerOperation"},
+    "HAS_SLOT_GRAMMAR": {"from": "QuestionArchetype", "to": "SlotGrammar"},
+    "COMPATIBLE_WITH": {"from": "KnowledgePoint", "to": "QuestionArchetype"},
+    "DEFINES_BLUEPRINT": {"from": "AssessmentRegime", "to": "ExamBlueprint"},
+    "ENRICHES_KP": {"from": "ReadingSource", "to": "KnowledgePoint"},
+    "TESTS_KP": {"from": "PracticalOperation", "to": "KnowledgePoint"},
+    "GENERATED_FROM": {"from": "PrepArtifact", "to": "KnowledgePoint"},
+    "BLOCKS": {"from": "QAFlag", "to": "PrepArtifact"}
+  },
+  "forbidden_links": [
+    {
+      "id": "no_cross_target_factual_claim",
+      "if_source_analysis_context": "cross_target_example",
+      "forbid_link": "SUPPORTS_FACTUAL_CLAIM"
+    },
+    {
+      "id": "old_regime_no_current_blueprint",
+      "if_source_analysis_context": "target_old_or_different_regime",
+      "forbid_link": "CONTROLS_CURRENT_BLUEPRINT"
+    },
+    {
+      "id": "unverified_source_no_claim_support",
+      "if_verification_status": "candidate",
+      "forbid_link": "SUPPORTS_CLAIM"
+    },
+    {
+      "id": "unreadable_source_no_factual_chain",
+      "if_extraction_status": "unreadable",
+      "forbid_link": "SUPPORTS_KP"
+    }
+  ],
+  "action_types": {
+    "CreateSourceInventory": ["SourceDocument"],
+    "ExtractFragments": ["SourceFragment", "QAFlag"],
+    "NormalizeTargetGroup": ["SourceDocument"],
+    "SplitExamRegime": ["AssessmentRegime", "ExamBlueprint"],
+    "ExtractPastPaperQuestions": ["PastPaperQuestion"],
+    "ClassifyQuestionType": ["PastPaperQuestion"],
+    "InferQuestionArchetype": ["QuestionArchetype", "ExaminerOperation", "SlotGrammar"],
+    "SegmentKnowledgePoints": ["KnowledgePoint", "EvidenceClaim"],
+    "MapKPToArchetype": ["COMPATIBLE_WITH"],
+    "VerifyReadingSource": ["ReadingSource", "EvidenceClaim"],
+    "GeneratePrepArtifact": ["PrepArtifact"],
+    "RunDeliverableQA": ["QAFlag"],
+    "ApproveStudentOutput": ["PrepArtifact"]
+  },
+  "validation_rules": [
+    "every_student_visible_artifact_has_source_links",
+    "question_type_controls_output_template",
+    "exact_future_question_wording_not_claimed",
+    "short_answer_variants_require_slot_grammar",
+    "mcq_official_answer_requires_answer_key",
+    "external_reading_claim_requires_verified_source",
+    "old_regime_evidence_cannot_raise_current_confidence_above_medium",
+    "lecturer_style_cannot_raise_confidence_above_medium_without_repeated_current_regime_support",
+    "student_output_excludes_internal_helper_artifacts"
+  ],
+  "query_templates": {
+    "essay_theme": ["current_regime", "essay_archetype", "compatible_kps", "lecture_scope", "confidence_band", "qa_flags"],
+    "mcq_prep": ["mcq_archetype", "discriminator_axes", "distractor_families", "mcq_scoring_policy", "confidence_band"],
+    "data_problem_prep": ["practical_operation", "linked_kps", "input_operation_inference_limitation_follow_up"],
+    "extra_reading_insert": ["verified_reading_source", "matched_kp", "matched_chapter_or_section", "sentence_budget_decision"]
+  }
+}

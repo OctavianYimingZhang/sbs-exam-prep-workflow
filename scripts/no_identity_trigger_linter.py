@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-DEFAULT_PATHS = ["SKILL.md", "README.md", "agents", "references", "scripts"]
+DEFAULT_PATHS = ["SKILL.md", "README.md", "agents", "references", "scripts", "ontology"]
 IGNORE_DIRS = {".git", "__pycache__", ".venv", "benchmarks", "tests"}
 LEGACY_WORD = "un" + "it"
 
