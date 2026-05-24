@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/example_contribution.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/example_contribution.schema.json",
   "title": "ExampleContribution",
   "type": "object",
   "required": ["example_id", "source_type", "observed_problem", "transferable_rule", "structural_trigger", "non_transferable_content", "affected_protocols", "validation_check", "confidence"],

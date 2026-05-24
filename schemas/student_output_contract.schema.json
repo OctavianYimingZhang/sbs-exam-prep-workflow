@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/student_output_contract.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/student_output_contract.schema.json",
   "title": "StudentOutputContract",
   "type": "object",
   "required": ["contract_id", "output_mode", "allowed_visible_fields", "forbidden_visible_fields"],

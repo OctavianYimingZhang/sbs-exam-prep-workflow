@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/gate_result.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/gate_result.schema.json",
   "title": "GateResult",
   "type": "object",
   "required": ["gate_result_id", "gate_name", "outcome", "reason", "blocked_conclusion", "remediation_source", "severity"],

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/output_view.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/output_view.schema.json",
   "title": "OutputView",
   "type": "object",
   "required": ["view_id", "view_type", "included_sections", "omitted_sections", "reason", "artifact_policy"],

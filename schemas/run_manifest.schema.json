@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/run_manifest.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/run_manifest.schema.json",
   "title": "RunManifest",
   "type": "object",
   "required": ["run_id", "created_at", "request_scope", "source_hashes", "actions", "object_store", "artifacts", "qa_summary"],

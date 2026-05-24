@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/run_status.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/run_status.schema.json",
   "title": "RunStatus",
   "type": "object",
   "required": ["run_id", "plan_id", "status", "current_action", "completed_actions", "blocked_actions", "artifacts"],

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/language_delta.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/language_delta.schema.json",
   "title": "LanguageDelta",
   "type": "object",
   "required": ["delta_id", "bad_pattern", "improved_pattern", "reasoning", "applies_to", "linter_signal", "severity"],

@@ -1,8 +1,8 @@
 # Everything Exam Preparation
 
-`sbs-exam-prep-workflow` is the Codex Skill in this repository. It turns a student's exam materials into Word-first, evidence-grounded revision artifacts: a lecture knowledge walkthrough plus question-type add-on reports for MCQ, Short Answer, Long Answer/Project/Scenario, and Essay exams.
+`everything-exam-preparation` is the Codex Skill in this repository. It turns a student's exam materials into Word-first, evidence-grounded revision artifacts: a lecture knowledge walkthrough plus question-type add-on reports for MCQ, Short Answer, Long Answer/Project/Scenario, and Essay exams.
 
-The `sbs` prefix is a package name. The workflow itself is course-agnostic: it must learn from uploaded materials and validated sources, not from hard-coded course, topic, or example names.
+The Skill name follows the GitHub repository name in Codex-safe lowercase hyphen form. The workflow itself is course-agnostic: it must learn from uploaded materials and validated sources, not from hard-coded course, topic, or example names.
 
 The project exists because exam preparation is not one task. The correct output depends on the evidence available and on the way the exam asks questions. A student who uploads slides and MCQs should not receive essay-theme planning by default; a student who uploads essay prompts should not receive a generic flashcard table unless that is the requested artifact.
 
@@ -76,8 +76,8 @@ Clone the public repository as a Codex Skill:
 
 ```bash
 mkdir -p ~/.codex/skills
-git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/sbs-exam-prep-workflow
-cd ~/.codex/skills/sbs-exam-prep-workflow
+git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/everything-exam-preparation
+cd ~/.codex/skills/everything-exam-preparation
 ```
 
 Install helper-script dependencies:
@@ -479,15 +479,15 @@ Clone as a Codex Skill:
 
 ```bash
 mkdir -p ~/.codex/skills
-git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/sbs-exam-prep-workflow
+git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/everything-exam-preparation
 ```
 
-The GitHub repository is named `Everything-Exam-Preparation`; the local folder name `sbs-exam-prep-workflow` is the Codex Skill id.
+The GitHub repository is named `Everything-Exam-Preparation`; the local folder name `everything-exam-preparation` is the Codex Skill id.
 
 Install Python dependencies for helper scripts:
 
 ```bash
-cd ~/.codex/skills/sbs-exam-prep-workflow
+cd ~/.codex/skills/everything-exam-preparation
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt

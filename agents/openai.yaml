@@ -1,7 +1,7 @@
 interface:
-  display_name: "SBS Exam Prep Workflow"
+  display_name: "Everything Exam Preparation"
   short_description: "Evidence-grounded exam-prep workflow with setup, planning, Word walkthrough, and question-type DOCX add-on routes"
-  default_prompt: "Use $sbs-exam-prep-workflow to turn my lecture slides, official notes, past papers, practical materials, answer keys, exemplars, feedback, and readings into the narrowest valid exam-prep route. Build a SkillConfig, create a WorkflowPlan, check input readiness, and by default generate a lecture-first Knowledge Walkthrough DOCX. If I ask for MCQ, Short Answer, Long Answer/Project/Scenario, or Essay preparation, add the matching DOCX report. Use past-paper analysis as a chat-only brief before file generation. Keep helper artifacts separate unless I ask for an audit package."
+  default_prompt: "Use $everything-exam-preparation to turn my lecture slides, official notes, past papers, practical materials, answer keys, exemplars, feedback, and readings into the narrowest valid exam-prep route. Build a SkillConfig, create a WorkflowPlan, check input readiness, and by default generate a lecture-first Knowledge Walkthrough DOCX. If I ask for MCQ, Short Answer, Long Answer/Project/Scenario, or Essay preparation, add the matching DOCX report. Use past-paper analysis as a chat-only brief before file generation. Keep helper artifacts separate unless I ask for an audit package."
 
 policy:
   allow_implicit_invocation: true

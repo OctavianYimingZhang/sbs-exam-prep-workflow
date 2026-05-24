@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/user_exam_prep_request.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/user_exam_prep_request.schema.json",
   "title": "UserExamPrepRequest",
   "type": "object",
   "required": ["request_id", "raw_request", "requested_mode", "language", "target_group_or_gap", "focus_areas", "source_policy", "user_provided_sources", "academic_integrity_status"],

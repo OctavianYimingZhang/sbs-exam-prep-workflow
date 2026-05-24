@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/source_fragment.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/source_fragment.schema.json",
   "title": "SourceFragment",
   "type": "object",
   "required": ["fragment_id", "source_id", "fragment_type", "locator", "text", "image_anchor", "extraction_confidence"],

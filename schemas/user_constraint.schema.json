@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/user_constraint.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/user_constraint.schema.json",
   "title": "UserConstraint",
   "type": "object",
   "required": ["constraint_id", "request_id", "time_budget_or_gap", "preferred_output_depth", "requested_artifacts", "allowed_audit_package", "deadline_or_gap"],

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/input_readiness_report.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/input_readiness_report.schema.json",
   "title": "InputReadinessReport",
   "type": "object",
   "required": [

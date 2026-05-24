@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/evidence_claim.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/evidence_claim.schema.json",
   "title": "EvidenceClaim",
   "type": "object",
   "required": ["claim_id", "claim_text", "support_level", "verification_status", "source_anchors", "claim_strength"],

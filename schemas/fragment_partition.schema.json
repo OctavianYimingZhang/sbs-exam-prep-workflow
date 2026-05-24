@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/fragment_partition.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/fragment_partition.schema.json",
   "title": "FragmentPartition",
   "type": "object",
   "required": ["partition_id", "source_id", "fragment_ids", "source_role", "analysis_context", "target_group_key", "exam_regime", "year", "question_type", "concept_type", "command_verbs", "input_format", "image_count", "extraction_confidence", "allowed_evidence_use", "source_hash"],

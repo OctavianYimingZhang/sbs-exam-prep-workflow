@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/skill_config.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/skill_config.schema.json",
   "title": "SkillConfig",
   "type": "object",
   "required": ["project", "source_inputs", "source_policy", "output_mode", "qa", "advanced"],

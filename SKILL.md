@@ -1,9 +1,9 @@
 ---
-name: sbs-exam-prep-workflow
+name: everything-exam-preparation
 description: Word-first exam-preparation workflow for lecture slides, past papers, practical materials, MCQ, short-answer, long-answer, project/scenario prompts, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, and DOCX add-on reports.
 ---
 
-# SBS Exam Prep Workflow
+# Everything Exam Preparation
 
 Build an evidence-grounded exam-preparation system from the student's supplied materials. The workflow starts from first principles:
 

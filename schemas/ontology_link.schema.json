@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/ontology_link.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/ontology_link.schema.json",
   "title": "OntologyLink",
   "type": "object",
   "required": ["link_id", "link_type", "from_id", "to_id"],

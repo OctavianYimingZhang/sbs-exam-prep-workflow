@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/qa_flag.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/qa_flag.schema.json",
   "title": "QAFlag",
   "type": "object",
   "required": ["flag_id", "severity", "reason", "blocked_object", "resolution_status"],

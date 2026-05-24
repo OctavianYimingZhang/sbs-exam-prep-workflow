@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/prompt_card.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/prompt_card.schema.json",
   "title": "PromptCard",
   "type": "object",
   "required": ["card_id", "preset", "purpose", "minimum_inputs", "output_contract", "hard_stops"],

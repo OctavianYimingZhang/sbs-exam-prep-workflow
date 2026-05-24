@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/sbs-exam-prep-workflow/gap_report.schema.json",
+  "$id": "https://example.invalid/everything-exam-preparation/gap_report.schema.json",
   "title": "GapReport",
   "type": "object",
   "required": ["status", "high_gaps", "medium_gaps", "low_gaps", "checks"],
