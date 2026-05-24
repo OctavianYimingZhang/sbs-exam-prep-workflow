@@ -72,7 +72,7 @@ For MCQ-heavy exams, create a statement/discriminator map:
 - one-sentence rule;
 - wrong-option diagnosis.
 
-Required `MCQ_HighFrequency` fields:
+Internal `MCQ_HighFrequency` fields may include:
 
 - Lecture;
 - Knowledge point;
@@ -82,6 +82,20 @@ Required `MCQ_HighFrequency` fields:
 - Common trap;
 - Source slide/page;
 - Confidence.
+
+The default student-facing MCQ report must not expose those internal fields. Convert the internal map into `MCQStudentPointCard` objects:
+
+```yaml
+MCQStudentPointCard:
+  priority: 必备 | 重点 | 补充
+  point: string
+  knowledge_explanation: string
+  how_exam_tests_it: string
+  common_traps: []
+  must_remember: string
+```
+
+Do not include practice questions, answer keys, contrast tables, separate trap banks, source anchors, confidence, evidence, examiner-operation labels, or discriminator-axis labels in the default MCQ high-yield report. Fold wrong-option logic into `common_traps`.
 
 If no answer key exists, do not invent official answers. Mark answers as `inferred_from_lecture`.
 
@@ -171,7 +185,7 @@ ShortAnswerVariant:
   confidence: High | Medium | Low
 ```
 
-Generate two answer layers:
+Internally, generate two answer layers when useful:
 
 1. `Exam Answer`
    - concise student-style answer;
@@ -197,6 +211,25 @@ Generate mark-length skeletons where relevant:
 - 8/10-mark version: full schema including comparison, diagram, data interpretation, or scenario conclusion.
 
 Do not claim exact official mark allocation unless an official mark scheme is present.
+
+The default student-facing short-answer report must be simplified into module logic plus point cards:
+
+```yaml
+ShortAnswerModuleSection:
+  module_name: string
+  module_core_logic: string
+  high_yield_points: []
+  point_cards: list[ShortAnswerPointCard]
+
+ShortAnswerPointCard:
+  priority: 必备 | 重点 | 补充
+  point: string
+  common_question_form: string
+  exam_explanation_with_highlighted_keywords: string
+  example_answer: string
+```
+
+Do not show mark-producing schema, required terms, optional examples, reference expansion, common omissions, task verb, confidence, evidence, or source anchor as separate student-facing fields. Bold required terms inside the explanation. Put the scoring logic into a natural `example_answer`.
 
 ## Practical / Data / Problem Outputs
 

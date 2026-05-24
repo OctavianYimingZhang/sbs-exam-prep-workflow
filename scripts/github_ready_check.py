@@ -88,6 +88,8 @@ def main() -> int:
         negative_dir = tmp_dir / "negative_docx"
         deliverable_dir = tmp_dir / "deliverable_docx"
         deliverable_qa_dir = tmp_dir / "deliverable_docx_internal_qa"
+        knowledge_walkthrough_dir = tmp_dir / "knowledge_walkthrough_docx"
+        knowledge_walkthrough_qa_dir = tmp_dir / "knowledge_walkthrough_internal_qa"
         bad_public_dir = tmp_dir / "bad_public_output"
         citation_fallback_dir = tmp_dir / "citation_fallback"
         past_paper_extract_dir = tmp_dir / "past_paper_question_extract"
@@ -107,6 +109,7 @@ def main() -> int:
                 run_command("action_writer_coverage", [py, "scripts/validate_action_writer_coverage.py"]),
                 run_command("interaction_contract", [py, "scripts/validate_interaction_contract.py"]),
                 run_command("workflow_planning_contract", [py, "scripts/validate_workflow_planning_contract.py"]),
+                run_command("student_output_contract", [py, "scripts/validate_student_output_contract.py"]),
                 run_command(
                     "workflow_plan_fixture",
                     [
@@ -118,6 +121,17 @@ def main() -> int:
                         "tests/fixtures/control_plane/source_scan.json",
                         "--output",
                         str(workflow_plan_path),
+                    ],
+                ),
+                run_command(
+                    "workflow_plan_knowledge_walkthrough_fixture",
+                    [
+                        py,
+                        "scripts/plan_workflow.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_knowledge_walkthrough.json",
+                        "--output",
+                        str(planner_dir / "knowledge_walkthrough_plan_route.json"),
                     ],
                 ),
                 run_command(
@@ -280,6 +294,24 @@ def main() -> int:
                     ],
                 ),
                 run_command("identity_trigger_scan", [py, "scripts/no_identity_trigger_linter.py"]),
+                run_command(
+                    "knowledge_walkthrough_docx_generate",
+                    [
+                        py,
+                        "scripts/generate_knowledge_walkthrough_docx.py",
+                        "--plan",
+                        "tests/fixtures/knowledge_walkthrough/knowledge_walkthrough_plan.json",
+                        "--output-dir",
+                        str(knowledge_walkthrough_dir),
+                        "--qa-dir",
+                        str(knowledge_walkthrough_qa_dir),
+                        "--clean",
+                        "--strict",
+                        "--deliverable-only",
+                    ],
+                ),
+                run_command("knowledge_walkthrough_lint", [py, "scripts/knowledge_walkthrough_linter.py", str(knowledge_walkthrough_dir)]),
+                run_command("knowledge_walkthrough_public_output", [py, "scripts/final_deliverable_linter.py", str(knowledge_walkthrough_dir), "--allowed", ".docx"]),
                 run_command(
                     "positive_docx_generate_strict",
                     [

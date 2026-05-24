@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/student_output_contract.schema.json",
+  "title": "StudentOutputContract",
+  "type": "object",
+  "required": ["contract_id", "output_mode", "allowed_visible_fields", "forbidden_visible_fields"],
+  "properties": {
+    "contract_id": { "type": "string" },
+    "output_mode": {
+      "enum": [
+        "knowledge_walkthrough_docx",
+        "mcq_prep",
+        "short_answer_prep",
+        "project_scenario_long_answer",
+        "essay_theme_plan",
+        "example_essay_docx",
+        "full_excel_workbook"
+      ]
+    },
+    "allowed_visible_fields": { "type": "array", "items": { "type": "string" } },
+    "forbidden_visible_fields": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "source_anchor",
+          "confidence",
+          "evidence",
+          "examiner_operation",
+          "discriminator_axis",
+          "practice_mcq",
+          "answer_key",
+          "contrast_table",
+          "separate_trap_bank",
+          "mark_producing_schema",
+          "required_terms",
+          "optional_examples",
+          "reference_expansion",
+          "common_omissions",
+          "task_verb",
+          "recurrence_count",
+          "lecture_centrality",
+          "prediction_score"
+        ]
+      }
+    },
+    "mcq_student_point_card": {
+      "type": "object",
+      "properties": {
+        "priority": { "enum": ["必备", "重点", "补充"] },
+        "point": { "type": "string" },
+        "knowledge_explanation": { "type": "string" },
+        "how_exam_tests_it": { "type": "string" },
+        "common_traps": { "type": "array", "items": { "type": "string" } },
+        "must_remember": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "short_answer_point_card": {
+      "type": "object",
+      "properties": {
+        "priority": { "enum": ["必备", "重点", "补充"] },
+        "point": { "type": "string" },
+        "common_question_form": { "type": "string" },
+        "exam_explanation_with_highlighted_keywords": { "type": "string" },
+        "example_answer": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

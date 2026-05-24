@@ -46,7 +46,8 @@ Use the narrowest preset that can answer the user's request:
 | --- | --- |
 | File roles and evidence limits only | `source_inventory_only` |
 | Exam sections, question types, and answer rules | `exam_format_diagnosis` |
-| Default workbook | `full_excel_workbook` |
+| Default lecture knowledge review | `knowledge_walkthrough_docx` |
+| Explicit Excel workbook | `full_excel_workbook` |
 | Paper-derived preparation priorities | `past_paper_prediction` |
 | MCQ strategy and content drills | `mcq_prep` |
 | Short-answer variants and mark schemas | `short_answer_prep` |

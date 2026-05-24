@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint default workbook KP explanations for essay-style synthesis quality.
+"""Lint workbook KP explanations for essay-style synthesis quality.
 
 The linter protects the separation between internal source coverage and
 student-facing prose. It does not judge biological correctness. It flags

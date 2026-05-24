@@ -1,6 +1,6 @@
 # KP Essay Synthesis Protocol
 
-This protocol governs the default workbook knowledge-point explanation. It is not full Example Essay Mode. It is the mandatory synthesis pass that converts source coverage into a student-facing essay paragraph fragment.
+This protocol governs explicit workbook knowledge-point explanations. It is not full Example Essay Mode and not the default lecture-review DOCX route. It is the synthesis pass that converts source coverage into a student-facing essay paragraph fragment when workbook output is requested.
 
 Use `language_quality_contract.md` for shared prose-quality rules. This file adds workbook-specific constraints: no source tracing in explanation cells, no how-to-write language, and no page/slide narration.
 
@@ -27,9 +27,9 @@ Hard rule:
 Source coverage is satisfied by slide images, page ranges, coverage audit, and internal diagnostics. The explanation cell is not responsible for mentioning every page. Never preserve coverage by narrating page-by-page content in prose.
 ```
 
-## Default Explanation Definition
+## Workbook Explanation Definition
 
-The default workbook explanation is:
+The workbook explanation is:
 
 - a concept-level paragraph, not a source trace;
 - written for revision as a reusable essay paragraph fragment;

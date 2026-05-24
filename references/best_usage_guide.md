@@ -24,7 +24,8 @@ Start from the requested artifact, then choose the minimum valid route:
 | --- | --- |
 | "What files do I have and what can they support?" | `source_inventory_only` |
 | "What is the exam format?" | `exam_format_diagnosis` |
-| "Make the normal revision workbook." | `full_excel_workbook` |
+| "Go through the lecture knowledge." | `knowledge_walkthrough_docx` |
+| "Make the revision workbook." | `full_excel_workbook` |
 | "Use past papers to prioritize revision." | `past_paper_prediction` |
 | "Prepare me for MCQs." | `mcq_prep` |
 | "Prepare short answers." | `short_answer_prep` |
@@ -38,6 +39,7 @@ Start from the requested artifact, then choose the minimum valid route:
 
 The exam strategy controls the output strategy:
 
+- lecture-review default: lecture-first Word walkthrough with conceptual modules;
 - essay or problem-essay: themes, coverage plans, paragraph skeletons, evidence banks, and optional DOCX Example Essays;
 - MCQ: discriminators, contrast tables, traps, wrong-option diagnosis, and scoring policy only when marking rules are visible;
 - short answer: bounded variants, mark-producing answer schemas, concise answers, and reference expansions;

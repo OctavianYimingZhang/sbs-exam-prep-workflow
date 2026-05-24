@@ -12,6 +12,7 @@ REQUIRED_MODES = {
     "full_workflow",
     "source_inventory",
     "exam_format_diagnosis",
+    "knowledge_walkthrough_docx",
     "prediction_workbook",
     "mcq_prep",
     "short_answer_prep",

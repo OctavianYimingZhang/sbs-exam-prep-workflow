@@ -11,7 +11,7 @@ Examples:
 - If the user asks only for source inventory, do not generate predictions or workbooks.
 - If the user asks only for DOCX linting, do not rewrite essays.
 - If the user asks only for Example Essay DOCX generation and already supplies a valid document plan, do not rerun past-paper prediction.
-- If the user asks for the complete exam-prep workflow, run the modules in the full dependency order.
+- If the user asks for the complete default lecture-review workflow, route to `knowledge_walkthrough_docx` and run only its dependencies.
 
 ## Module Contract
 
@@ -210,8 +210,8 @@ Minimum inputs:
 
 Outputs:
 
-- MCQ discriminator axes;
-- short-answer mark-producing schemas;
+- MCQ Point Cards with explanation, exam-use pattern, traps, and must-remember rules;
+- short-answer module logic and point cards with highlighted keywords and example answers;
 - predicted essay themes by lecture scope, with optional practice variants;
 - data/problem operations;
 - long-answer project method/readout/control plans.
@@ -220,7 +220,27 @@ Standalone behaviour:
 
 - output only the requested question-type product.
 
-### 10. Default Excel Workbook Generation
+### 10. Knowledge Walkthrough DOCX Generation
+
+Trigger:
+
+- user asks to go through lecture knowledge, revise lecture content in order, or requests the default full workflow without a narrower artifact.
+
+Minimum inputs:
+
+- lecture slides or official notes.
+
+Outputs:
+
+- one student-facing Word walkthrough;
+- internal manifest or QA JSON outside the public output folder unless an audit package is requested.
+
+Standalone behaviour:
+
+- if supplied with a valid `KnowledgeWalkthroughPlan`, generate/lint the DOCX without rerunning upstream modules.
+- preserve lecture order while splitting each lecture by conceptual function rather than slide/page number.
+
+### 11. Explicit Excel Workbook Generation
 
 Trigger:
 
@@ -240,7 +260,7 @@ Standalone behaviour:
 
 - if supplied with valid intermediate JSON/KP records, build the workbook without rerunning upstream modules.
 
-### 11. Example Essay DOCX Mode
+### 12. Example Essay DOCX Mode
 
 Trigger:
 
@@ -266,7 +286,7 @@ Standalone behaviour:
 - if a valid `ExampleEssayDocumentPlan` is supplied, generate/lint DOCX files without rerunning prediction.
 - if no lecture slides are supplied or identifiable, do not draft a polished essay; request the missing lecture evidence or flag the blocker.
 
-### 12. Citation Resolver
+### 13. Citation Resolver
 
 Trigger:
 
@@ -287,7 +307,7 @@ Standalone behaviour:
 
 - do not insert citation-derived essay content unless the source is resolved and read.
 
-### 13. Extra Reading Matcher
+### 14. Extra Reading Matcher
 
 Trigger:
 
@@ -309,7 +329,7 @@ Standalone behaviour:
 
 - stop after matching unless the user asks to write or update an essay.
 
-### 14. QA / Linting
+### 15. QA / Linting
 
 Trigger:
 
@@ -330,7 +350,7 @@ Standalone behaviour:
 
 - do not rewrite files unless explicitly requested.
 
-### 15. Cross-Subject Regression
+### 16. Cross-Subject Regression
 
 Trigger:
 
@@ -349,7 +369,7 @@ Standalone behaviour:
 
 - do not make content predictions.
 
-### 16. Gap Closure Report
+### 17. Gap Closure Report
 
 Trigger:
 
@@ -369,7 +389,7 @@ Standalone behaviour:
 
 - do not claim completion while high or medium gaps remain unresolved.
 
-### 17. GitHub Ready QA
+### 18. GitHub Ready QA
 
 Trigger:
 
@@ -403,11 +423,12 @@ When the user requests the complete exam-prep workflow, run modules in this orde
 7. KP Essay Synthesis.
 8. Archetype / Past-Paper / Pattern Analysis.
 9. Question-Type Output Generation.
-10. Default Excel Workbook Generation.
-11. QA / Linting.
-12. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
-13. Gap Closure Report when modifying the Skill itself.
-14. GitHub Ready QA before commit or push.
+10. Knowledge Walkthrough DOCX Generation for the default lecture-review output.
+11. Explicit Excel Workbook Generation only when requested.
+12. QA / Linting.
+13. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
+14. Gap Closure Report when modifying the Skill itself.
+15. GitHub Ready QA before commit or push.
 
 If the user also explicitly requests complete Example Essays, run Example Essay DOCX Mode as a separate branch after lecture-source grounding and question selection:
 

@@ -9,8 +9,14 @@ presets:
     required_source_classes: ["formal_past_papers"]
     modules: ["source_inventory", "exam_regime", "question_type"]
     student_outputs: ["exam format diagnosis"]
+  knowledge_walkthrough_docx:
+    purpose: "Build a lecture-first Word walkthrough that explains each lecture through AI-inferred conceptual modules."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["formal_past_papers", "practical_materials", "extra_reading"]
+    modules: ["source_inventory", "fragment_index", "lecture_module_extraction", "knowledge_walkthrough_plan", "knowledge_walkthrough_docx_generation", "deliverable_qa"]
+    student_outputs: ["Lecture Knowledge Walkthrough DOCX"]
   full_excel_workbook:
-    purpose: "Build the default exam-prep workbook from lecture and assessment evidence."
+    purpose: "Build the explicit Excel workbook route from lecture and assessment evidence."
     required_source_classes: ["lecture_or_official_notes"]
     recommended_source_classes: ["formal_past_papers", "practical_materials", "answer_keys", "extra_reading"]
     modules: ["source_inventory", "fragment_index", "exam_regime", "question_type", "knowledge_points", "examiner_operations", "prep_artifact"]

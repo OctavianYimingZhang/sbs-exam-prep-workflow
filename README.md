@@ -18,6 +18,14 @@ User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> validated
 
 This makes the workflow configurable and auditable. The Skill first decides the requested output mode, then checks which source classes are needed, then plans the minimum action path, then blocks only the conclusions that lack evidence.
 
+The default lecture-review output is now Word-first:
+
+```text
+Lecture Knowledge Walkthrough DOCX
+```
+
+It is not an Excel table converted into Word. It preserves lecture order, splits each lecture into conceptual modules, and explains each module in directly revisable prose. Excel workbooks, MCQ reports, short-answer reports, long-answer playbooks, prediction workbooks, and Example Essays remain available as explicit routes.
+
 ## Operational Ontology
 
 The Skill treats exam preparation as an operational object graph rather than a loose file index:
@@ -66,12 +74,13 @@ Choose one mode, or provide materials and ask for exam prep to use the default `
 
 | Mode | Use when | Output |
 | --- | --- | --- |
-| `full_workflow` | You want the complete exam-prep workflow. | Source coverage card plus workbook and requested add-ons. |
+| `full_workflow` | You want the default lecture-review workflow. | Source coverage card plus Lecture Knowledge Walkthrough DOCX. |
 | `source_inventory` | You only want file roles and extraction status. | Source inventory and evidence-use limits. |
 | `exam_format_diagnosis` | You want to know how the exam is structured. | Sections, question types, rules, and route recommendation. |
+| `knowledge_walkthrough_docx` | You want to go through lecture knowledge in order. | Lecture-first Word walkthrough with module overviews, knowledge walkthroughs, key logic, common confusions, and recap. |
 | `prediction_workbook` | You want past-paper prediction and workbook output. | Archetypes, confidence bands, and prep actions. |
-| `mcq_prep` | You need MCQ-focused preparation. | Discriminators, traps, contrast tables, and scoring policy when visible. |
-| `short_answer_prep` | You need short-answer practice. | Bounded variants, mark schemas, concise answers, reference expansions. |
+| `mcq_prep` | You need MCQ-focused preparation. | Point cards with explanations, exam-use pattern, traps, and must-remember rules. |
+| `short_answer_prep` | You need short-answer practice. | Module logic plus point cards with highlighted keywords and example answers. |
 | `practical_data_prep` | You need practical, data, graph, protocol, calculation, or case prep. | Input -> operation -> inference -> limitation drills. |
 | `long_answer_plan` | You need scenario/project long-answer planning. | Method blocks, readouts, controls, caveats. |
 | `essay_theme_plan` | You need essay preparation but not full essays. | Themes, coverage plans, skeletons, evidence banks. |
@@ -99,10 +108,11 @@ The planning layer supports these presets:
 | --- | --- | --- |
 | `source_inventory_only` | any readable source | file classification and evidence limits |
 | `exam_format_diagnosis` | formal past papers | structure, sections, answer rules, question type |
-| `full_excel_workbook` | lecture slides or official notes | default workbook |
+| `knowledge_walkthrough_docx` | lecture slides or official notes | default Word walkthrough |
+| `full_excel_workbook` | lecture slides or official notes | explicit Excel workbook |
 | `past_paper_prediction` | formal papers plus lecture/official content | archetypes, slot grammar, confidence bands |
-| `mcq_prep` | lecture/official content | discriminators, traps, scoring policy where visible |
-| `short_answer_prep` | lecture/official content | bounded variants and mark schemas |
+| `mcq_prep` | lecture/official content | student-facing MCQ Point Cards |
+| `short_answer_prep` | lecture/official content | module logic and short-answer point cards |
 | `practical_data_problem_prep` | lecture/official content plus practical/data material | input-operation-inference drills |
 | `project_scenario_long_answer` | lecture/official content | method/readout/control/caveat blocks |
 | `essay_theme_plan` | lecture/official content | themes, coverage plans, paragraph skeletons |
@@ -114,14 +124,15 @@ The setup protocol is in [`references/interactive_setup_protocol.md`](references
 
 ## What It Produces
 
-Default output is an Excel-first revision workbook. Complete Example Essays are generated only when explicitly requested.
+Default lecture-review output is a Word-first revision walkthrough. Complete Example Essays are generated only when explicitly requested.
 
 Typical student-facing outputs:
 
 | Request type | Main output | Purpose |
 | --- | --- | --- |
 | Source inventory | JSON or concise report | Identify files, roles, extraction status, and evidence limits. |
-| Exam-prep workbook | `Exam_Prep_Map` Excel workbook | Map lecture material to knowledge points and exam-facing prep actions. |
+| Lecture knowledge walkthrough | `Lecture_Knowledge_Walkthrough.docx` | Go through lectures in order through AI-inferred conceptual modules. |
+| Exam-prep workbook | `Exam_Prep_Map` Excel workbook | Explicit table-style map from lecture material to knowledge points and exam-facing prep actions. |
 | Past-paper prediction | Archetype registry, slot grammar, confidence bands | Convert papers into auditable preparation targets rather than exact-stem guesses. |
 | Essay/problem-essay prep | Predicted essay themes, coverage plans, paragraph skeletons, evidence banks | Prepare broad examinable themes without inventing exact future stems. |
 | MCQ prep | Discriminator axes, contrast tables, traps, scoring policy, concise flashcards | Train recognition of close alternatives, common distractors, and expected-value answer strategy. |
@@ -146,17 +157,79 @@ flowchart TD
     H --> I[Knowledge-point segmentation]
     I --> J[Examiner-operation inference]
     J --> K{Output route}
-    K --> L[Excel prep workbook]
-    K --> M[MCQ / short-answer / data prep]
-    K --> N[Long-answer or scenario model]
-    K --> O[Optional Example Essay DOCX]
+    K --> L[Lecture Knowledge Walkthrough DOCX]
+    K --> M[Excel prep workbook]
+    K --> N[MCQ / short-answer / data prep]
+    K --> O[Long-answer or scenario model]
+    K --> Q[Optional Example Essay DOCX]
     L --> P[Language, source, identity, and deliverable QA]
     M --> P
     N --> P
     O --> P
+    Q --> P
 ```
 
 The Skill first classifies the evidence, then chooses the preparation strategy. It avoids applying essay logic to MCQ, short-answer, data/problem, or practical questions.
+
+## Student-Facing Output Filter
+
+Internal reasoning can use source anchors, confidence, recurrence, lecture centrality, examiner operation, discriminator axes, and evidence rules. Ordinary student-facing reports must not display those internal fields.
+
+Visible output should be rewritten as:
+
+```text
+priority -> point/module -> explanation -> exam-use answer or walkthrough
+```
+
+Forbidden in ordinary student-facing reports:
+
+```text
+source anchor
+evidence rationale
+confidence
+recurrence count
+lecture centrality
+examiner operation
+discriminator axis
+task verb
+reference expansion
+common omissions
+past-paper year mapping
+prediction score
+```
+
+For MCQ reports, the default visible item is an MCQ Point Card: priority, point, knowledge explanation, how the exam tests it, common traps, and must-remember rule. Practice questions, answer keys, contrast tables, and separate trap banks are separate optional outputs, not part of the default MCQ high-yield report.
+
+For Short Answer reports, each section starts with module logic, then point cards. Required keywords are bolded inside the explanation, and mark logic is absorbed into the Example Answer. The student report does not show mark-producing schema, required-term fields, reference expansion, common omissions, task verb, confidence, evidence, or source anchors.
+
+The full policy is in [`references/student_facing_output_policy.md`](references/student_facing_output_policy.md).
+
+## Knowledge Walkthrough DOCX
+
+The `knowledge_walkthrough_docx` route is for going through lecture content. It does not predict papers, write essays, or create practice packs by default.
+
+Each lecture becomes:
+
+```text
+Lecture Overview
+Module Map
+Module 1
+Module 2
+...
+Lecture Recap
+```
+
+Each module contains:
+
+```text
+What This Module Explains
+Knowledge Walkthrough
+Key Logic
+Common Confusions
+Must Master
+```
+
+The route is defined in [`references/knowledge_walkthrough_docx_protocol.md`](references/knowledge_walkthrough_docx_protocol.md).
 
 ## Past-Paper Prediction
 
@@ -300,8 +373,8 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | `SKILL.md` | Top-level Codex Skill instructions and output contract. |
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
 | `references/` | Protocols for evidence handling, routing, scoring, language quality, Example Essays, Excel output, regression, and release. |
-| `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, language linting, DOCX generation, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
-| `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
+| `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, DOCX generation, student-output linting, language linting, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
+| `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, student output contracts, knowledge walkthrough plans, Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
 | `tests/fixtures/` | Small public fixtures for DOCX, source-grounding, and citation-fallback checks. |
 | `agents/` | Optional Skill interface metadata, presets, prompt cards, and setup wizard metadata. |
@@ -327,6 +400,23 @@ python -m pip install -r requirements.txt
 The scripts are plain Python files. Extraction and DOCX quality depend on the installed document libraries and source-file quality.
 
 ## Common Commands
+
+Generate a Lecture Knowledge Walkthrough DOCX:
+
+```bash
+python scripts/generate_knowledge_walkthrough_docx.py \
+  --plan /path/to/knowledge_walkthrough_plan.json \
+  --output-dir /path/to/public_output \
+  --qa-dir /path/to/internal_qa \
+  --deliverable-only \
+  --strict
+```
+
+Lint a Lecture Knowledge Walkthrough DOCX:
+
+```bash
+python scripts/knowledge_walkthrough_linter.py /path/to/public_output
+```
 
 Create a workflow plan from a setup config:
 

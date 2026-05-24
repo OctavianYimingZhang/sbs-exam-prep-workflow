@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/knowledge_walkthrough_plan.schema.json",
+  "title": "KnowledgeWalkthroughPlan",
+  "type": "object",
+  "required": ["walkthrough_id", "title", "target_group_key", "lecture_order", "lectures"],
+  "properties": {
+    "object_type": { "const": "KnowledgeWalkthroughPlan" },
+    "walkthrough_id": { "type": "string" },
+    "title": { "type": "string" },
+    "target_group_key": { "type": "string" },
+    "lecture_order": { "type": "array", "items": { "type": "string" } },
+    "forbidden_student_fields": { "type": "array", "items": { "type": "string" } },
+    "student_visible_structure": { "type": "array", "items": { "type": "string" } },
+    "lectures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["lecture_id", "lecture_title", "lecture_overview", "module_map", "modules", "lecture_recap"],
+        "properties": {
+          "lecture_id": { "type": "string" },
+          "lecture_title": { "type": "string" },
+          "lecture_overview": { "type": "string" },
+          "core_logic": { "type": "string" },
+          "module_map": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["module_id", "module_title", "one_sentence"],
+              "properties": {
+                "module_id": { "type": "string" },
+                "module_title": { "type": "string" },
+                "one_sentence": { "type": "string" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["module_id", "module_title", "module_overview", "knowledge_walkthrough", "key_logic", "must_master"],
+              "properties": {
+                "object_type": { "const": "LectureModule" },
+                "module_id": { "type": "string" },
+                "module_title": { "type": "string" },
+                "module_overview": { "type": "string" },
+                "knowledge_walkthrough": { "type": "string" },
+                "key_logic": { "type": "string" },
+                "common_confusions": { "type": "array", "items": { "type": "string" } },
+                "must_master": { "type": "array", "items": { "type": "string" } },
+                "source_anchors": { "type": "array", "items": { "type": "string" } },
+                "student_visible": { "type": "boolean" }
+              },
+              "additionalProperties": true
+            }
+          },
+          "lecture_recap": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "qa_status": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,260 @@
+#!/usr/bin/env python3
+"""Generate a lecture-first Knowledge Walkthrough DOCX from a plan."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import shutil
+from pathlib import Path
+from typing import Any
+
+try:
+    from docx import Document  # type: ignore
+    from docx.enum.text import WD_ALIGN_PARAGRAPH  # type: ignore
+    from docx.oxml.ns import qn  # type: ignore
+    from docx.shared import Cm  # type: ignore
+except Exception as exc:  # pragma: no cover
+    raise SystemExit(f"python-docx is required: {exc}")
+
+
+FORBIDDEN_KEYS = {
+    "source_anchor",
+    "source_anchors_visible",
+    "confidence",
+    "evidence",
+    "evidence_score",
+    "recurrence_count",
+    "examiner_operation",
+    "discriminator_axis",
+    "essay_theme",
+    "essay_plan",
+    "full_example_essay",
+    "practice_question",
+    "answer_key",
+    "prediction_score",
+}
+
+FORBIDDEN_TEXT = {
+    "source anchor",
+    "confidence",
+    "evidence score",
+    "recurrence count",
+    "examiner operation",
+    "discriminator axis",
+    "essay plan",
+    "full example essay",
+    "practice question",
+    "answer key",
+    "past paper year",
+    "prediction score",
+    "according to slide",
+    "slides say",
+    "ppt page",
+}
+
+
+def safe_filename(text: str, max_len: int = 72) -> str:
+    cleaned = re.sub(r"[\\/:*?\"<>|]+", "", text)
+    cleaned = re.sub(r"\s+", "_", cleaned.strip())
+    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "", cleaned)
+    return (cleaned[:max_len].strip("._-") or "knowledge_walkthrough")
+
+
+def load_plan(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def normalize_run(run) -> None:
+    run.font.name = "Arial"
+    if run._element.rPr is not None:
+        run._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial")
+
+
+def normalize_paragraph(paragraph, kind: str) -> None:
+    paragraph.paragraph_format.line_spacing = 1.5
+    if kind == "title":
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    elif kind in {"heading", "subheading"}:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    else:
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    for run in paragraph.runs:
+        normalize_run(run)
+
+
+def set_document_defaults(doc: Document) -> None:
+    section = doc.sections[0]
+    section.top_margin = Cm(2.5)
+    section.bottom_margin = Cm(2.5)
+    section.left_margin = Cm(2.5)
+    section.right_margin = Cm(2.5)
+    doc.styles["Normal"].font.name = "Arial"
+    doc.styles["Normal"].paragraph_format.line_spacing = 1.5
+    for style_name in ["KWTitle", "KWHeading", "KWSubheading", "KWBody"]:
+        if style_name not in doc.styles:
+            doc.styles.add_style(style_name, 1)
+        style = doc.styles[style_name]
+        style.font.name = "Arial"
+        style.paragraph_format.line_spacing = 1.5
+
+
+def add_marked_text(paragraph, text: str) -> None:
+    parts = re.split(r"(\*\*[^*]+\*\*)", str(text))
+    for part in parts:
+        if not part:
+            continue
+        if part.startswith("**") and part.endswith("**") and len(part) > 4:
+            run = paragraph.add_run(part[2:-2])
+            run.bold = True
+        else:
+            run = paragraph.add_run(part)
+        normalize_run(run)
+
+
+def add_paragraph(doc: Document, text: str, kind: str = "body"):
+    style = {"title": "KWTitle", "heading": "KWHeading", "subheading": "KWSubheading", "body": "KWBody"}[kind]
+    paragraph = doc.add_paragraph(style=style)
+    add_marked_text(paragraph, text)
+    if kind in {"title", "heading", "subheading"}:
+        for run in paragraph.runs:
+            run.bold = True
+    normalize_paragraph(paragraph, kind)
+    return paragraph
+
+
+def walk_values(value: Any) -> list[tuple[str, Any]]:
+    found: list[tuple[str, Any]] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            found.append((str(key), child))
+            found.extend(walk_values(child))
+    elif isinstance(value, list):
+        for child in value:
+            found.extend(walk_values(child))
+    return found
+
+
+def validate_plan(plan: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    if not plan.get("lectures"):
+        errors.append("walkthrough_requires_lectures")
+    if not plan.get("lecture_order"):
+        errors.append("walkthrough_requires_lecture_order")
+    for key, value in walk_values(plan):
+        if key in FORBIDDEN_KEYS:
+            errors.append(f"forbidden_key_visible_in_plan:{key}")
+        if isinstance(value, str):
+            lowered = value.lower()
+            for phrase in FORBIDDEN_TEXT:
+                if phrase in lowered:
+                    errors.append(f"forbidden_text_in_plan:{phrase}")
+    for lecture in plan.get("lectures", []):
+        if not lecture.get("module_map"):
+            errors.append(f"lecture_missing_module_map:{lecture.get('lecture_id', 'unknown')}")
+        if not lecture.get("modules"):
+            errors.append(f"lecture_missing_modules:{lecture.get('lecture_id', 'unknown')}")
+        if not lecture.get("lecture_recap"):
+            errors.append(f"lecture_missing_recap:{lecture.get('lecture_id', 'unknown')}")
+    return sorted(set(errors))
+
+
+def write_docx(plan: dict[str, Any], output_dir: Path, qa_dir: Path, strict: bool) -> dict[str, Any]:
+    errors = validate_plan(plan)
+    if strict and errors:
+        return {"status": "fail", "qa_flags": errors, "documents": []}
+
+    doc = Document()
+    set_document_defaults(doc)
+    title = plan.get("title") or "Lecture Knowledge Walkthrough"
+    add_paragraph(doc, str(title), "title")
+    add_paragraph(doc, "How To Use This Document", "heading")
+    add_paragraph(
+        doc,
+        "Use this document to go through the lecture knowledge in order. It is organised by lecture and conceptual module, not by slide page or hidden scoring.",
+        "body",
+    )
+
+    manifest = {
+        "walkthrough_id": plan.get("walkthrough_id"),
+        "target_group_key": plan.get("target_group_key"),
+        "title": title,
+        "lectures": [],
+        "qa_flags": errors,
+    }
+
+    for lecture in plan.get("lectures", []):
+        lecture_title = lecture.get("lecture_title", "Lecture")
+        add_paragraph(doc, f"Lecture: {lecture_title}", "heading")
+        add_paragraph(doc, "What This Lecture Is About", "subheading")
+        add_paragraph(doc, str(lecture.get("lecture_overview", "")), "body")
+        if lecture.get("core_logic"):
+            add_paragraph(doc, "Core Logic", "subheading")
+            add_paragraph(doc, str(lecture["core_logic"]), "body")
+
+        add_paragraph(doc, "Module Map", "subheading")
+        for item in lecture.get("module_map", []):
+            add_paragraph(doc, f"{item.get('module_title', 'Module')}: {item.get('one_sentence', '')}", "body")
+
+        lecture_manifest = {"lecture_id": lecture.get("lecture_id"), "lecture_title": lecture_title, "modules": []}
+        for module in lecture.get("modules", []):
+            add_paragraph(doc, f"Module: {module.get('module_title', 'Module')}", "subheading")
+            add_paragraph(doc, "What This Module Explains", "subheading")
+            add_paragraph(doc, str(module.get("module_overview", "")), "body")
+            add_paragraph(doc, "Knowledge Walkthrough", "subheading")
+            add_paragraph(doc, str(module.get("knowledge_walkthrough", "")), "body")
+            add_paragraph(doc, "Key Logic", "subheading")
+            add_paragraph(doc, str(module.get("key_logic", "")), "body")
+            common_confusions = module.get("common_confusions", [])
+            if common_confusions:
+                add_paragraph(doc, "Common Confusions", "subheading")
+                for item in common_confusions:
+                    add_paragraph(doc, str(item), "body")
+            add_paragraph(doc, "Must Master", "subheading")
+            for item in module.get("must_master", []):
+                add_paragraph(doc, str(item), "body")
+            lecture_manifest["modules"].append({"module_id": module.get("module_id"), "module_title": module.get("module_title")})
+
+        add_paragraph(doc, "Lecture Recap", "subheading")
+        for item in lecture.get("lecture_recap", []):
+            add_paragraph(doc, str(item), "body")
+        manifest["lectures"].append(lecture_manifest)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    qa_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"{safe_filename(title)}.docx"
+    docx_path = output_dir / filename
+    doc.save(docx_path)
+    manifest["documents"] = [{"docx_path": str(docx_path), "filename": filename}]
+    manifest["status"] = "pass" if not errors else "warn"
+    manifest_path = qa_dir / "knowledge_walkthrough_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    return manifest
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--plan", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--qa-dir", type=Path)
+    parser.add_argument("--clean", action="store_true")
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--deliverable-only", action="store_true")
+    args = parser.parse_args()
+
+    output_dir = args.output_dir
+    qa_dir = args.qa_dir or (output_dir if not args.deliverable_only else output_dir.parent / "knowledge_walkthrough_internal_qa")
+    if args.clean:
+        if output_dir.exists():
+            shutil.rmtree(output_dir)
+        if qa_dir.exists() and qa_dir != output_dir:
+            shutil.rmtree(qa_dir)
+
+    result = write_docx(load_plan(args.plan), output_dir, qa_dir, args.strict)
+    print(json.dumps(result, indent=2))
+    return 0 if result.get("status") in {"pass", "warn"} else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

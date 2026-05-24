@@ -49,6 +49,7 @@ Use `ontology/ontology.json` as the machine-readable contract for object types.
 Core objects:
 
 - `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, `WorkflowPlan`, and `OutputView`: interaction-layer objects that select mode, plan actions, expose source coverage, and prevent hidden blockers.
+- `LectureModule` and `KnowledgeWalkthroughPlan`: Word-first lecture-review objects that preserve lecture order while converting slides or notes into conceptual modules.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
 - `FragmentPartition`: metadata partition used to prune irrelevant fragments before expensive reasoning or generation.
@@ -112,12 +113,14 @@ SourceDocument CONTAINS SourceFragment
 SourceDocument PARTITIONED_AS FragmentPartition
 FragmentPartition GROUPS_FRAGMENT SourceFragment
 SourceFragment SUPPORTS_KP KnowledgePoint
+SourceFragment SUPPORTS_LECTURE_MODULE LectureModule
 KnowledgePoint SUPPORTS_CLAIM EvidenceClaim
 PastPaperQuestion INSTANTIATES QuestionArchetype
 QuestionArchetype USES_OPERATION ExaminerOperation
 KnowledgePoint COMPATIBLE_WITH QuestionArchetype
 ReadingSource ENRICHES_KP KnowledgePoint
 PrepArtifact GENERATED_FROM_KP KnowledgePoint
+PrepArtifact GENERATED_FROM_LECTURE_MODULE LectureModule
 PrepArtifact GENERATED_FROM_MCQ_POLICY MCQScoringPolicy
 PrepArtifact GENERATED_FROM_SHORT_ANSWER_VARIANT ShortAnswerVariant
 PrepArtifact GENERATED_FROM_ESSAY_COVERAGE_PLAN EssayCoveragePlan
@@ -150,6 +153,8 @@ RecordGateResult
 PlanWorkflow
 ExtractFragments
 BuildFragmentIndex
+BuildLectureModules
+BuildKnowledgeWalkthroughPlan
 NormalizeTargetGroup
 SplitExamRegime
 ExtractPastPaperQuestions
@@ -181,6 +186,18 @@ Workflow plan preview query:
 
 ```text
 request scope + selected preset + target + actions + skipped modules + blockers + publish gate
+```
+
+Knowledge walkthrough query:
+
+```text
+lecture order + lecture overview + module map + lecture modules + key logic + common confusions + lecture recap
+```
+
+Student output filter query:
+
+```text
+internal objects + selected output mode + allowed visible fields + forbidden visible fields
 ```
 
 Essay theme query:
@@ -236,6 +253,8 @@ Fail or block student-facing output when:
 - an ontology object has no writer action;
 - the requested output mode has no selected `OutputView`;
 - a major generation path has no `WorkflowPlan`;
+- student-facing output exposes internal evidence, confidence, source-anchor, discriminator, task-verb, or examiner-operation fields;
+- a knowledge walkthrough follows slide/page order instead of conceptual module order;
 - the source coverage map hides a blocking gap;
 - a source role is not allowed to support the claim;
 - old-regime evidence controls current-regime prediction;

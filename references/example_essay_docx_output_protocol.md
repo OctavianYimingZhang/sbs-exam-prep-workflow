@@ -6,7 +6,7 @@ Use this protocol only when Example Essay Mode is explicitly requested by the us
 
 Do not trigger this DOCX protocol for ordinary workbook KP explanations, prediction-only outputs, or a request for a single essay-style paragraph unless the user explicitly asks for complete Example Essay documents.
 
-The normal default workflow remains Excel-first. This DOCX protocol does not apply to prediction-only, workbook-only, MCQ, short-answer, or ordinary revision-map requests.
+The normal default lecture-review workflow is `knowledge_walkthrough_docx`. This DOCX protocol does not apply to prediction-only, workbook-only, MCQ, short-answer, or ordinary lecture-walkthrough requests.
 
 ## Primary Output
 

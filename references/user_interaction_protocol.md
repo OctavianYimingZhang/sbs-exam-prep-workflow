@@ -27,12 +27,13 @@ Classify the request into one mode before deep analysis:
 
 | Mode | Use when | Main output |
 | --- | --- | --- |
-| `full_workflow` | User wants complete exam-prep workflow or does not specify a narrower mode. | Source coverage card plus Excel-first workbook and requested add-ons. |
+| `full_workflow` | User wants default lecture review or does not specify a narrower mode. | Source coverage card plus Lecture Knowledge Walkthrough DOCX. |
 | `source_inventory` | User asks only to inspect or classify files. | File roles, extraction status, trust level, and evidence permissions. |
 | `exam_format_diagnosis` | User asks what the exam format rewards. | Sections, question types, answer rules, and recommended prep routes. |
+| `knowledge_walkthrough_docx` | User asks to go through lecture knowledge in order. | Lecture-first Word walkthrough with conceptual modules. |
 | `prediction_workbook` | User asks for past-paper prediction or exam-prep Excel. | Archetype-based workbook with confidence bands and prep actions. |
-| `mcq_prep` | User asks for MCQ preparation. | Discriminators, traps, contrast tables, and scoring policy when visible. |
-| `short_answer_prep` | User asks for short-answer practice. | Bounded variants, mark schemas, concise answers, and reference expansions. |
+| `mcq_prep` | User asks for MCQ preparation. | Point cards with explanation, exam-use pattern, traps, and must-remember rules. |
+| `short_answer_prep` | User asks for short-answer practice. | Module logic plus point cards with highlighted keywords and example answers. |
 | `practical_data_prep` | User asks for practical, data, graph, protocol, calculation, or case prep. | Input -> operation -> inference -> limitation -> follow-up drills. |
 | `long_answer_plan` | User asks for project/scenario long-answer planning. | Method blocks, readouts, controls, caveats, and compact model answers when requested. |
 | `essay_theme_plan` | User asks for essay preparation but not full essays. | Essay themes, coverage plans, paragraph skeletons, evidence banks. |
@@ -40,14 +41,15 @@ Classify the request into one mode before deep analysis:
 | `evidence_gap_audit` | User asks what is missing or why output is blocked. | Source coverage map, blocking gaps, stale evidence, and next-source checklist. |
 | `incremental_refresh` | User supplies new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects, sections, artifacts, and QA results are refreshed. |
 
-If the user provides only materials and asks for exam prep, default to `full_workflow`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
+If the user provides only materials and asks for general lecture review or exam prep without naming a narrower artifact, default to `full_workflow`, which maps to `knowledge_walkthrough_docx`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
 
 Map interaction modes to execution presets before planning:
 
 | Interaction mode | Execution preset |
 | --- | --- |
-| `full_workflow` | `full_excel_workbook` |
+| `full_workflow` | `knowledge_walkthrough_docx` |
 | `source_inventory` | `source_inventory_only` |
+| `knowledge_walkthrough_docx` | `knowledge_walkthrough_docx` |
 | `prediction_workbook` | `past_paper_prediction` |
 | `practical_data_prep` | `practical_data_problem_prep` |
 | `long_answer_plan` | `project_scenario_long_answer` |
@@ -131,6 +133,7 @@ Allowed focused views:
 
 - `source_inventory`;
 - `source_coverage_card`;
+- `knowledge_walkthrough_docx`;
 - `prediction_brief`;
 - `mcq_drill`;
 - `short_answer_bank`;
@@ -150,6 +153,7 @@ When interactive guidance is useful, end the student-facing result with short fo
 - refresh from newly uploaded papers or slides;
 - convert prediction results into a focused MCQ, short-answer, essay, or practical drill;
 - generate Example Essay DOCX from a chosen theme;
+- convert the same lecture modules into MCQ or short-answer reports;
 - audit source gaps only;
 - rerun QA after adding missing answer keys, readings, or mark schemes.
 

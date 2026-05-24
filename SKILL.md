@@ -1,6 +1,6 @@
 ---
 name: sbs-exam-prep-workflow
-description: Excel-first exam-preparation workflow for lecture slides, past papers, practical materials, MCQ, short-answer, long-answer, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, and optional DOCX-first Example Essays.
+description: Word-first lecture knowledge walkthrough and evidence-grounded exam-preparation workflow for lecture slides, past papers, practical materials, MCQ, short-answer, long-answer, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, explicit Excel workbooks, and optional DOCX-first Example Essays.
 ---
 
 # SBS Exam Prep Workflow
@@ -13,7 +13,7 @@ Inputs -> exam format -> question type -> examiner operation -> knowledge point 
 
 The workflow is not topic-hotness-first. Frequency and recency are auxiliary signals. The core task is to infer how the examiner asks questions, what kind of answer each question type rewards, and what preparation artefact best matches that strategy.
 
-Default output is an Excel-first student workbook. Complete Example Essays are generated only when explicitly requested; they are DOCX-first and one document per essay. Do not help with a live exam, active assessed submission, or contract-cheating request.
+Default lecture-review output is a Word-first `Lecture Knowledge Walkthrough DOCX`: it preserves lecture order, splits each lecture into conceptual modules, and explains the knowledge in student-facing language. Excel workbooks, MCQ reports, short-answer reports, long-answer playbooks, prediction workbooks, and complete Example Essays are generated only when explicitly requested or when selected by the plan. Complete Example Essays remain DOCX-first and one document per essay. Do not help with a live exam, active assessed submission, or contract-cheating request.
 
 For non-trivial runs, use the setup and planning chain before generation:
 
@@ -22,6 +22,21 @@ User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> validated
 ```
 
 This chain is the control layer. It chooses the narrowest valid preset, lists required sources, records skipped modules, exposes blockers, and prevents internal helper files from being mixed into student-facing outputs.
+
+## Student-Facing Output Filter
+
+The Skill may use source anchors, evidence claims, confidence bands, examiner-operation labels, recurrence, lecture centrality, and scoring logic internally. Student-facing outputs must not expose internal audit reasoning unless the user explicitly requests an audit package.
+
+For ordinary student-facing exam-prep outputs, rewrite each item as directly usable revision content:
+
+```text
+internal reasoning: evidence -> operation -> priority -> output type
+student output: priority -> point/module -> explanation -> exam-use answer or walkthrough
+```
+
+Do not show `source_anchor`, evidence rationale, confidence, recurrence count, lecture centrality, examiner operation, discriminator axis, task verb, reference expansion, common omissions, evidence limit, past-paper year mapping, or prediction score in the public student report.
+
+Visible priority labels are only `必备`, `重点`, and `补充`.
 
 ## Evidence Boundary
 
@@ -72,6 +87,8 @@ Student-visible output may be generated only from Gold objects whose support lin
 - `references/user_interaction_protocol.md`: request parsing, mode selection, source coverage cards, output views, and blocking-gap interaction.
 - `references/interactive_setup_protocol.md`: `SkillConfig`, `WorkflowPlan`, `InputReadinessReport`, plan preview, and setup wizard rules.
 - `references/best_usage_guide.md`: best source pack, preset selection, strategy rules, and planning commands.
+- `references/student_facing_output_policy.md`: visible output filters and final student report contracts for MCQ, short-answer, long-answer, and essay outputs.
+- `references/knowledge_walkthrough_docx_protocol.md`: lecture-first Word walkthrough route, module extraction, DOCX structure, and forbidden student fields.
 - `references/modular_entrypoints_protocol.md`: standalone and full-workflow entry points.
 - `references/question_type_protocol.md`: MCQ, short-answer, essay, and long-answer routing.
 - `references/scoring_and_pattern_protocol.md`: pattern inference, retention, recency, and confidence rules.
@@ -108,6 +125,7 @@ Parse the request into `UserExamPrepRequest`, `UserConstraint`, `SkillConfig`, `
 - `full_workflow`;
 - `source_inventory`;
 - `exam_format_diagnosis`;
+- `knowledge_walkthrough_docx`;
 - `prediction_workbook`;
 - `mcq_prep`;
 - `short_answer_prep`;
@@ -119,7 +137,7 @@ Parse the request into `UserExamPrepRequest`, `UserConstraint`, `SkillConfig`, `
 - `incremental_refresh`;
 - audit/regression only.
 
-If the user provides only materials and asks for exam prep, default to `full_workflow` / `full_excel_workbook`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
+If the user provides only materials and asks to go through the knowledge, revise the lectures, or prepare generally without naming a question-type artifact, default to `knowledge_walkthrough_docx`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
 
 Run only the requested module and its minimum dependencies. If the user supplies valid intermediate artefacts, use them directly. Report modules run, modules skipped, and artefacts generated.
 
@@ -249,19 +267,17 @@ Report frequency, retention, recency, lecture centrality, question-shape fit, an
 
 MCQ:
 
-- concept discriminators;
-- distractor families;
-- contrast tables;
-- exception traps;
-- mechanism-order traps;
-- concise flashcards.
+- student-visible `MCQ Point Card` only by default;
+- `Priority`, `Point`, `知识点讲解`, `考试怎么考`, `常见陷阱`, and `必须记住`;
+- no practice question, answer key, contrast table, separate trap bank, discriminator axis, confidence, evidence, or source anchor unless the user explicitly asks for a separate practice/audit output;
+- common wrong-option logic must be folded into `常见陷阱`.
 
 Short answer:
 
-- mark-producing answer schema;
-- concise `Exam Answer`;
-- fuller `Reference Expansion`;
-- required terms, examples, and controls.
+- module-level logic before point cards;
+- `Priority`, `Point`, `常见问法`, `考点讲解（关键词高亮）`, and `Example Answer`;
+- no visible mark-producing schema, required-term field, optional-example field, reference expansion, common omissions, task verb, confidence, evidence, or source anchor;
+- required keywords should be bolded inside the explanation, and scoring logic should be absorbed into the natural `Example Answer`.
 
 Essay / problem-essay:
 
@@ -274,11 +290,16 @@ Essay / problem-essay:
 Long answer / project / scenario:
 
 - question deconstruction;
-- method block library;
-- expected readouts;
-- interpretation logic;
-- controls, caveats, limitations;
+- exam-response playbook;
+- reusable answer blocks for mechanism, method/readout, interpretation, control, and limitation;
 - compact model answer only when explicitly requested.
+
+Knowledge walkthrough:
+
+- lecture-first DOCX;
+- each lecture becomes a short overview, module map, conceptual module walkthroughs, and lecture recap;
+- modules are inferred by conceptual function, not by PPT page order;
+- no essay skeletons, full essays, practice questions, answer keys, prediction scores, or internal audit fields.
 
 ### 9. Example Essay Mode
 
@@ -337,7 +358,7 @@ Extra reading should normally contribute only a small enrichment layer. It must 
 
 ### 11. Excel Generation
 
-Default student-facing output is a single-sheet visual workbook named `Exam_Prep_Map`.
+Excel output is an explicit workbook route, not the default lecture-review route. When requested, the student-facing workbook is a single-sheet visual workbook named `Exam_Prep_Map`.
 
 Use a minimal column set unless the user asks for audit detail:
 
@@ -370,6 +391,8 @@ Produce diagnostics for:
 - ontology object without writer action;
 - interaction mode missing or unsupported by source coverage;
 - workflow action missing required source input;
+- student-facing output exposes internal evidence, confidence, source-anchor, discriminator, task-verb, or examiner-operation fields;
+- knowledge walkthrough DOCX follows slide/page order instead of conceptual module order;
 - student-facing artifact without valid Gold-object lineage;
 - missing run manifest or lineage event for generated artifacts;
 - exact future-question wording claimed;
@@ -427,7 +450,8 @@ When modifying the Skill itself, completion requires:
 
 Default user-facing output:
 
-- normally includes the requested `Exam-Prep Excel` workbook when workbook generation is requested.
+- normally includes the requested `Lecture Knowledge Walkthrough DOCX` when the user asks to go through lecture knowledge or provides materials without naming a narrower output.
+- includes the requested `Exam-Prep Excel` workbook only when workbook generation is requested.
 
 Explicit Example Essay Mode user-facing output:
 

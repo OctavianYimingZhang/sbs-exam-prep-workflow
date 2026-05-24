@@ -19,20 +19,27 @@ REQUIRED_FILES = [
     "schemas/workflow_action.schema.json",
     "schemas/workflow_plan.schema.json",
     "schemas/input_readiness_report.schema.json",
+    "schemas/knowledge_walkthrough_plan.schema.json",
     "schemas/run_status.schema.json",
+    "schemas/student_output_contract.schema.json",
     "schemas/prompt_card.schema.json",
     "scripts/plan_workflow.py",
     "scripts/input_readiness_check.py",
+    "scripts/generate_knowledge_walkthrough_docx.py",
+    "scripts/knowledge_walkthrough_linter.py",
     "scripts/render_workflow_plan.py",
     "scripts/run_status_report.py",
     "scripts/lineage_report.py",
     "references/interactive_setup_protocol.md",
     "references/best_usage_guide.md",
+    "references/student_facing_output_policy.md",
+    "references/knowledge_walkthrough_docx_protocol.md",
 ]
 
 REQUIRED_PRESETS = {
     "source_inventory_only",
     "exam_format_diagnosis",
+    "knowledge_walkthrough_docx",
     "full_excel_workbook",
     "past_paper_prediction",
     "mcq_prep",
@@ -138,7 +145,7 @@ def validate(root: Path) -> dict[str, Any]:
         ]
         if (root / path).exists()
     )
-    for term in ["SkillConfig", "WorkflowPlan", "InputReadinessReport", "Plan Preview"]:
+    for term in ["SkillConfig", "WorkflowPlan", "InputReadinessReport", "Plan Preview", "knowledge_walkthrough_docx"]:
         if term not in combined_docs:
             failures.append({"type": "planning_term_missing_from_docs", "term": term})
 

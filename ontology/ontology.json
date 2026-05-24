@@ -28,6 +28,14 @@
       "description": "Executable plan that turns the parsed request and source coverage into scoped actions, blockers, skipped modules, and publish gates.",
       "required_properties": ["plan_id", "request_scope", "selected_preset", "target_group_key", "source_inventory_required", "fragment_index_required", "actions", "skipped_modules", "blockers", "publish_gate"]
     },
+    "LectureModule": {
+      "description": "Conceptual module inferred from a lecture or official note for student-facing knowledge walkthrough output.",
+      "required_properties": ["module_id", "lecture_id", "lecture_title", "module_title", "module_overview", "knowledge_walkthrough", "key_logic", "common_confusions", "must_master", "source_anchors", "student_visible"]
+    },
+    "KnowledgeWalkthroughPlan": {
+      "description": "DOCX-first student-facing lecture walkthrough plan that preserves lecture order while rewriting each lecture into conceptual modules.",
+      "required_properties": ["walkthrough_id", "target_group_key", "lecture_order", "lectures", "student_visible_structure", "forbidden_student_fields", "qa_status"]
+    },
     "SourceDocument": {
       "description": "Every supplied or discovered file.",
       "required_properties": ["source_id", "path", "file_role", "trust_level", "analysis_context", "allowed_evidence_use", "extraction_status"]
@@ -130,8 +138,10 @@
     "DEFINES_BLUEPRINT": {"from": "AssessmentRegime", "to": "ExamBlueprint"},
     "ENRICHES_KP": {"from": "ReadingSource", "to": "KnowledgePoint"},
     "TESTS_KP": {"from": "PracticalOperation", "to": "KnowledgePoint"},
+    "SUPPORTS_LECTURE_MODULE": {"from": "SourceFragment", "to": "LectureModule"},
     "GENERATED_FROM": {"from": "PrepArtifact", "to": "KnowledgePoint"},
     "GENERATED_FROM_KP": {"from": "PrepArtifact", "to": "KnowledgePoint"},
+    "GENERATED_FROM_LECTURE_MODULE": {"from": "PrepArtifact", "to": "LectureModule"},
     "GENERATED_FROM_MCQ_POLICY": {"from": "PrepArtifact", "to": "MCQScoringPolicy"},
     "GENERATED_FROM_SHORT_ANSWER_VARIANT": {"from": "PrepArtifact", "to": "ShortAnswerVariant"},
     "GENERATED_FROM_ESSAY_COVERAGE_PLAN": {"from": "PrepArtifact", "to": "EssayCoveragePlan"},
@@ -172,6 +182,8 @@
     "CreateSourceInventory": ["SourceDocument"],
     "ExtractFragments": ["SourceFragment", "QAFlag"],
     "BuildFragmentIndex": ["FragmentPartition"],
+    "BuildLectureModules": ["LectureModule", "QAFlag"],
+    "BuildKnowledgeWalkthroughPlan": ["KnowledgeWalkthroughPlan"],
     "NormalizeTargetGroup": ["SourceDocument"],
     "SplitExamRegime": ["AssessmentRegime", "ExamBlueprint"],
     "ExtractPastPaperQuestions": ["PastPaperQuestion"],
@@ -198,6 +210,9 @@
     "user_request_mode_selected_or_defaulted",
     "source_coverage_visible_before_generation",
     "workflow_plan_precedes_execution",
+    "student_facing_output_filter_applied",
+    "knowledge_walkthrough_docx_is_lecture_first",
+    "question_type_reports_hide_internal_reasoning",
     "blocking_gap_asks_one_question_or_marks_blocked",
     "output_view_does_not_break_evidence_rules",
     "student_visible_artifact_requires_valid_gold_objects",
@@ -217,6 +232,8 @@
     "source_coverage_card": ["requested_mode", "required_source_classes", "available_source_classes", "missing_blocking_sources", "blocked_conclusions"],
     "output_view_selection": ["user_request", "source_coverage_map", "allowed_artifact_policy", "minimum_dependencies"],
     "workflow_plan_preview": ["request_scope", "selected_preset", "target_group_key", "actions", "skipped_modules", "blockers", "publish_gate"],
+    "student_output_filter": ["internal_objects", "student_visible_structure", "forbidden_student_fields", "output_mode"],
+    "knowledge_walkthrough_docx": ["lecture_order", "lecture_overview", "module_map", "lecture_modules", "lecture_recap", "forbidden_student_fields"],
     "essay_theme": ["current_regime", "essay_archetype", "compatible_kps", "lecture_scope", "confidence_band", "qa_flags"],
     "mcq_prep": ["mcq_archetype", "discriminator_axes", "distractor_families", "mcq_scoring_policy", "confidence_band"],
     "data_problem_prep": ["practical_operation", "linked_kps", "input_operation_inference_limitation_follow_up"],

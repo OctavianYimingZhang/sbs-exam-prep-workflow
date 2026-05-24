@@ -10,7 +10,7 @@ prompt_cards:
       - "No supplied or discoverable sources."
   - card_id: "full_excel_workbook"
     preset: "full_excel_workbook"
-    purpose: "Build the default student-facing workbook from valid source objects."
+    purpose: "Build the explicit student-facing workbook from valid source objects."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
       - "Generate workbook content from source-linked knowledge points."
@@ -18,6 +18,17 @@ prompt_cards:
     hard_stops:
       - "No lecture slides or official notes."
       - "Blocking ontology or language QA flag."
+  - card_id: "knowledge_walkthrough_docx"
+    preset: "knowledge_walkthrough_docx"
+    purpose: "Build a lecture-first Word walkthrough for revising the lecture knowledge in order."
+    minimum_inputs: ["lecture_or_official_notes"]
+    output_contract:
+      - "Preserve lecture order."
+      - "Split each lecture into conceptual modules, not slide/page summaries."
+      - "Use module overview, knowledge walkthrough, key logic, common confusions, must-master points, and lecture recap."
+      - "Do not show source anchors, confidence, recurrence, examiner operations, essay plans, practice questions, or answer keys."
+    hard_stops:
+      - "No lecture slides or official notes."
   - card_id: "past_paper_prediction"
     preset: "past_paper_prediction"
     purpose: "Build archetypes and preparation priorities without claiming exact future wording."

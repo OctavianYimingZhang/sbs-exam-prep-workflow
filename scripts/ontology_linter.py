@@ -16,6 +16,8 @@ REQUIRED_OBJECT_TYPES = {
     "GateResult",
     "OutputView",
     "WorkflowPlan",
+    "LectureModule",
+    "KnowledgeWalkthroughPlan",
     "SourceDocument",
     "SourceFragment",
     "FragmentPartition",
@@ -53,8 +55,10 @@ REQUIRED_LINK_TYPES = {
     "DEFINES_BLUEPRINT",
     "ENRICHES_KP",
     "TESTS_KP",
+    "SUPPORTS_LECTURE_MODULE",
     "GENERATED_FROM",
     "GENERATED_FROM_KP",
+    "GENERATED_FROM_LECTURE_MODULE",
     "GENERATED_FROM_MCQ_POLICY",
     "GENERATED_FROM_SHORT_ANSWER_VARIANT",
     "GENERATED_FROM_ESSAY_COVERAGE_PLAN",
@@ -74,6 +78,8 @@ REQUIRED_ACTION_TYPES = {
     "CreateSourceInventory",
     "ExtractFragments",
     "BuildFragmentIndex",
+    "BuildLectureModules",
+    "BuildKnowledgeWalkthroughPlan",
     "NormalizeTargetGroup",
     "SplitExamRegime",
     "ExtractPastPaperQuestions",
@@ -100,6 +106,9 @@ REQUIRED_VALIDATION_RULES = {
     "user_request_mode_selected_or_defaulted",
     "source_coverage_visible_before_generation",
     "workflow_plan_precedes_execution",
+    "student_facing_output_filter_applied",
+    "knowledge_walkthrough_docx_is_lecture_first",
+    "question_type_reports_hide_internal_reasoning",
     "blocking_gap_asks_one_question_or_marks_blocked",
     "output_view_does_not_break_evidence_rules",
     "exact_future_question_wording_not_claimed",
@@ -176,7 +185,17 @@ def validate_ontology(data: dict[str, Any]) -> dict[str, Any]:
     if missing_rules:
         failures.append({"type": "missing_validation_rules", "items": missing_rules})
 
-    for template in ["source_coverage_card", "output_view_selection", "workflow_plan_preview", "essay_theme", "mcq_prep", "data_problem_prep", "extra_reading_insert"]:
+    for template in [
+        "source_coverage_card",
+        "output_view_selection",
+        "workflow_plan_preview",
+        "student_output_filter",
+        "knowledge_walkthrough_docx",
+        "essay_theme",
+        "mcq_prep",
+        "data_problem_prep",
+        "extra_reading_insert",
+    ]:
         if template not in data.get("query_templates", {}):
             failures.append({"type": "missing_query_template", "template": template})
 

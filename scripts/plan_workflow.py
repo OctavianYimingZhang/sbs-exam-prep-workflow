@@ -23,8 +23,10 @@ SOURCE_INPUT_KEYS = (
 )
 
 PRESET_ALIASES = {
-    "full_workflow": "full_excel_workbook",
+    "full_workflow": "knowledge_walkthrough_docx",
     "source_inventory": "source_inventory_only",
+    "lecture_walkthrough_docx": "knowledge_walkthrough_docx",
+    "knowledge_walkthrough": "knowledge_walkthrough_docx",
     "prediction_workbook": "past_paper_prediction",
     "practical_data_prep": "practical_data_problem_prep",
     "long_answer_plan": "project_scenario_long_answer",
@@ -32,12 +34,13 @@ PRESET_ALIASES = {
     "example_essay": "example_essay_docx",
     "example_essay_docx": "example_essay_docx",
     "evidence_gap_audit": "audit_lint_only",
-    "incremental_refresh": "full_excel_workbook",
+    "incremental_refresh": "knowledge_walkthrough_docx",
 }
 
 PRESET_REQUIRED_CLASSES = {
     "source_inventory_only": ["any_source"],
     "exam_format_diagnosis": ["formal_past_papers"],
+    "knowledge_walkthrough_docx": ["lecture_or_official_notes"],
     "full_excel_workbook": ["lecture_or_official_notes"],
     "past_paper_prediction": ["formal_past_papers", "lecture_or_official_notes"],
     "mcq_prep": ["lecture_or_official_notes"],
@@ -53,6 +56,14 @@ PRESET_REQUIRED_CLASSES = {
 PRESET_MODULES = {
     "source_inventory_only": ["source_inventory"],
     "exam_format_diagnosis": ["source_inventory", "exam_regime", "question_type"],
+    "knowledge_walkthrough_docx": [
+        "source_inventory",
+        "fragment_index",
+        "lecture_module_extraction",
+        "knowledge_walkthrough_plan",
+        "knowledge_walkthrough_docx_generation",
+        "deliverable_qa",
+    ],
     "full_excel_workbook": [
         "source_inventory",
         "fragment_index",
@@ -144,6 +155,24 @@ MODULE_DEFS = {
         "minimum_inputs": ["source_inventory"],
         "expected_outputs": ["FragmentPartition"],
         "qa_checks": ["partition metadata", "source hash"],
+    },
+    "lecture_module_extraction": {
+        "action_type": "BuildLectureModules",
+        "minimum_inputs": ["lecture_or_official_notes"],
+        "expected_outputs": ["LectureModule"],
+        "qa_checks": ["lecture order", "conceptual module boundaries", "student-facing filter"],
+    },
+    "knowledge_walkthrough_plan": {
+        "action_type": "BuildKnowledgeWalkthroughPlan",
+        "minimum_inputs": ["LectureModule"],
+        "expected_outputs": ["KnowledgeWalkthroughPlan"],
+        "qa_checks": ["module map", "lecture recap", "forbidden student fields"],
+    },
+    "knowledge_walkthrough_docx_generation": {
+        "action_type": "GeneratePrepArtifact",
+        "minimum_inputs": ["KnowledgeWalkthroughPlan"],
+        "expected_outputs": ["PrepArtifact"],
+        "qa_checks": ["DOCX format", "knowledge walkthrough linter", "public output boundary"],
     },
     "exam_regime": {
         "action_type": "SplitExamRegime",
@@ -263,7 +292,7 @@ def stable_id(prefix: str, payload: Any) -> str:
 
 
 def normalize_preset(raw: str | None) -> str:
-    value = (raw or "full_excel_workbook").strip()
+    value = (raw or "knowledge_walkthrough_docx").strip()
     value = PRESET_ALIASES.get(value, value)
     if value not in PRESET_MODULES:
         raise ValueError(f"unsupported output preset: {raw}")
@@ -374,7 +403,7 @@ def action_for_module(index: int, module: str, modules: list[str], reuse_existin
 
 def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> dict[str, Any]:
     output_mode = config.get("output_mode", {})
-    raw_mode = output_mode.get("preset") or output_mode.get("mode") or "full_excel_workbook"
+    raw_mode = output_mode.get("preset") or output_mode.get("mode") or "knowledge_walkthrough_docx"
     selected_preset = normalize_preset(str(raw_mode))
     required = PRESET_REQUIRED_CLASSES[selected_preset]
     available = available_source_classes(config, source_scan)

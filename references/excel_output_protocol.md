@@ -1,6 +1,6 @@
 # Excel Output Protocol
 
-The integrated workflow is Excel-first for default exam-prep workbooks. Old DOCX-oriented output contracts are overridden for default workbook mode only.
+Excel output is an explicit workbook route. The default lecture-review route is `knowledge_walkthrough_docx` and follows `knowledge_walkthrough_docx_protocol.md`.
 
 Explicit Example Essay Mode is the narrow exception: complete Example Essays are DOCX-first and follow `example_essay_docx_output_protocol.md`.
 
