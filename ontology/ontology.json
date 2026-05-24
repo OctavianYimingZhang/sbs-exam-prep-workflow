@@ -4,6 +4,26 @@
   "purpose": "Typed object-link-action model for evidence-bound exam preparation workflows.",
   "core_principle": "Source files are converted into typed objects and links before they can produce student-facing preparation artifacts.",
   "object_types": {
+    "UserExamPrepRequest": {
+      "description": "Parsed user intent, requested exam-prep mode, language, source policy, and focus areas.",
+      "required_properties": ["request_id", "raw_request", "requested_mode", "language", "target_group_or_gap", "focus_areas", "source_policy", "user_provided_sources", "academic_integrity_status"]
+    },
+    "UserConstraint": {
+      "description": "User-specific constraints that may affect scope, output depth, source policy, and preparation priorities.",
+      "required_properties": ["constraint_id", "request_id", "time_budget_or_gap", "preferred_output_depth", "requested_artifacts", "allowed_audit_package", "deadline_or_gap"]
+    },
+    "SourceCoverageMap": {
+      "description": "User-visible source coverage status before generation of major outputs.",
+      "required_properties": ["coverage_id", "request_id", "required_source_classes", "available_source_classes", "missing_blocking_sources", "freshness_status", "unreadable_sources", "blocked_conclusions"]
+    },
+    "GateResult": {
+      "description": "Status for an intake, source, ontology, output-view, or publish gate.",
+      "required_properties": ["gate_result_id", "gate_name", "outcome", "reason", "blocked_conclusion", "remediation_source", "severity"]
+    },
+    "OutputView": {
+      "description": "Selected projection from the same evidence object graph.",
+      "required_properties": ["view_id", "view_type", "included_sections", "omitted_sections", "reason", "artifact_policy"]
+    },
     "SourceDocument": {
       "description": "Every supplied or discovered file.",
       "required_properties": ["source_id", "path", "file_role", "trust_level", "analysis_context", "allowed_evidence_use", "extraction_status"]
@@ -134,6 +154,10 @@
     }
   ],
   "action_types": {
+    "ParseUserExamPrepRequest": ["UserExamPrepRequest", "UserConstraint", "GateResult"],
+    "BuildSourceCoverageMap": ["SourceCoverageMap", "QAFlag"],
+    "SelectOutputView": ["OutputView", "GateResult"],
+    "RecordGateResult": ["GateResult"],
     "CreateSourceInventory": ["SourceDocument"],
     "ExtractFragments": ["SourceFragment", "QAFlag"],
     "BuildFragmentIndex": ["FragmentPartition"],
@@ -143,9 +167,15 @@
     "ClassifyQuestionType": ["PastPaperQuestion"],
     "InferQuestionArchetype": ["QuestionArchetype", "ExaminerOperation", "SlotGrammar"],
     "SegmentKnowledgePoints": ["KnowledgePoint", "EvidenceClaim"],
+    "BuildPracticalOperations": ["PracticalOperation"],
+    "BuildMethodBlocks": ["MethodBlock"],
+    "BuildMCQScoringPolicy": ["MCQScoringPolicy"],
+    "GenerateShortAnswerVariants": ["ShortAnswerVariant"],
+    "BuildEssayCoveragePlan": ["EssayCoveragePlan"],
     "MapKPToArchetype": ["COMPATIBLE_WITH"],
     "VerifyReadingSource": ["ReadingSource", "EvidenceClaim"],
     "GeneratePrepArtifact": ["PrepArtifact"],
+    "CreateWorkflowRun": ["WorkflowRun"],
     "ValidateOntologyRuntime": ["QAFlag"],
     "WriteRunManifest": ["RunManifest", "LineageEvent"],
     "RunDeliverableQA": ["QAFlag"],
@@ -153,6 +183,11 @@
   },
   "validation_rules": [
     "every_student_visible_artifact_has_source_links",
+    "every_non_root_object_has_writer_action",
+    "user_request_mode_selected_or_defaulted",
+    "source_coverage_visible_before_generation",
+    "blocking_gap_asks_one_question_or_marks_blocked",
+    "output_view_does_not_break_evidence_rules",
     "student_visible_artifact_requires_valid_gold_objects",
     "question_type_controls_output_template",
     "exact_future_question_wording_not_claimed",
@@ -167,6 +202,8 @@
     "student_output_excludes_internal_helper_artifacts"
   ],
   "query_templates": {
+    "source_coverage_card": ["requested_mode", "required_source_classes", "available_source_classes", "missing_blocking_sources", "blocked_conclusions"],
+    "output_view_selection": ["user_request", "source_coverage_map", "allowed_artifact_policy", "minimum_dependencies"],
     "essay_theme": ["current_regime", "essay_archetype", "compatible_kps", "lecture_scope", "confidence_band", "qa_flags"],
     "mcq_prep": ["mcq_archetype", "discriminator_axes", "distractor_families", "mcq_scoring_policy", "confidence_band"],
     "data_problem_prep": ["practical_operation", "linked_kps", "input_operation_inference_limitation_follow_up"],

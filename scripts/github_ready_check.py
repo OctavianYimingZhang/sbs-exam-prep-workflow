@@ -98,6 +98,8 @@ def main() -> int:
             [
                 run_command("compile_scripts", [py, "-m", "compileall", "-q", "scripts"]),
                 run_command("ontology_contract", [py, "scripts/ontology_linter.py"]),
+                run_command("action_writer_coverage", [py, "scripts/validate_action_writer_coverage.py"]),
+                run_command("interaction_contract", [py, "scripts/validate_interaction_contract.py"]),
                 run_command(
                     "fragment_index_fixture",
                     [

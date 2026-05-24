@@ -47,6 +47,7 @@ Use `ontology/ontology.json` as the machine-readable contract for object types.
 
 Core objects:
 
+- `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, and `OutputView`: interaction-layer objects that select mode, expose source coverage, and prevent hidden blockers.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
 - `FragmentPartition`: metadata partition used to prune irrelevant fragments before expensive reasoning or generation.
@@ -135,6 +136,10 @@ Every workflow step should be expressible as an action that reads objects and wr
 
 ```text
 CreateSourceInventory
+ParseUserExamPrepRequest
+BuildSourceCoverageMap
+SelectOutputView
+RecordGateResult
 ExtractFragments
 BuildFragmentIndex
 NormalizeTargetGroup
@@ -143,9 +148,15 @@ ExtractPastPaperQuestions
 ClassifyQuestionType
 InferQuestionArchetype
 SegmentKnowledgePoints
+BuildPracticalOperations
+BuildMethodBlocks
+BuildMCQScoringPolicy
+GenerateShortAnswerVariants
+BuildEssayCoveragePlan
 MapKPToArchetype
 VerifyReadingSource
 GeneratePrepArtifact
+CreateWorkflowRun
 ValidateOntologyRuntime
 WriteRunManifest
 RunDeliverableQA
@@ -205,6 +216,9 @@ These files are helper artifacts. They must not be mixed into the final user-fac
 Fail or block student-facing output when:
 
 - a claim has no source anchor;
+- an ontology object has no writer action;
+- the requested output mode has no selected `OutputView`;
+- the source coverage map hides a blocking gap;
 - a source role is not allowed to support the claim;
 - old-regime evidence controls current-regime prediction;
 - external examples provide factual or prediction content;

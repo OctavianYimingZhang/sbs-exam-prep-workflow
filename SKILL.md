@@ -61,6 +61,7 @@ Student-visible output may be generated only from Gold objects whose support lin
 
 - `references/input_processing_protocol.md`: source roles, trust levels, evidence use, extraction, and format fields.
 - `references/operational_ontology_protocol.md`: object-link-action graph, evidence-permission links, actions, query discipline, and ontology validation.
+- `references/user_interaction_protocol.md`: request parsing, mode selection, source coverage cards, output views, and blocking-gap interaction.
 - `references/modular_entrypoints_protocol.md`: standalone and full-workflow entry points.
 - `references/question_type_protocol.md`: MCQ, short-answer, essay, and long-answer routing.
 - `references/scoring_and_pattern_protocol.md`: pattern inference, retention, recency, and confidence rules.
@@ -80,7 +81,7 @@ Student-visible output may be generated only from Gold objects whose support lin
 - `references/cross_subject_regression_protocol.md`: benchmark rules that validate generic behaviour without becoming production triggers.
 - `references/github_release_protocol.md`: local QA, sync, commit, and push requirements.
 
-Use helper scripts where available for source extraction, fragment indexing, runtime ontology validation, run-manifest and lineage linting, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
+Use helper scripts where available for source extraction, fragment indexing, runtime ontology validation, action writer coverage validation, interaction-contract validation, run-manifest and lineage linting, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
 
 When past-paper prediction is requested, generate or conceptually maintain question-level records before ranking. The required internal path is:
 
@@ -92,19 +93,29 @@ past papers -> current exam regime -> PastPaperQuestion records -> QuestionArche
 
 ### 0. Route The Request
 
-Decide whether the user requested:
+Parse the request into `UserExamPrepRequest`, `UserConstraint`, and `OutputView` when the run is non-trivial. Decide whether the selected mode is:
 
-- source inventory only;
-- exam-format diagnosis;
-- prediction workbook;
-- MCQ prep;
-- short-answer prep;
-- long-answer/project answer planning;
-- complete Example Essays;
-- audit/regression only;
-- the full workflow.
+- `full_workflow`;
+- `source_inventory`;
+- `exam_format_diagnosis`;
+- `prediction_workbook`;
+- `mcq_prep`;
+- `short_answer_prep`;
+- `practical_data_prep`;
+- `long_answer_plan`;
+- `essay_theme_plan`;
+- `example_essay_docx`;
+- `evidence_gap_audit`;
+- `incremental_refresh`;
+- audit/regression only.
+
+If the user provides only materials and asks for exam prep, default to `full_workflow`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
 
 Run only the requested module and its minimum dependencies. If the user supplies valid intermediate artefacts, use them directly. Report modules run, modules skipped, and artefacts generated.
+
+Ask at most one clarification question at a time. Ask only when the missing input blocks a requested conclusion and cannot be safely inferred from the source set. Otherwise proceed and record a `QAFlag`, `GateResult`, or source-coverage blocker.
+
+Before generating a major workbook, Example Essay package, or prediction artifact, create a concise `SourceCoverageMap`. Expose source coverage when useful so the user can see missing source classes, unreadable files, and blocked conclusions before generation.
 
 ### 1. Build Source Inventory
 
@@ -122,6 +133,8 @@ For every supplied or discovered file, record:
 Never infer hidden content from failed extraction, unsupported files, weak OCR, or unreadable images.
 
 After inventory, create or conceptually maintain `FragmentPartition` metadata when downstream work needs selective reading. Partition by source role, analysis context, target group, regime, year, question type, concept type, input format, extraction confidence, allowed evidence use, and source hash. Use this metadata to skip irrelevant sources before deep analysis.
+
+For strongest results, prefer a source pack containing lecture slides/official notes, formal past papers, answer keys or mark schemes when available, practical or data materials, essay/long-answer prompts, extra reading recommendations or books, and any user-provided weak areas or time budget. If the source pack is incomplete, continue where support is sufficient and block only unsupported conclusions.
 
 ### 2. Split Exam Regimes
 
@@ -334,6 +347,8 @@ Produce diagnostics for:
 - old-regime evidence excluded from prediction;
 - low-confidence prediction;
 - missing runtime object or invalid ontology link;
+- ontology object without writer action;
+- interaction mode missing or unsupported by source coverage;
 - student-facing artifact without valid Gold-object lineage;
 - missing run manifest or lineage event for generated artifacts;
 - exact future-question wording claimed;
@@ -367,6 +382,8 @@ Benchmarks validate generic behaviour only:
 - past-paper prediction hard failures;
 - runtime object-store validation;
 - manifest and lineage reproducibility;
+- action writer coverage;
+- interaction contract coverage;
 
 Any benchmark-specific content, name, lecturer, example, year, topic, or recurrence pattern is non-transferable unless the new target sources independently contain and verify it.
 
@@ -378,6 +395,8 @@ When modifying the Skill itself, completion requires:
 - workbook and Example Essay language checks pass where scripts exist;
 - DOCX Example Essays, when requested or fixture-tested, pass formatting and source audits;
 - no production logic uses source-set identity, benchmark names, or course names as triggers;
+- every ontology object is produced by a writer action or explicitly treated as parsed user/source input;
+- interaction routing, source coverage, and output-view checks pass;
 - runtime object-store, manifest, and lineage checks pass when control-plane artifacts are generated;
 - installed Skill copy and repository copy are synced;
 - GitHub-ready QA passes before commit and push.

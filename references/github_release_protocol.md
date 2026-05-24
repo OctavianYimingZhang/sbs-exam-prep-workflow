@@ -6,18 +6,20 @@ Use this protocol before committing and pushing Skill updates.
 
 1. Run compile checks for all scripts.
 2. Run the ontology contract linter.
-3. Run the fragment-index fixture.
-4. Run the runtime ontology validator fixture, including a negative cross-target leakage case.
-5. Run the run-manifest and lineage fixture.
-6. Run workbook prose fixture lint.
-7. Run benchmark metadata/regression checks.
-8. Generate the positive Example Essay DOCX fixture in strict mode.
-9. Lint the generated DOCX formatting and source mapping.
-10. Run the Example Essay language linter.
-11. Run the no-identity-trigger linter.
-12. Run the public safety scan for private absolute paths and institutional-private markers.
-13. Confirm the installed Skill copy matches the repository copy.
-14. Confirm `git status --short` contains only intentional changes.
+3. Run action writer coverage validation.
+4. Run interaction contract validation.
+5. Run the fragment-index fixture.
+6. Run the runtime ontology validator fixture, including a negative cross-target leakage case.
+7. Run the run-manifest and lineage fixture.
+8. Run workbook prose fixture lint.
+9. Run benchmark metadata/regression checks.
+10. Generate the positive Example Essay DOCX fixture in strict mode.
+11. Lint the generated DOCX formatting and source mapping.
+12. Run the Example Essay language linter.
+13. Run the no-identity-trigger linter.
+14. Run the public safety scan for private absolute paths and institutional-private markers.
+15. Confirm the installed Skill copy matches the repository copy.
+16. Confirm `git status --short` contains only intentional changes.
 
 ## Identity Trigger Rule
 

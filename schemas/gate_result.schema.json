@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/gate_result.schema.json",
+  "title": "GateResult",
+  "type": "object",
+  "required": ["gate_result_id", "gate_name", "outcome", "reason", "blocked_conclusion", "remediation_source", "severity"],
+  "properties": {
+    "object_type": { "const": "GateResult" },
+    "gate_result_id": { "type": "string" },
+    "gate_name": { "type": "string" },
+    "outcome": { "enum": ["pass", "warn", "block"] },
+    "reason": { "type": "string" },
+    "blocked_conclusion": { "type": ["string", "null"] },
+    "remediation_source": { "type": ["string", "null"] },
+    "severity": { "enum": ["blocking", "warning", "info"] }
+  },
+  "additionalProperties": true
+}

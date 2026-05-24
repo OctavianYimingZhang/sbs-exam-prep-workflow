@@ -52,6 +52,27 @@ No QA pass -> no publish.
 
 This is implemented with a fragment metadata index, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
 
+## Interactive Use
+
+Choose one mode, or provide materials and ask for exam prep to use the default `full_workflow` mode.
+
+| Mode | Use when | Output |
+| --- | --- | --- |
+| `full_workflow` | You want the complete exam-prep workflow. | Source coverage card plus workbook and requested add-ons. |
+| `source_inventory` | You only want file roles and extraction status. | Source inventory and evidence-use limits. |
+| `exam_format_diagnosis` | You want to know how the exam is structured. | Sections, question types, rules, and route recommendation. |
+| `prediction_workbook` | You want past-paper prediction and workbook output. | Archetypes, confidence bands, and prep actions. |
+| `mcq_prep` | You need MCQ-focused preparation. | Discriminators, traps, contrast tables, and scoring policy when visible. |
+| `short_answer_prep` | You need short-answer practice. | Bounded variants, mark schemas, concise answers, reference expansions. |
+| `practical_data_prep` | You need practical, data, graph, protocol, calculation, or case prep. | Input -> operation -> inference -> limitation drills. |
+| `long_answer_plan` | You need scenario/project long-answer planning. | Method blocks, readouts, controls, caveats. |
+| `essay_theme_plan` | You need essay preparation but not full essays. | Themes, coverage plans, skeletons, evidence banks. |
+| `example_essay_docx` | You explicitly want complete Example Essay documents. | One DOCX per essay plus source audit. |
+| `evidence_gap_audit` | You want to know what is missing. | Source coverage, blockers, unresolved conflicts, next-source checklist. |
+| `incremental_refresh` | You add new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects and artifacts are refreshed. |
+
+The strongest source pack includes lecture slides/official notes, formal past papers, mark schemes or answer keys where available, practical/data materials, essay or long-answer prompts, extra reading recommendations/books, and any user weak areas or time budget if personalization is requested. Missing sources do not automatically stop the run; only unsupported conclusions are blocked.
+
 ## What It Produces
 
 Default output is an Excel-first revision workbook. Complete Example Essays are generated only when explicitly requested.
@@ -310,6 +331,13 @@ python scripts/run_manifest_linter.py \
   --lineage-events /path/to/internal_qa/lineage_events.jsonl
 ```
 
+Validate action writer coverage and the interaction contract:
+
+```bash
+python scripts/validate_action_writer_coverage.py
+python scripts/validate_interaction_contract.py
+```
+
 Lint ontology and past-paper prediction outputs:
 
 ```bash
@@ -371,7 +399,7 @@ python scripts/github_ready_check.py --ci
 
 ## Benchmark Sanitization
 
-The public benchmark files are regression fixtures. They test generic behaviours such as regime splitting, question-type routing, workbook layout adaptation, source-boundary discipline, Example Essay language quality, ontology contract integrity, runtime object-store validation, run-manifest lineage, past-paper prediction hard failures, and cross-source leakage prevention.
+The public benchmark files are regression fixtures. They test generic behaviours such as regime splitting, question-type routing, workbook layout adaptation, source-boundary discipline, Example Essay language quality, ontology contract integrity, action writer coverage, interaction contract coverage, runtime object-store validation, run-manifest lineage, past-paper prediction hard failures, and cross-source leakage prevention.
 
 They intentionally exclude private lecture slides, past papers, notes, mocks, student files, generated workbooks, local absolute paths, and cached run outputs.
 

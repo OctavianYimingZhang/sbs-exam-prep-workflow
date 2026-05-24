@@ -10,6 +10,11 @@ from typing import Any
 
 
 REQUIRED_OBJECT_TYPES = {
+    "UserExamPrepRequest",
+    "UserConstraint",
+    "SourceCoverageMap",
+    "GateResult",
+    "OutputView",
     "SourceDocument",
     "SourceFragment",
     "FragmentPartition",
@@ -54,6 +59,10 @@ REQUIRED_LINK_TYPES = {
 }
 
 REQUIRED_ACTION_TYPES = {
+    "ParseUserExamPrepRequest",
+    "BuildSourceCoverageMap",
+    "SelectOutputView",
+    "RecordGateResult",
     "CreateSourceInventory",
     "ExtractFragments",
     "BuildFragmentIndex",
@@ -63,9 +72,15 @@ REQUIRED_ACTION_TYPES = {
     "ClassifyQuestionType",
     "InferQuestionArchetype",
     "SegmentKnowledgePoints",
+    "BuildPracticalOperations",
+    "BuildMethodBlocks",
+    "BuildMCQScoringPolicy",
+    "GenerateShortAnswerVariants",
+    "BuildEssayCoveragePlan",
     "MapKPToArchetype",
     "VerifyReadingSource",
     "GeneratePrepArtifact",
+    "CreateWorkflowRun",
     "ValidateOntologyRuntime",
     "WriteRunManifest",
     "RunDeliverableQA",
@@ -73,6 +88,11 @@ REQUIRED_ACTION_TYPES = {
 }
 
 REQUIRED_VALIDATION_RULES = {
+    "every_non_root_object_has_writer_action",
+    "user_request_mode_selected_or_defaulted",
+    "source_coverage_visible_before_generation",
+    "blocking_gap_asks_one_question_or_marks_blocked",
+    "output_view_does_not_break_evidence_rules",
     "exact_future_question_wording_not_claimed",
     "short_answer_variants_require_slot_grammar",
     "mcq_official_answer_requires_answer_key",
@@ -122,6 +142,22 @@ def validate_ontology(data: dict[str, Any]) -> dict[str, Any]:
     if missing_actions:
         failures.append({"type": "missing_action_types", "items": missing_actions})
 
+    object_names = set(object_types)
+    link_names = set(link_types)
+    writer_coverage: dict[str, list[str]] = {name: [] for name in object_names}
+    for action_name, outputs in action_types.items():
+        if not isinstance(outputs, list) or not outputs:
+            failures.append({"type": "action_missing_outputs", "action_type": action_name})
+            continue
+        for output in outputs:
+            if output in object_names:
+                writer_coverage[output].append(action_name)
+            elif output not in link_names:
+                failures.append({"type": "action_writes_unknown_type", "action_type": action_name, "output": output})
+    missing_writers = sorted(name for name, writers in writer_coverage.items() if not writers)
+    if missing_writers:
+        failures.append({"type": "object_without_writer_action", "items": missing_writers})
+
     forbidden_ids = {item.get("id") for item in data.get("forbidden_links", []) if isinstance(item, dict)}
     for required_id in {"no_cross_target_factual_claim", "old_regime_no_current_blueprint", "unverified_source_no_claim_support"}:
         if required_id not in forbidden_ids:
@@ -131,7 +167,7 @@ def validate_ontology(data: dict[str, Any]) -> dict[str, Any]:
     if missing_rules:
         failures.append({"type": "missing_validation_rules", "items": missing_rules})
 
-    for template in ["essay_theme", "mcq_prep", "data_problem_prep", "extra_reading_insert"]:
+    for template in ["source_coverage_card", "output_view_selection", "essay_theme", "mcq_prep", "data_problem_prep", "extra_reading_insert"]:
         if template not in data.get("query_templates", {}):
             failures.append({"type": "missing_query_template", "template": template})
 

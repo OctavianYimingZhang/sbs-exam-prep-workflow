@@ -10,6 +10,11 @@ from typing import Any
 
 
 ID_FIELDS = {
+    "UserExamPrepRequest": "request_id",
+    "UserConstraint": "constraint_id",
+    "SourceCoverageMap": "coverage_id",
+    "GateResult": "gate_result_id",
+    "OutputView": "view_id",
     "SourceDocument": "source_id",
     "SourceFragment": "fragment_id",
     "FragmentPartition": "partition_id",
@@ -32,6 +37,11 @@ ID_FIELDS = {
 }
 
 FILE_TYPE_HINTS = {
+    "user_exam_prep_requests": "UserExamPrepRequest",
+    "user_constraints": "UserConstraint",
+    "source_coverage_maps": "SourceCoverageMap",
+    "gate_results": "GateResult",
+    "output_views": "OutputView",
     "source_documents": "SourceDocument",
     "source_fragments": "SourceFragment",
     "fragment_partitions": "FragmentPartition",
