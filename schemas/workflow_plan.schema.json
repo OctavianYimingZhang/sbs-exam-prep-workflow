@@ -3,13 +3,96 @@
   "$id": "https://example.invalid/sbs-exam-prep-workflow/workflow_plan.schema.json",
   "title": "WorkflowPlan",
   "type": "object",
-  "required": ["plan_id", "request_scope", "actions", "skipped_modules", "publish_gate"],
+  "required": [
+    "object_type",
+    "plan_id",
+    "request_scope",
+    "selected_preset",
+    "target_group_key",
+    "source_inventory_required",
+    "fragment_index_required",
+    "actions",
+    "skipped_modules",
+    "blockers",
+    "publish_gate"
+  ],
   "properties": {
-    "plan_id": { "type": "string" },
-    "request_scope": { "type": "string" },
-    "actions": { "type": "array" },
-    "skipped_modules": { "type": "array" },
-    "publish_gate": { "type": "string" }
+    "object_type": { "const": "WorkflowPlan" },
+    "plan_id": { "type": "string", "minLength": 1 },
+    "request_scope": {
+      "type": "object",
+      "required": ["raw_mode", "normalized_preset", "student_visible_only"],
+      "properties": {
+        "raw_mode": { "type": "string" },
+        "normalized_preset": { "type": "string" },
+        "student_visible_only": { "type": "boolean" },
+        "include_audit_package": { "type": "boolean" },
+        "requested_artifacts": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "selected_preset": {
+      "enum": [
+        "source_inventory_only",
+        "exam_format_diagnosis",
+        "full_excel_workbook",
+        "past_paper_prediction",
+        "mcq_prep",
+        "short_answer_prep",
+        "practical_data_problem_prep",
+        "project_scenario_long_answer",
+        "essay_theme_plan",
+        "example_essay_docx",
+        "audit_lint_only",
+        "github_ready_qa"
+      ]
+    },
+    "target_group_key": { "type": "string", "minLength": 1 },
+    "source_inventory_required": { "type": "boolean" },
+    "fragment_index_required": { "type": "boolean" },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "workflow_action.schema.json" }
+    },
+    "skipped_modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["module", "reason"],
+        "properties": {
+          "module": { "type": "string" },
+          "reason": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["blocker_id", "severity", "missing_input", "resolution_prompt"],
+        "properties": {
+          "blocker_id": { "type": "string" },
+          "severity": { "enum": ["blocking", "warning", "info"] },
+          "missing_input": { "type": "string" },
+          "resolution_prompt": { "type": "string" },
+          "blocked_modules": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "publish_gate": {
+      "type": "object",
+      "required": ["object_validation", "lineage_required", "qa_required"],
+      "properties": {
+        "object_validation": { "type": "boolean" },
+        "lineage_required": { "type": "boolean" },
+        "qa_required": { "type": "boolean" },
+        "strict_publish_gate": { "type": "boolean" },
+        "fail_on_blocking_flags": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
   },
   "additionalProperties": true
 }

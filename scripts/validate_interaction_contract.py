@@ -28,6 +28,7 @@ REQUIRED_OBJECTS = {
     "UserConstraint",
     "SourceCoverageMap",
     "GateResult",
+    "WorkflowPlan",
     "OutputView",
 }
 
@@ -36,11 +37,16 @@ REQUIRED_ACTIONS = {
     "BuildSourceCoverageMap",
     "SelectOutputView",
     "RecordGateResult",
+    "PlanWorkflow",
 }
 
 REQUIRED_TEXT = {
     "Source Coverage Card": "source coverage card",
     "Best Source Pack": "best source pack",
+    "SkillConfig": "skillconfig",
+    "WorkflowPlan": "workflowplan",
+    "InputReadinessReport": "inputreadinessreport",
+    "Plan Preview": "plan preview",
     "one clarification question": "one clarification question",
     "blocked conclusions": "blocked conclusions",
 }

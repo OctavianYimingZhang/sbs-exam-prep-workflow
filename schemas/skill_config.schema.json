@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sbs-exam-prep-workflow/skill_config.schema.json",
+  "title": "SkillConfig",
+  "type": "object",
+  "required": ["project", "source_inputs", "source_policy", "output_mode", "qa", "advanced"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "required": ["course_name", "module_code", "target_group_key", "exam_year", "output_folder"],
+      "properties": {
+        "course_name": { "type": "string" },
+        "module_code": { "type": "string" },
+        "target_group_key": { "type": "string" },
+        "exam_year": { "type": ["string", "number", "null"] },
+        "output_folder": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "source_inputs": {
+      "type": "object",
+      "properties": {
+        "lecture_slides": { "type": "array", "items": { "type": ["string", "object"] } },
+        "official_notes": { "type": "array", "items": { "type": ["string", "object"] } },
+        "formal_past_papers": { "type": "array", "items": { "type": ["string", "object"] } },
+        "practical_materials": { "type": "array", "items": { "type": ["string", "object"] } },
+        "mocks_quizzes_answer_keys": { "type": "array", "items": { "type": ["string", "object"] } },
+        "exemplars_or_feedback": { "type": "array", "items": { "type": ["string", "object"] } },
+        "extra_reading_books_or_papers": { "type": "array", "items": { "type": ["string", "object"] } }
+      },
+      "additionalProperties": true
+    },
+    "source_policy": {
+      "type": "object",
+      "required": [
+        "allow_online_academic_search",
+        "allow_extra_reading_enrichment",
+        "require_verified_citations",
+        "treat_examples_as_style_only"
+      ],
+      "properties": {
+        "allow_online_academic_search": { "type": "boolean" },
+        "allow_extra_reading_enrichment": { "type": "boolean" },
+        "require_verified_citations": { "type": "boolean" },
+        "treat_examples_as_style_only": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "output_mode": {
+      "type": "object",
+      "required": ["preset", "include_audit_package", "student_visible_only"],
+      "properties": {
+        "preset": {
+          "enum": [
+            "source_inventory_only",
+            "exam_format_diagnosis",
+            "full_excel_workbook",
+            "past_paper_prediction",
+            "mcq_prep",
+            "short_answer_prep",
+            "practical_data_problem_prep",
+            "project_scenario_long_answer",
+            "essay_theme_plan",
+            "example_essay_docx",
+            "audit_lint_only",
+            "github_ready_qa"
+          ]
+        },
+        "include_audit_package": { "type": "boolean" },
+        "student_visible_only": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "qa": {
+      "type": "object",
+      "required": [
+        "strict_publish_gate",
+        "require_lineage",
+        "run_language_lint",
+        "run_ontology_validator",
+        "fail_on_blocking_flags"
+      ],
+      "properties": {
+        "strict_publish_gate": { "type": "boolean" },
+        "require_lineage": { "type": "boolean" },
+        "run_language_lint": { "type": "boolean" },
+        "run_ontology_validator": { "type": "boolean" },
+        "fail_on_blocking_flags": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "advanced": {
+      "type": "object",
+      "required": ["reuse_existing_intermediates", "rebuild_fragment_index", "clean_stale_generated_outputs"],
+      "properties": {
+        "reuse_existing_intermediates": { "type": "boolean" },
+        "rebuild_fragment_index": { "enum": ["auto", "always", "never"] },
+        "clean_stale_generated_outputs": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,49 @@
+prompt_cards:
+  - card_id: "source_inventory"
+    preset: "source_inventory_only"
+    purpose: "Classify files, evidence use, extraction status, and missing source classes."
+    minimum_inputs: ["at least one supplied source path or discovered academic source"]
+    output_contract:
+      - "Return source roles and evidence-use limits."
+      - "Do not infer hidden content from unreadable or unsupported files."
+    hard_stops:
+      - "No supplied or discoverable sources."
+  - card_id: "full_excel_workbook"
+    preset: "full_excel_workbook"
+    purpose: "Build the default student-facing workbook from valid source objects."
+    minimum_inputs: ["lecture_or_official_notes"]
+    output_contract:
+      - "Generate workbook content from source-linked knowledge points."
+      - "Keep helper files outside the student-facing folder unless an audit package is requested."
+    hard_stops:
+      - "No lecture slides or official notes."
+      - "Blocking ontology or language QA flag."
+  - card_id: "past_paper_prediction"
+    preset: "past_paper_prediction"
+    purpose: "Build archetypes and preparation priorities without claiming exact future wording."
+    minimum_inputs: ["formal_past_papers", "lecture_or_official_notes"]
+    output_contract:
+      - "Use question-level records before ranking patterns."
+      - "Report confidence bands, not fake precision."
+    hard_stops:
+      - "No formal paper evidence."
+      - "No target lecture or official content for KP compatibility."
+  - card_id: "example_essay_docx"
+    preset: "example_essay_docx"
+    purpose: "Produce complete Example Essay documents from verified source logic."
+    minimum_inputs: ["lecture_or_official_notes"]
+    output_contract:
+      - "Generate one DOCX per essay."
+      - "Verify citations or use an explicit classic-study fallback plan."
+      - "Run DOCX formatting and language lint before delivery."
+    hard_stops:
+      - "No lecture or official content."
+      - "Unverified citation used as factual support."
+  - card_id: "audit_lint_only"
+    preset: "audit_lint_only"
+    purpose: "Run checks and report blockers without creating new student outputs."
+    minimum_inputs: []
+    output_contract:
+      - "Return pass/fail checks and blocking reasons."
+      - "Do not generate or publish new study artifacts."
+    hard_stops: []

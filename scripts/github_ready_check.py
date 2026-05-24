@@ -92,6 +92,12 @@ def main() -> int:
         citation_fallback_dir = tmp_dir / "citation_fallback"
         past_paper_extract_dir = tmp_dir / "past_paper_question_extract"
         fragment_index_dir = tmp_dir / "fragment_index"
+        planner_dir = tmp_dir / "planner"
+        workflow_plan_path = planner_dir / "workflow_plan.json"
+        input_readiness_path = planner_dir / "input_readiness.json"
+        workflow_plan_preview_path = planner_dir / "workflow_plan.md"
+        run_status_path = planner_dir / "run_status.json"
+        lineage_report_path = planner_dir / "lineage_report.json"
         bad_public_dir.mkdir(parents=True, exist_ok=True)
         (bad_public_dir / "example_essay_manifest.json").write_text("{}", encoding="utf-8")
         checks.extend(
@@ -100,6 +106,77 @@ def main() -> int:
                 run_command("ontology_contract", [py, "scripts/ontology_linter.py"]),
                 run_command("action_writer_coverage", [py, "scripts/validate_action_writer_coverage.py"]),
                 run_command("interaction_contract", [py, "scripts/validate_interaction_contract.py"]),
+                run_command("workflow_planning_contract", [py, "scripts/validate_workflow_planning_contract.py"]),
+                run_command(
+                    "workflow_plan_fixture",
+                    [
+                        py,
+                        "scripts/plan_workflow.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_full_excel.json",
+                        "--source-scan",
+                        "tests/fixtures/control_plane/source_scan.json",
+                        "--output",
+                        str(workflow_plan_path),
+                    ],
+                ),
+                run_command(
+                    "input_readiness_fixture",
+                    [
+                        py,
+                        "scripts/input_readiness_check.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_full_excel.json",
+                        "--source-scan",
+                        "tests/fixtures/control_plane/source_scan.json",
+                        "--output",
+                        str(input_readiness_path),
+                    ],
+                ),
+                run_command(
+                    "workflow_plan_render_fixture",
+                    [
+                        py,
+                        "scripts/render_workflow_plan.py",
+                        "--plan",
+                        str(workflow_plan_path),
+                        "--output",
+                        str(workflow_plan_preview_path),
+                    ],
+                ),
+                run_command(
+                    "run_status_fixture",
+                    [
+                        py,
+                        "scripts/run_status_report.py",
+                        "--plan",
+                        str(workflow_plan_path),
+                        "--output",
+                        str(run_status_path),
+                    ],
+                ),
+                run_command(
+                    "workflow_plan_missing_input_blocks",
+                    [
+                        py,
+                        "scripts/plan_workflow.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_missing_lecture.json",
+                        "--fail-on-blockers",
+                    ],
+                    expect_failure=True,
+                ),
+                run_command(
+                    "input_readiness_missing_input_blocks",
+                    [
+                        py,
+                        "scripts/input_readiness_check.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_missing_lecture.json",
+                        "--fail-on-blockers",
+                    ],
+                    expect_failure=True,
+                ),
                 run_command(
                     "fragment_index_fixture",
                     [
@@ -143,6 +220,19 @@ def main() -> int:
                         "tests/fixtures/control_plane/run_manifest.json",
                         "--lineage-events",
                         "tests/fixtures/control_plane/lineage_events.jsonl",
+                    ],
+                ),
+                run_command(
+                    "lineage_report_fixture",
+                    [
+                        py,
+                        "scripts/lineage_report.py",
+                        "--manifest",
+                        "tests/fixtures/control_plane/run_manifest.json",
+                        "--lineage-events",
+                        "tests/fixtures/control_plane/lineage_events.jsonl",
+                        "--output",
+                        str(lineage_report_path),
                     ],
                 ),
                 run_command("workbook_language_fixture", [py, "scripts/essay_style_linter.py", "--fixture", "benchmarks/kp_essay_style_linter_fixtures.json"]),

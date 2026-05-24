@@ -3,13 +3,14 @@
 The Skill uses an operational ontology to control workflow, evidence permissions, and output generation. The ontology is not a topic taxonomy and not an embedding index. It is an object-link-action model:
 
 ```text
-SourceDocument -> SourceFragment -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
+SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
 ```
 
 ## Purpose
 
 The ontology exists to make exam preparation evidence-bound and auditable:
 
+- the user request becomes a plan before execution;
 - source files become typed objects before they influence output;
 - links encode what a source is allowed to support;
 - actions write back objects, links, artifacts, and QA flags;
@@ -47,7 +48,7 @@ Use `ontology/ontology.json` as the machine-readable contract for object types.
 
 Core objects:
 
-- `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, and `OutputView`: interaction-layer objects that select mode, expose source coverage, and prevent hidden blockers.
+- `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, `WorkflowPlan`, and `OutputView`: interaction-layer objects that select mode, plan actions, expose source coverage, and prevent hidden blockers.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
 - `FragmentPartition`: metadata partition used to prune irrelevant fragments before expensive reasoning or generation.
@@ -116,6 +117,12 @@ PastPaperQuestion INSTANTIATES QuestionArchetype
 QuestionArchetype USES_OPERATION ExaminerOperation
 KnowledgePoint COMPATIBLE_WITH QuestionArchetype
 ReadingSource ENRICHES_KP KnowledgePoint
+PrepArtifact GENERATED_FROM_KP KnowledgePoint
+PrepArtifact GENERATED_FROM_MCQ_POLICY MCQScoringPolicy
+PrepArtifact GENERATED_FROM_SHORT_ANSWER_VARIANT ShortAnswerVariant
+PrepArtifact GENERATED_FROM_ESSAY_COVERAGE_PLAN EssayCoveragePlan
+PrepArtifact GENERATED_FROM_METHOD_BLOCK MethodBlock
+PrepArtifact GENERATED_FROM_PRACTICAL_OPERATION PracticalOperation
 QAFlag BLOCKS PrepArtifact
 WorkflowRun HAS_MANIFEST RunManifest
 WorkflowRun EMITS_LINEAGE LineageEvent
@@ -140,6 +147,7 @@ ParseUserExamPrepRequest
 BuildSourceCoverageMap
 SelectOutputView
 RecordGateResult
+PlanWorkflow
 ExtractFragments
 BuildFragmentIndex
 NormalizeTargetGroup
@@ -168,6 +176,12 @@ Actions may use helper scripts, but production behaviour must be controlled by o
 ## Query Discipline
 
 Student-facing artifacts should be generated from eligible ontology queries, not direct raw-file concatenation.
+
+Workflow plan preview query:
+
+```text
+request scope + selected preset + target + actions + skipped modules + blockers + publish gate
+```
 
 Essay theme query:
 
@@ -199,6 +213,7 @@ When an implementation persists ontology outputs, use JSONL or JSON under an int
 
 ```text
 internal_qa/ontology_objects/source_documents.jsonl
+internal_qa/ontology_objects/workflow_plans.jsonl
 internal_qa/ontology_objects/source_fragments.jsonl
 internal_qa/ontology_objects/fragment_partitions.jsonl
 internal_qa/ontology_objects/past_paper_questions.jsonl
@@ -207,6 +222,8 @@ internal_qa/ontology_objects/evidence_claims.jsonl
 internal_qa/ontology_links/links.jsonl
 internal_qa/run_manifest.json
 internal_qa/lineage_events.jsonl
+internal_qa/input_readiness.json
+internal_qa/workflow_plan.md
 ```
 
 These files are helper artifacts. They must not be mixed into the final user-facing output unless the user explicitly requests an audit package.
@@ -218,6 +235,7 @@ Fail or block student-facing output when:
 - a claim has no source anchor;
 - an ontology object has no writer action;
 - the requested output mode has no selected `OutputView`;
+- a major generation path has no `WorkflowPlan`;
 - the source coverage map hides a blocking gap;
 - a source role is not allowed to support the claim;
 - old-regime evidence controls current-regime prediction;

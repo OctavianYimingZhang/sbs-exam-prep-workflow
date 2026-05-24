@@ -15,6 +15,7 @@ REQUIRED_OBJECT_TYPES = {
     "SourceCoverageMap",
     "GateResult",
     "OutputView",
+    "WorkflowPlan",
     "SourceDocument",
     "SourceFragment",
     "FragmentPartition",
@@ -53,6 +54,12 @@ REQUIRED_LINK_TYPES = {
     "ENRICHES_KP",
     "TESTS_KP",
     "GENERATED_FROM",
+    "GENERATED_FROM_KP",
+    "GENERATED_FROM_MCQ_POLICY",
+    "GENERATED_FROM_SHORT_ANSWER_VARIANT",
+    "GENERATED_FROM_ESSAY_COVERAGE_PLAN",
+    "GENERATED_FROM_METHOD_BLOCK",
+    "GENERATED_FROM_PRACTICAL_OPERATION",
     "BLOCKS",
     "HAS_MANIFEST",
     "EMITS_LINEAGE",
@@ -63,6 +70,7 @@ REQUIRED_ACTION_TYPES = {
     "BuildSourceCoverageMap",
     "SelectOutputView",
     "RecordGateResult",
+    "PlanWorkflow",
     "CreateSourceInventory",
     "ExtractFragments",
     "BuildFragmentIndex",
@@ -91,6 +99,7 @@ REQUIRED_VALIDATION_RULES = {
     "every_non_root_object_has_writer_action",
     "user_request_mode_selected_or_defaulted",
     "source_coverage_visible_before_generation",
+    "workflow_plan_precedes_execution",
     "blocking_gap_asks_one_question_or_marks_blocked",
     "output_view_does_not_break_evidence_rules",
     "exact_future_question_wording_not_claimed",
@@ -167,7 +176,7 @@ def validate_ontology(data: dict[str, Any]) -> dict[str, Any]:
     if missing_rules:
         failures.append({"type": "missing_validation_rules", "items": missing_rules})
 
-    for template in ["source_coverage_card", "output_view_selection", "essay_theme", "mcq_prep", "data_problem_prep", "extra_reading_insert"]:
+    for template in ["source_coverage_card", "output_view_selection", "workflow_plan_preview", "essay_theme", "mcq_prep", "data_problem_prep", "extra_reading_insert"]:
         if template not in data.get("query_templates", {}):
             failures.append({"type": "missing_query_template", "template": template})
 

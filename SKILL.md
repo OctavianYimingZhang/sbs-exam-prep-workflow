@@ -15,6 +15,14 @@ The workflow is not topic-hotness-first. Frequency and recency are auxiliary sig
 
 Default output is an Excel-first student workbook. Complete Example Essays are generated only when explicitly requested; they are DOCX-first and one document per essay. Do not help with a live exam, active assessed submission, or contract-cheating request.
 
+For non-trivial runs, use the setup and planning chain before generation:
+
+```text
+User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> validated output
+```
+
+This chain is the control layer. It chooses the narrowest valid preset, lists required sources, records skipped modules, exposes blockers, and prevents internal helper files from being mixed into student-facing outputs.
+
 ## Evidence Boundary
 
 Classify every input before analysis:
@@ -62,6 +70,8 @@ Student-visible output may be generated only from Gold objects whose support lin
 - `references/input_processing_protocol.md`: source roles, trust levels, evidence use, extraction, and format fields.
 - `references/operational_ontology_protocol.md`: object-link-action graph, evidence-permission links, actions, query discipline, and ontology validation.
 - `references/user_interaction_protocol.md`: request parsing, mode selection, source coverage cards, output views, and blocking-gap interaction.
+- `references/interactive_setup_protocol.md`: `SkillConfig`, `WorkflowPlan`, `InputReadinessReport`, plan preview, and setup wizard rules.
+- `references/best_usage_guide.md`: best source pack, preset selection, strategy rules, and planning commands.
 - `references/modular_entrypoints_protocol.md`: standalone and full-workflow entry points.
 - `references/question_type_protocol.md`: MCQ, short-answer, essay, and long-answer routing.
 - `references/scoring_and_pattern_protocol.md`: pattern inference, retention, recency, and confidence rules.
@@ -81,7 +91,7 @@ Student-visible output may be generated only from Gold objects whose support lin
 - `references/cross_subject_regression_protocol.md`: benchmark rules that validate generic behaviour without becoming production triggers.
 - `references/github_release_protocol.md`: local QA, sync, commit, and push requirements.
 
-Use helper scripts where available for source extraction, fragment indexing, runtime ontology validation, action writer coverage validation, interaction-contract validation, run-manifest and lineage linting, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
+Use helper scripts where available for workflow planning, input-readiness checks, plan rendering, source extraction, fragment indexing, runtime ontology validation, action writer coverage validation, interaction-contract validation, run-manifest and lineage linting, example-corpus analysis, grouping, archetype schemas, workbook language linting, Example Essay language linting, DOCX generation, DOCX formatting linting, citation resolution, extra-reading chapter matching, source audit, render QA, identity-trigger linting, gap reporting, GitHub-ready QA, and regression checks. Helper scripts are implementation aids; production behaviour must be controlled by parsed evidence conditions, not by benchmark names.
 
 When past-paper prediction is requested, generate or conceptually maintain question-level records before ranking. The required internal path is:
 
@@ -93,7 +103,7 @@ past papers -> current exam regime -> PastPaperQuestion records -> QuestionArche
 
 ### 0. Route The Request
 
-Parse the request into `UserExamPrepRequest`, `UserConstraint`, and `OutputView` when the run is non-trivial. Decide whether the selected mode is:
+Parse the request into `UserExamPrepRequest`, `UserConstraint`, `SkillConfig`, `WorkflowPlan`, `InputReadinessReport`, and `OutputView` when the run is non-trivial. Decide whether the selected mode is:
 
 - `full_workflow`;
 - `source_inventory`;
@@ -109,9 +119,18 @@ Parse the request into `UserExamPrepRequest`, `UserConstraint`, and `OutputView`
 - `incremental_refresh`;
 - audit/regression only.
 
-If the user provides only materials and asks for exam prep, default to `full_workflow`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
+If the user provides only materials and asks for exam prep, default to `full_workflow` / `full_excel_workbook`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
 
 Run only the requested module and its minimum dependencies. If the user supplies valid intermediate artefacts, use them directly. Report modules run, modules skipped, and artefacts generated.
+
+When a config file is available, create the plan with:
+
+```bash
+python scripts/plan_workflow.py --config path/to/skill_config.json --output internal_qa/workflow_plan.json
+python scripts/input_readiness_check.py --config path/to/skill_config.json --output internal_qa/input_readiness.json
+```
+
+Show a concise Plan Preview before executing any major generation path when the source pack has blockers, when the user asks for a prediction, or when the run will create public artifacts.
 
 Ask at most one clarification question at a time. Ask only when the missing input blocks a requested conclusion and cannot be safely inferred from the source set. Otherwise proceed and record a `QAFlag`, `GateResult`, or source-coverage blocker.
 
@@ -342,6 +361,7 @@ Produce diagnostics for:
 - unsupported files;
 - ambiguous question type;
 - missing slide evidence;
+- missing workflow plan or input-readiness gate for a major generation path;
 - answer not found in lectures;
 - unverified citation;
 - old-regime evidence excluded from prediction;
@@ -349,6 +369,7 @@ Produce diagnostics for:
 - missing runtime object or invalid ontology link;
 - ontology object without writer action;
 - interaction mode missing or unsupported by source coverage;
+- workflow action missing required source input;
 - student-facing artifact without valid Gold-object lineage;
 - missing run manifest or lineage event for generated artifacts;
 - exact future-question wording claimed;
@@ -397,6 +418,7 @@ When modifying the Skill itself, completion requires:
 - no production logic uses source-set identity, benchmark names, or course names as triggers;
 - every ontology object is produced by a writer action or explicitly treated as parsed user/source input;
 - interaction routing, source coverage, and output-view checks pass;
+- setup, workflow planning, input-readiness, and plan-preview checks pass;
 - runtime object-store, manifest, and lineage checks pass when control-plane artifacts are generated;
 - installed Skill copy and repository copy are synced;
 - GitHub-ready QA passes before commit and push.

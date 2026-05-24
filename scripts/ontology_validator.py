@@ -15,6 +15,7 @@ ID_FIELDS = {
     "SourceCoverageMap": "coverage_id",
     "GateResult": "gate_result_id",
     "OutputView": "view_id",
+    "WorkflowPlan": "plan_id",
     "SourceDocument": "source_id",
     "SourceFragment": "fragment_id",
     "FragmentPartition": "partition_id",
@@ -29,6 +30,9 @@ ID_FIELDS = {
     "ReadingSource": "reading_id",
     "PracticalOperation": "operation_id",
     "MethodBlock": "method_block_id",
+    "MCQScoringPolicy": "policy_id",
+    "ShortAnswerVariant": "variant_id",
+    "EssayCoveragePlan": "plan_id",
     "PrepArtifact": "artifact_id",
     "QAFlag": "flag_id",
     "WorkflowRun": "run_id",
@@ -42,11 +46,24 @@ FILE_TYPE_HINTS = {
     "source_coverage_maps": "SourceCoverageMap",
     "gate_results": "GateResult",
     "output_views": "OutputView",
+    "workflow_plans": "WorkflowPlan",
     "source_documents": "SourceDocument",
     "source_fragments": "SourceFragment",
     "fragment_partitions": "FragmentPartition",
+    "assessment_regimes": "AssessmentRegime",
+    "exam_blueprints": "ExamBlueprint",
+    "past_paper_questions": "PastPaperQuestion",
     "knowledge_points": "KnowledgePoint",
+    "examiner_operations": "ExaminerOperation",
+    "question_archetypes": "QuestionArchetype",
+    "slot_grammars": "SlotGrammar",
     "evidence_claims": "EvidenceClaim",
+    "reading_sources": "ReadingSource",
+    "practical_operations": "PracticalOperation",
+    "method_blocks": "MethodBlock",
+    "mcq_scoring_policies": "MCQScoringPolicy",
+    "short_answer_variants": "ShortAnswerVariant",
+    "essay_coverage_plans": "EssayCoveragePlan",
     "prep_artifacts": "PrepArtifact",
     "qa_flags": "QAFlag",
     "run_manifests": "RunManifest",
@@ -64,6 +81,16 @@ PUBLIC_HELPER_PATTERNS = (
     "lineage_report",
     "source_audit",
 )
+
+GENERATED_FROM_LINK_TYPES = {
+    "GENERATED_FROM",
+    "GENERATED_FROM_KP",
+    "GENERATED_FROM_MCQ_POLICY",
+    "GENERATED_FROM_SHORT_ANSWER_VARIANT",
+    "GENERATED_FROM_ESSAY_COVERAGE_PLAN",
+    "GENERATED_FROM_METHOD_BLOCK",
+    "GENERATED_FROM_PRACTICAL_OPERATION",
+}
 
 
 def load_json(path: Path) -> Any:
@@ -196,7 +223,7 @@ def link_failures(links: list[dict[str, Any]], objects: dict[str, dict[str, Any]
             failures.append({"type": "link_to_type_mismatch", "link_id": link.get("link_id"), "expected": expected.get("to"), "actual": to_object.get("object_type")})
 
         source_context = context_for_object(from_id, objects)
-        if source_context.get("analysis_context") in {"cross_target_example", "benchmark_fixture"} and link_type in {"SUPPORTS_KP", "SUPPORTS_CLAIM", "GENERATED_FROM"}:
+        if source_context.get("analysis_context") in {"cross_target_example", "benchmark_fixture"} and link_type in {"SUPPORTS_KP", "SUPPORTS_CLAIM", *GENERATED_FROM_LINK_TYPES}:
             failures.append({"type": "cross_target_or_benchmark_support_link", "link_id": link.get("link_id"), "link_type": link_type})
         if source_context.get("analysis_context") == "target_old_or_different_regime" and link_type == "DEFINES_BLUEPRINT":
             failures.append({"type": "old_regime_defines_current_blueprint", "link_id": link.get("link_id")})

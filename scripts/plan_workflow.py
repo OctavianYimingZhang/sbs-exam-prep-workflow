@@ -1,0 +1,488 @@
+#!/usr/bin/env python3
+"""Build an executable WorkflowPlan from a SkillConfig."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Any
+
+
+SOURCE_INPUT_KEYS = (
+    "lecture_slides",
+    "official_notes",
+    "formal_past_papers",
+    "practical_materials",
+    "mocks_quizzes_answer_keys",
+    "exemplars_or_feedback",
+    "extra_reading_books_or_papers",
+)
+
+PRESET_ALIASES = {
+    "full_workflow": "full_excel_workbook",
+    "source_inventory": "source_inventory_only",
+    "prediction_workbook": "past_paper_prediction",
+    "practical_data_prep": "practical_data_problem_prep",
+    "long_answer_plan": "project_scenario_long_answer",
+    "essay_theme_plan": "essay_theme_plan",
+    "example_essay": "example_essay_docx",
+    "example_essay_docx": "example_essay_docx",
+    "evidence_gap_audit": "audit_lint_only",
+    "incremental_refresh": "full_excel_workbook",
+}
+
+PRESET_REQUIRED_CLASSES = {
+    "source_inventory_only": ["any_source"],
+    "exam_format_diagnosis": ["formal_past_papers"],
+    "full_excel_workbook": ["lecture_or_official_notes"],
+    "past_paper_prediction": ["formal_past_papers", "lecture_or_official_notes"],
+    "mcq_prep": ["lecture_or_official_notes"],
+    "short_answer_prep": ["lecture_or_official_notes"],
+    "practical_data_problem_prep": ["lecture_or_official_notes", "practical_materials"],
+    "project_scenario_long_answer": ["lecture_or_official_notes"],
+    "essay_theme_plan": ["lecture_or_official_notes"],
+    "example_essay_docx": ["lecture_or_official_notes"],
+    "audit_lint_only": [],
+    "github_ready_qa": [],
+}
+
+PRESET_MODULES = {
+    "source_inventory_only": ["source_inventory"],
+    "exam_format_diagnosis": ["source_inventory", "exam_regime", "question_type"],
+    "full_excel_workbook": [
+        "source_inventory",
+        "fragment_index",
+        "exam_regime",
+        "question_type",
+        "knowledge_points",
+        "examiner_operations",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "past_paper_prediction": [
+        "source_inventory",
+        "fragment_index",
+        "exam_regime",
+        "past_paper_questions",
+        "question_archetypes",
+        "knowledge_points",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "mcq_prep": [
+        "source_inventory",
+        "fragment_index",
+        "question_type",
+        "knowledge_points",
+        "mcq_policy",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "short_answer_prep": [
+        "source_inventory",
+        "fragment_index",
+        "question_type",
+        "knowledge_points",
+        "short_answer_variants",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "practical_data_problem_prep": [
+        "source_inventory",
+        "fragment_index",
+        "question_type",
+        "knowledge_points",
+        "practical_operations",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "project_scenario_long_answer": [
+        "source_inventory",
+        "fragment_index",
+        "question_type",
+        "knowledge_points",
+        "method_blocks",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "essay_theme_plan": [
+        "source_inventory",
+        "fragment_index",
+        "exam_regime",
+        "question_type",
+        "knowledge_points",
+        "essay_coverage_plan",
+        "prep_artifact",
+        "deliverable_qa",
+    ],
+    "example_essay_docx": [
+        "source_inventory",
+        "fragment_index",
+        "knowledge_points",
+        "essay_coverage_plan",
+        "citation_resolution",
+        "docx_generation",
+        "deliverable_qa",
+    ],
+    "audit_lint_only": ["audit"],
+    "github_ready_qa": ["repository_qa"],
+}
+
+MODULE_DEFS = {
+    "source_inventory": {
+        "action_type": "CreateSourceInventory",
+        "minimum_inputs": ["any_source"],
+        "expected_outputs": ["SourceDocument", "SourceCoverageMap"],
+        "qa_checks": ["source roles", "extraction status", "evidence-use limits"],
+    },
+    "fragment_index": {
+        "action_type": "BuildFragmentIndex",
+        "minimum_inputs": ["source_inventory"],
+        "expected_outputs": ["FragmentPartition"],
+        "qa_checks": ["partition metadata", "source hash"],
+    },
+    "exam_regime": {
+        "action_type": "SplitExamRegime",
+        "minimum_inputs": ["formal_past_papers"],
+        "expected_outputs": ["AssessmentRegime", "ExamBlueprint"],
+        "qa_checks": ["current regime separation", "answer rules"],
+    },
+    "question_type": {
+        "action_type": "ClassifyQuestionType",
+        "minimum_inputs": ["formal_past_papers"],
+        "expected_outputs": ["question-type route"],
+        "qa_checks": ["mode-specific route"],
+    },
+    "past_paper_questions": {
+        "action_type": "ExtractPastPaperQuestions",
+        "minimum_inputs": ["formal_past_papers"],
+        "expected_outputs": ["PastPaperQuestion"],
+        "qa_checks": ["question numbers", "marks", "command verbs"],
+    },
+    "question_archetypes": {
+        "action_type": "InferQuestionArchetype",
+        "minimum_inputs": ["PastPaperQuestion"],
+        "expected_outputs": ["QuestionArchetype", "ExaminerOperation", "SlotGrammar"],
+        "qa_checks": ["slot grammar", "confidence band"],
+    },
+    "knowledge_points": {
+        "action_type": "SegmentKnowledgePoints",
+        "minimum_inputs": ["lecture_or_official_notes"],
+        "expected_outputs": ["KnowledgePoint", "EvidenceClaim"],
+        "qa_checks": ["source anchors", "claim strength"],
+    },
+    "examiner_operations": {
+        "action_type": "InferQuestionArchetype",
+        "minimum_inputs": ["KnowledgePoint", "question-type route"],
+        "expected_outputs": ["ExaminerOperation"],
+        "qa_checks": ["answer shape", "marking logic"],
+    },
+    "mcq_policy": {
+        "action_type": "BuildMCQScoringPolicy",
+        "minimum_inputs": ["question-type route"],
+        "expected_outputs": ["MCQScoringPolicy"],
+        "qa_checks": ["answer-key boundary", "negative marking visibility"],
+    },
+    "short_answer_variants": {
+        "action_type": "GenerateShortAnswerVariants",
+        "minimum_inputs": ["KnowledgePoint", "SlotGrammar"],
+        "expected_outputs": ["ShortAnswerVariant"],
+        "qa_checks": ["bounded variants", "mark scale"],
+    },
+    "practical_operations": {
+        "action_type": "BuildPracticalOperations",
+        "minimum_inputs": ["practical_materials"],
+        "expected_outputs": ["PracticalOperation"],
+        "qa_checks": ["input operation inference limitation follow-up"],
+    },
+    "method_blocks": {
+        "action_type": "BuildMethodBlocks",
+        "minimum_inputs": ["KnowledgePoint"],
+        "expected_outputs": ["MethodBlock"],
+        "qa_checks": ["readout", "control", "caveat"],
+    },
+    "essay_coverage_plan": {
+        "action_type": "BuildEssayCoveragePlan",
+        "minimum_inputs": ["KnowledgePoint"],
+        "expected_outputs": ["EssayCoveragePlan"],
+        "qa_checks": ["coverage role", "argument skeleton"],
+    },
+    "citation_resolution": {
+        "action_type": "VerifyReadingSource",
+        "minimum_inputs": ["lecture_or_official_notes"],
+        "expected_outputs": ["ReadingSource", "EvidenceClaim"],
+        "qa_checks": ["citation verified", "classic-study fallback if needed"],
+    },
+    "docx_generation": {
+        "action_type": "GeneratePrepArtifact",
+        "minimum_inputs": ["EssayCoveragePlan", "EvidenceClaim"],
+        "expected_outputs": ["PrepArtifact"],
+        "qa_checks": ["DOCX language", "format", "source audit"],
+    },
+    "prep_artifact": {
+        "action_type": "GeneratePrepArtifact",
+        "minimum_inputs": ["KnowledgePoint"],
+        "expected_outputs": ["PrepArtifact"],
+        "qa_checks": ["student-facing language", "source links"],
+    },
+    "deliverable_qa": {
+        "action_type": "RunDeliverableQA",
+        "minimum_inputs": ["PrepArtifact"],
+        "expected_outputs": ["QAFlag"],
+        "qa_checks": ["public output boundary", "language lint", "ontology validation"],
+    },
+    "audit": {
+        "action_type": "RunDeliverableQA",
+        "minimum_inputs": [],
+        "expected_outputs": ["QA report"],
+        "qa_checks": ["requested checks only"],
+    },
+    "repository_qa": {
+        "action_type": "RunDeliverableQA",
+        "minimum_inputs": [],
+        "expected_outputs": ["GitHub-ready QA result"],
+        "qa_checks": ["repository checks"],
+    },
+}
+
+ALL_MODULES = tuple(MODULE_DEFS)
+
+
+def load_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def stable_id(prefix: str, payload: Any) -> str:
+    raw = json.dumps(payload, sort_keys=True, ensure_ascii=True)
+    digest = hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
+    return f"{prefix}_{digest}"
+
+
+def normalize_preset(raw: str | None) -> str:
+    value = (raw or "full_excel_workbook").strip()
+    value = PRESET_ALIASES.get(value, value)
+    if value not in PRESET_MODULES:
+        raise ValueError(f"unsupported output preset: {raw}")
+    return value
+
+
+def list_items(value: Any) -> list[Any]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return [item for item in value if item not in ("", None)]
+    if isinstance(value, str) and value.strip():
+        return [value]
+    return []
+
+
+def class_for_source_key(key: str) -> str:
+    if key in {"lecture_slides", "official_notes"}:
+        return "lecture_or_official_notes"
+    if key == "formal_past_papers":
+        return "formal_past_papers"
+    if key == "practical_materials":
+        return "practical_materials"
+    if key == "mocks_quizzes_answer_keys":
+        return "answer_keys"
+    if key == "exemplars_or_feedback":
+        return "exemplars_or_feedback"
+    if key == "extra_reading_books_or_papers":
+        return "extra_reading"
+    return key
+
+
+def class_for_scan_role(role: str) -> str | None:
+    role = role.lower()
+    if "lecture" in role or role in {"official_note", "official_notes"}:
+        return "lecture_or_official_notes"
+    if "past_paper" in role:
+        return "formal_past_papers"
+    if "practical" in role or "protocol" in role:
+        return "practical_materials"
+    if "answer_key" in role or "solution" in role:
+        return "answer_keys"
+    if "exemplar" in role or "feedback" in role or "guidance" in role:
+        return "exemplars_or_feedback"
+    if "reading" in role or "book" in role:
+        return "extra_reading"
+    return None
+
+
+def available_source_classes(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> set[str]:
+    available: set[str] = set()
+    source_inputs = config.get("source_inputs", {})
+    for key in SOURCE_INPUT_KEYS:
+        if list_items(source_inputs.get(key)):
+            available.add(class_for_source_key(key))
+    if source_scan:
+        for item in source_scan.get("files", []):
+            if not isinstance(item, dict):
+                continue
+            source_class = class_for_scan_role(str(item.get("role", "")))
+            if source_class and item.get("status", "ok") != "missing":
+                available.add(source_class)
+    if available:
+        available.add("any_source")
+    return available
+
+
+def missing_required_classes(required: list[str], available: set[str]) -> list[str]:
+    return [item for item in required if item not in available]
+
+
+def blocker_for_missing(index: int, missing_input: str, selected_preset: str) -> dict[str, Any]:
+    labels = {
+        "any_source": "at least one readable source",
+        "lecture_or_official_notes": "lecture slides or official notes",
+        "formal_past_papers": "formal past papers",
+        "practical_materials": "practical or data/problem materials",
+    }
+    label = labels.get(missing_input, missing_input.replace("_", " "))
+    return {
+        "blocker_id": f"block_{index:03d}_{re.sub(r'[^a-z0-9]+', '_', missing_input.lower()).strip('_')}",
+        "severity": "blocking",
+        "missing_input": missing_input,
+        "resolution_prompt": f"Provide {label}, or choose a narrower preset that does not require it.",
+        "blocked_modules": PRESET_MODULES[selected_preset],
+    }
+
+
+def action_for_module(index: int, module: str, modules: list[str], reuse_existing: bool, blockers: list[dict[str, Any]]) -> dict[str, Any]:
+    module_def = MODULE_DEFS[module]
+    blocking = bool(blockers) and module not in {"source_inventory", "audit", "repository_qa"}
+    return {
+        "action_id": f"act_{index:03d}_{module}",
+        "action_type": module_def["action_type"],
+        "module": module,
+        "depends_on": [f"act_{idx + 1:03d}_{name}" for idx, name in enumerate(modules[: index - 1])],
+        "minimum_inputs": module_def["minimum_inputs"],
+        "expected_outputs": module_def["expected_outputs"],
+        "can_reuse_existing": reuse_existing,
+        "skip_reason": "blocked by missing required input" if blocking else None,
+        "qa_gate": {
+            "gate_name": f"{module}_gate",
+            "required": module not in {"audit", "repository_qa"},
+            "checks": module_def["qa_checks"],
+        },
+    }
+
+
+def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> dict[str, Any]:
+    output_mode = config.get("output_mode", {})
+    raw_mode = output_mode.get("preset") or output_mode.get("mode") or "full_excel_workbook"
+    selected_preset = normalize_preset(str(raw_mode))
+    required = PRESET_REQUIRED_CLASSES[selected_preset]
+    available = available_source_classes(config, source_scan)
+    missing = missing_required_classes(required, available)
+    blockers = [blocker_for_missing(index, item, selected_preset) for index, item in enumerate(missing, start=1)]
+    modules = PRESET_MODULES[selected_preset]
+    advanced = config.get("advanced", {})
+    reuse_existing = bool(advanced.get("reuse_existing_intermediates", True))
+
+    actions = [action_for_module(index, module, modules, reuse_existing, blockers) for index, module in enumerate(modules, start=1)]
+
+    skipped_modules = [
+        {
+            "module": module,
+            "reason": f"not required for selected preset {selected_preset}",
+        }
+        for module in ALL_MODULES
+        if module not in modules
+    ]
+
+    project = config.get("project", {})
+    qa = config.get("qa", {})
+    request_scope = {
+        "raw_mode": str(raw_mode),
+        "normalized_preset": selected_preset,
+        "student_visible_only": bool(output_mode.get("student_visible_only", True)),
+        "include_audit_package": bool(output_mode.get("include_audit_package", False)),
+        "requested_artifacts": list(output_mode.get("requested_artifacts", [])) if isinstance(output_mode.get("requested_artifacts", []), list) else [],
+        "available_source_classes": sorted(available),
+        "required_source_classes": required,
+    }
+    target_group_key = str(project.get("target_group_key") or "unspecified_target")
+    plan_seed = {
+        "target_group_key": target_group_key,
+        "selected_preset": selected_preset,
+        "request_scope": request_scope,
+    }
+    return {
+        "object_type": "WorkflowPlan",
+        "plan_id": stable_id("workflow_plan", plan_seed),
+        "request_scope": request_scope,
+        "selected_preset": selected_preset,
+        "target_group_key": target_group_key,
+        "source_inventory_required": "source_inventory" in modules,
+        "fragment_index_required": "fragment_index" in modules,
+        "actions": actions,
+        "skipped_modules": skipped_modules,
+        "blockers": blockers,
+        "publish_gate": {
+            "object_validation": bool(qa.get("run_ontology_validator", True)),
+            "lineage_required": bool(qa.get("require_lineage", True)),
+            "qa_required": True,
+            "strict_publish_gate": bool(qa.get("strict_publish_gate", True)),
+            "fail_on_blocking_flags": bool(qa.get("fail_on_blocking_flags", True)),
+        },
+    }
+
+
+def validate_plan_shape(plan: dict[str, Any]) -> list[str]:
+    required = [
+        "plan_id",
+        "request_scope",
+        "selected_preset",
+        "target_group_key",
+        "source_inventory_required",
+        "fragment_index_required",
+        "actions",
+        "skipped_modules",
+        "blockers",
+        "publish_gate",
+    ]
+    failures = [f"missing top-level field: {field}" for field in required if field not in plan]
+    for index, action in enumerate(plan.get("actions", []), start=1):
+        for field in ("action_id", "action_type", "module", "depends_on", "minimum_inputs", "expected_outputs", "can_reuse_existing", "skip_reason", "qa_gate"):
+            if field not in action:
+                failures.append(f"action {index} missing field: {field}")
+    return failures
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, required=True, help="SkillConfig JSON file.")
+    parser.add_argument("--source-scan", type=Path, help="Optional extract_sources.py source_scan.json.")
+    parser.add_argument("--output", type=Path, help="Where to write the WorkflowPlan JSON.")
+    parser.add_argument("--fail-on-blockers", action="store_true")
+    args = parser.parse_args()
+
+    try:
+        config = load_json(args.config)
+        source_scan = load_json(args.source_scan) if args.source_scan else None
+        plan = build_plan(config, source_scan)
+        failures = validate_plan_shape(plan)
+        if failures:
+            raise ValueError("; ".join(failures))
+    except Exception as exc:
+        print(json.dumps({"status": "fail", "error": str(exc)}, indent=2), file=sys.stderr)
+        return 1
+
+    text = json.dumps(plan, indent=2)
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(text + "\n", encoding="utf-8")
+    else:
+        print(text)
+    if args.fail_on_blockers and plan["blockers"]:
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

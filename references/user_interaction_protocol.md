@@ -1,6 +1,6 @@
 # User Interaction Protocol
 
-This protocol turns a user request into explicit objects, output modes, coverage gates, and blocking-gap handling. It is not a source of factual course content.
+This protocol turns a user request into explicit setup objects, output modes, coverage gates, plan previews, and blocking-gap handling. It is not a source of factual course content.
 
 ## Interaction Objects
 
@@ -8,9 +8,18 @@ Use these objects for non-trivial runs:
 
 - `UserExamPrepRequest`: raw request, requested mode, language, target group if known, focus areas, source policy, user-provided sources, and academic-integrity status.
 - `UserConstraint`: time budget, preferred depth, requested artifacts, audit-package permission, and deadline if supplied.
+- `SkillConfig`: target, source inputs, source policy, output preset, QA strictness, and advanced reuse settings.
+- `WorkflowPlan`: ordered actions, dependencies, expected outputs, skipped modules, blockers, and publish gate.
+- `InputReadinessReport`: required source classes, available source classes, missing inputs, blockers, warnings, and can-run status.
 - `SourceCoverageMap`: source classes required for the requested mode, available classes, missing blocking sources, freshness status, unreadable sources, and blocked conclusions.
 - `GateResult`: pass/warn/block status for intake, source coverage, ontology validation, output view, and publish gates.
 - `OutputView`: selected projection from the same object graph.
+
+The setup chain is:
+
+```text
+User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> OutputView
+```
 
 ## Mode Selector
 
@@ -32,6 +41,18 @@ Classify the request into one mode before deep analysis:
 | `incremental_refresh` | User supplies new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects, sections, artifacts, and QA results are refreshed. |
 
 If the user provides only materials and asks for exam prep, default to `full_workflow`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
+
+Map interaction modes to execution presets before planning:
+
+| Interaction mode | Execution preset |
+| --- | --- |
+| `full_workflow` | `full_excel_workbook` |
+| `source_inventory` | `source_inventory_only` |
+| `prediction_workbook` | `past_paper_prediction` |
+| `practical_data_prep` | `practical_data_problem_prep` |
+| `long_answer_plan` | `project_scenario_long_answer` |
+| `evidence_gap_audit` | `audit_lint_only` |
+| `incremental_refresh` | narrowest affected preset |
 
 ## Clarification Rules
 
@@ -72,6 +93,21 @@ Blocked conclusions:
 ```
 
 Keep the card short. Its purpose is to expose blocked conclusions before generation, not to become a second audit report.
+
+## Plan Preview
+
+Create a `WorkflowPlan` before executing the selected preset. Show a short preview when the run is complex, blocked, prediction-heavy, or likely to create public artifacts:
+
+```text
+Selected preset:
+Target:
+Actions to run:
+Modules skipped:
+Blocking inputs:
+Publish gate:
+```
+
+The plan preview is not a student-facing deliverable unless the user asks for an audit or setup report.
 
 ## Best Source Pack
 

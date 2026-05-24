@@ -1,0 +1,67 @@
+presets:
+  source_inventory_only:
+    purpose: "Classify supplied or discovered files before deeper analysis."
+    required_source_classes: ["any_source"]
+    modules: ["source_inventory"]
+    student_outputs: ["source coverage card"]
+  exam_format_diagnosis:
+    purpose: "Extract exam structure, sections, rules, question types, and route recommendation."
+    required_source_classes: ["formal_past_papers"]
+    modules: ["source_inventory", "exam_regime", "question_type"]
+    student_outputs: ["exam format diagnosis"]
+  full_excel_workbook:
+    purpose: "Build the default exam-prep workbook from lecture and assessment evidence."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["formal_past_papers", "practical_materials", "answer_keys", "extra_reading"]
+    modules: ["source_inventory", "fragment_index", "exam_regime", "question_type", "knowledge_points", "examiner_operations", "prep_artifact"]
+    student_outputs: ["Exam_Prep_Map workbook"]
+  past_paper_prediction:
+    purpose: "Convert papers into archetypes, slot grammar, confidence bands, and preparation actions."
+    required_source_classes: ["formal_past_papers", "lecture_or_official_notes"]
+    modules: ["source_inventory", "fragment_index", "exam_regime", "past_paper_questions", "question_archetypes", "prep_artifact"]
+    student_outputs: ["prediction workbook", "archetype registry"]
+  mcq_prep:
+    purpose: "Build discriminator axes, traps, contrast tables, and scoring policy when answer rules are visible."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["formal_past_papers", "answer_keys"]
+    modules: ["source_inventory", "fragment_index", "question_type", "knowledge_points", "mcq_policy", "prep_artifact"]
+    student_outputs: ["MCQ prep tables"]
+  short_answer_prep:
+    purpose: "Build bounded short-answer variants and mark-producing schemas."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["formal_past_papers", "answer_keys"]
+    modules: ["source_inventory", "fragment_index", "question_type", "knowledge_points", "short_answer_variants", "prep_artifact"]
+    student_outputs: ["short-answer variant set"]
+  practical_data_problem_prep:
+    purpose: "Build input, operation, inference, limitation, and follow-up drills."
+    required_source_classes: ["lecture_or_official_notes", "practical_materials"]
+    modules: ["source_inventory", "fragment_index", "question_type", "knowledge_points", "practical_operations", "prep_artifact"]
+    student_outputs: ["practical/data prep tables"]
+  project_scenario_long_answer:
+    purpose: "Build method blocks for scenario or project-style long answers."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["practical_materials", "exemplars_or_feedback"]
+    modules: ["source_inventory", "fragment_index", "question_type", "knowledge_points", "method_blocks", "prep_artifact"]
+    student_outputs: ["method block library", "long-answer plan"]
+  essay_theme_plan:
+    purpose: "Build essay themes, coverage plans, paragraph skeletons, and evidence banks without full essays."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["formal_past_papers", "extra_reading"]
+    modules: ["source_inventory", "fragment_index", "exam_regime", "question_type", "knowledge_points", "essay_coverage_plan", "prep_artifact"]
+    student_outputs: ["essay theme plan"]
+  example_essay_docx:
+    purpose: "Generate complete DOCX Example Essays only when explicitly requested."
+    required_source_classes: ["lecture_or_official_notes"]
+    recommended_source_classes: ["formal_past_papers", "extra_reading", "exemplars_or_feedback"]
+    modules: ["source_inventory", "fragment_index", "knowledge_points", "essay_coverage_plan", "citation_resolution", "docx_generation", "deliverable_qa"]
+    student_outputs: ["Example Essay DOCX"]
+  audit_lint_only:
+    purpose: "Run source, ontology, language, deliverable, or release checks without generating new student outputs."
+    required_source_classes: []
+    modules: ["audit"]
+    student_outputs: ["QA report"]
+  github_ready_qa:
+    purpose: "Run repository release checks before sync, commit, and push."
+    required_source_classes: []
+    modules: ["repository_qa"]
+    student_outputs: ["GitHub-ready QA result"]

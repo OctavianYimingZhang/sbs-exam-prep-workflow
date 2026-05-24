@@ -10,6 +10,14 @@ inputs -> exam format -> question type -> examiner operation -> knowledge point 
 
 It is not a topic-hotness predictor. Frequency and recency are useful signals, but the main task is to infer how the examiner asks, what kind of reasoning the question rewards, and what preparation artefact best matches that strategy.
 
+For any non-trivial run, the Skill now uses a typed planning chain before generation:
+
+```text
+User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> validated output
+```
+
+This makes the workflow configurable and auditable. The Skill first decides the requested output mode, then checks which source classes are needed, then plans the minimum action path, then blocks only the conclusions that lack evidence.
+
 ## Operational Ontology
 
 The Skill treats exam preparation as an operational object graph rather than a loose file index:
@@ -73,6 +81,37 @@ Choose one mode, or provide materials and ask for exam prep to use the default `
 
 The strongest source pack includes lecture slides/official notes, formal past papers, mark schemes or answer keys where available, practical/data materials, essay or long-answer prompts, extra reading recommendations/books, and any user weak areas or time budget if personalization is requested. Missing sources do not automatically stop the run; only unsupported conclusions are blocked.
 
+## Setup And Planning Layer
+
+The Skill separates configuration from execution.
+
+| Layer | File or object | Role |
+| --- | --- | --- |
+| Setup | `SkillConfig` | Stores target details, source inputs, evidence policy, output preset, QA strictness, and advanced reuse settings. |
+| Plan | `WorkflowPlan` | Converts the chosen preset into ordered actions, dependencies, expected outputs, skipped modules, blockers, and publish gates. |
+| Readiness | `InputReadinessReport` | Checks whether the selected preset has its required source classes. |
+| Preview | rendered plan | Shows the user what will run, what will be skipped, and what is blocked. |
+| Execution | ontology actions | Produces source objects, knowledge objects, prep artifacts, QA flags, manifests, and lineage. |
+
+The planning layer supports these presets:
+
+| Preset | Minimum source classes | Main route |
+| --- | --- | --- |
+| `source_inventory_only` | any readable source | file classification and evidence limits |
+| `exam_format_diagnosis` | formal past papers | structure, sections, answer rules, question type |
+| `full_excel_workbook` | lecture slides or official notes | default workbook |
+| `past_paper_prediction` | formal papers plus lecture/official content | archetypes, slot grammar, confidence bands |
+| `mcq_prep` | lecture/official content | discriminators, traps, scoring policy where visible |
+| `short_answer_prep` | lecture/official content | bounded variants and mark schemas |
+| `practical_data_problem_prep` | lecture/official content plus practical/data material | input-operation-inference drills |
+| `project_scenario_long_answer` | lecture/official content | method/readout/control/caveat blocks |
+| `essay_theme_plan` | lecture/official content | themes, coverage plans, paragraph skeletons |
+| `example_essay_docx` | lecture/official content | verified-source DOCX Example Essays |
+| `audit_lint_only` | none | requested checks only |
+| `github_ready_qa` | none | repository release gate |
+
+The setup protocol is in [`references/interactive_setup_protocol.md`](references/interactive_setup_protocol.md). Practical usage guidance is in [`references/best_usage_guide.md`](references/best_usage_guide.md).
+
 ## What It Produces
 
 Default output is an Excel-first revision workbook. Complete Example Essays are generated only when explicitly requested.
@@ -97,21 +136,24 @@ Internal helper files such as manifests, source maps, QA JSON, citation logs, re
 
 ```mermaid
 flowchart TD
-    A[Supplied materials] --> B[Source inventory]
-    B --> C[Exam-regime split]
-    C --> D[Question-type classification]
-    D --> E[Exam strategy diagnosis]
-    E --> F[Knowledge-point segmentation]
-    F --> G[Examiner-operation inference]
-    G --> H{Output route}
-    H --> I[Excel prep workbook]
-    H --> J[MCQ / short-answer / data prep]
-    H --> K[Long-answer or scenario model]
-    H --> L[Optional Example Essay DOCX]
-    I --> M[Language, source, identity, and deliverable QA]
-    J --> M
-    K --> M
-    L --> M
+    A[User request] --> B[SkillConfig]
+    B --> C[WorkflowPlan]
+    C --> D[InputReadinessReport]
+    D --> E[Source inventory]
+    E --> F[Exam-regime split]
+    F --> G[Question-type classification]
+    G --> H[Exam strategy diagnosis]
+    H --> I[Knowledge-point segmentation]
+    I --> J[Examiner-operation inference]
+    J --> K{Output route}
+    K --> L[Excel prep workbook]
+    K --> M[MCQ / short-answer / data prep]
+    K --> N[Long-answer or scenario model]
+    K --> O[Optional Example Essay DOCX]
+    L --> P[Language, source, identity, and deliverable QA]
+    M --> P
+    N --> P
+    O --> P
 ```
 
 The Skill first classifies the evidence, then chooses the preparation strategy. It avoids applying essay logic to MCQ, short-answer, data/problem, or practical questions.
@@ -258,11 +300,11 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | `SKILL.md` | Top-level Codex Skill instructions and output contract. |
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
 | `references/` | Protocols for evidence handling, routing, scoring, language quality, Example Essays, Excel output, regression, and release. |
-| `scripts/` | Helper CLIs for extraction, grouping, language linting, DOCX generation, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
-| `schemas/` | JSON schemas for Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
+| `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, language linting, DOCX generation, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
+| `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
 | `tests/fixtures/` | Small public fixtures for DOCX, source-grounding, and citation-fallback checks. |
-| `agents/` | Optional Skill interface metadata. |
+| `agents/` | Optional Skill interface metadata, presets, prompt cards, and setup wizard metadata. |
 
 ## Install
 
@@ -285,6 +327,38 @@ python -m pip install -r requirements.txt
 The scripts are plain Python files. Extraction and DOCX quality depend on the installed document libraries and source-file quality.
 
 ## Common Commands
+
+Create a workflow plan from a setup config:
+
+```bash
+python scripts/plan_workflow.py \
+  --config /path/to/skill_config.json \
+  --output /path/to/internal_qa/workflow_plan.json
+```
+
+Check whether the selected preset has enough source support:
+
+```bash
+python scripts/input_readiness_check.py \
+  --config /path/to/skill_config.json \
+  --output /path/to/internal_qa/input_readiness.json
+```
+
+Render a plan preview:
+
+```bash
+python scripts/render_workflow_plan.py \
+  --plan /path/to/internal_qa/workflow_plan.json \
+  --output /path/to/internal_qa/workflow_plan.md
+```
+
+Create a run status object:
+
+```bash
+python scripts/run_status_report.py \
+  --plan /path/to/internal_qa/workflow_plan.json \
+  --output /path/to/internal_qa/run_status.json
+```
 
 Inventory sources:
 
@@ -329,6 +403,11 @@ Lint a run manifest and lineage events:
 python scripts/run_manifest_linter.py \
   --manifest /path/to/internal_qa/run_manifest.json \
   --lineage-events /path/to/internal_qa/lineage_events.jsonl
+
+python scripts/lineage_report.py \
+  --manifest /path/to/internal_qa/run_manifest.json \
+  --lineage-events /path/to/internal_qa/lineage_events.jsonl \
+  --output /path/to/internal_qa/lineage_report.json
 ```
 
 Validate action writer coverage and the interaction contract:
@@ -336,6 +415,7 @@ Validate action writer coverage and the interaction contract:
 ```bash
 python scripts/validate_action_writer_coverage.py
 python scripts/validate_interaction_contract.py
+python scripts/validate_workflow_planning_contract.py
 ```
 
 Lint ontology and past-paper prediction outputs:
