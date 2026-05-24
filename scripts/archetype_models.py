@@ -319,6 +319,11 @@ class EssayTextRun:
     highlight: EssayRunHighlight = "none"
     in_text_citation: str | None = None
     citation_original_read: bool | None = None
+    micro_detail_insert: bool = False
+    original_phrase: str | None = None
+    inserted_phrase: str | None = None
+    claim_delta: str | None = None
+    qa_status: str | None = None
 
     def validate(self) -> list[str]:
         errors: list[str] = []
@@ -338,6 +343,15 @@ class EssayTextRun:
             errors.append("green_highlight_only_for_verified_citation_or_classic_experiment_source")
         if self.highlight == "yellow" and self.source_type != "extra_reading_book":
             errors.append("yellow_highlight_only_for_extra_reading_book")
+        if self.micro_detail_insert:
+            if self.source_type not in {"extra_reading_book", "citation_original_source", "classic_experiment_source"}:
+                errors.append("micro_detail_requires_verified_extra_source")
+            if not self.source_anchor:
+                errors.append("micro_detail_insert_missing_source_anchor")
+            if not self.inserted_phrase:
+                errors.append("micro_detail_missing_inserted_phrase")
+            if self.claim_delta not in {None, "", "precision_only", "none"}:
+                errors.append("micro_detail_claim_delta_not_precision_only")
         return errors
 
     def to_dict(self) -> dict:

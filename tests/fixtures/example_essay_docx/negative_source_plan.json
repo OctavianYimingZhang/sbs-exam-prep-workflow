@@ -50,6 +50,17 @@
               "source_type": "extra_reading_book",
               "source_anchor": null,
               "highlight": "yellow"
+            },
+            {
+              "text": " This unverified named detail is incorrectly treated as a micro-detail insert.",
+              "source_type": "lecture_slide_core",
+              "source_anchor": "fixture_lecture_slides.pdf slide 2",
+              "highlight": "none",
+              "micro_detail_insert": true,
+              "original_phrase": "generic mechanism",
+              "inserted_phrase": "unverified named detail",
+              "claim_delta": "new_argument",
+              "qa_status": "micro_detail_rejected_unverified"
             }
           ]
         }

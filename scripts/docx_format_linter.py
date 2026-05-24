@@ -115,6 +115,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
     green_runs_missing_read_source = []
     yellow_runs_missing_extra_reading_anchor = []
     unexpected_highlights = []
+    micro_detail_failures = []
 
     source_paragraphs = source_map.get("paragraphs", []) if source_map else []
     allowed_author_years = set()
@@ -162,6 +163,15 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
 
             source_run = source_runs[r_idx - 1] if r_idx - 1 < len(source_runs) else {}
             wc = len(words(run.text))
+            if source_run.get("micro_detail_insert"):
+                if source_run.get("source_type") not in {"extra_reading_book", "citation_original_source", "classic_experiment_source"}:
+                    micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_requires_verified_extra_source"})
+                if not source_run.get("source_anchor"):
+                    micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_insert_missing_source_anchor"})
+                if not source_run.get("inserted_phrase"):
+                    micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_missing_inserted_phrase"})
+                if source_run.get("claim_delta") not in {None, "", "precision_only", "none"}:
+                    micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_claim_delta_not_precision_only"})
             if kind == "body":
                 total_body_words += wc
             highlight = run.font.highlight_color
@@ -189,6 +199,8 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         failures.append({"type": "yellow_highlight_missing_extra_reading_anchor", "runs": yellow_runs_missing_extra_reading_anchor})
     if unexpected_highlights:
         warnings.append({"type": "unexpected_highlight_colour", "runs": unexpected_highlights})
+    if micro_detail_failures:
+        failures.append({"type": "micro_detail_source_map_failures", "runs": micro_detail_failures})
 
     extra_reading_ratio = yellow_words / total_body_words if total_body_words else 0.0
     extra_status = (source_map or {}).get("extra_reading_status")
@@ -210,6 +222,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
             "green_runs_missing_citation": green_runs_missing_citation,
             "yellow_runs_missing_extra_reading_anchor": yellow_runs_missing_extra_reading_anchor,
             "green_runs_missing_read_original_source": green_runs_missing_read_source,
+            "micro_detail_failures": micro_detail_failures,
             "extra_reading_ratio": round(extra_reading_ratio, 4),
             "total_body_words": total_body_words,
             "yellow_words": yellow_words,

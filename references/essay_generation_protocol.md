@@ -18,7 +18,7 @@ Every paragraph must earn its place by advancing the answer. Do not pad to reach
 
 ## Required Internal Pipeline
 
-Run this sequence before drafting:
+Run this orchestration sequence for complete Example Essay generation:
 
 ```yaml
 ExampleEssayMode:
@@ -34,6 +34,7 @@ ExampleEssayMode:
   paragraph_plan:
   language_compression_plan:
   exam_ready_refinement_pass:
+  micro_extra_reading_enhancement_pass:
   highlight_plan:
   source_to_run_mapping:
   high_score_example_essay:
@@ -261,6 +262,123 @@ evidence -> mechanism tested -> interpretation -> limitation or scope
 ```
 
 Use stronger causal verbs only when the verified source directly warrants them. Otherwise prefer calibrated verbs such as `supports`, `implicates`, `is consistent with`, `contributes to`, or `suggests`.
+
+## Micro Extra Reading Enhancement Pass
+
+Run this pass after the essay has a coherent draft and before final highlight planning, source-to-run mapping, and DOCX generation.
+
+Purpose:
+
+- do not rewrite the essay;
+- do not add new paragraphs;
+- add only short verified named details to unhighlighted sentences;
+- increase molecular, circuit, method, chemical, or pathway precision without changing the lecture-derived argument.
+
+The correct question is not "Can extra reading add more content?". The correct question is:
+
+```text
+Is there an unhighlighted mechanism, evidence, or interpretation sentence with a generic slot that can be made more precise by one verified named detail?
+```
+
+Eligible sentence functions:
+
+- mechanism;
+- evidence;
+- interpretation;
+- application when it contains a mechanism or method readout.
+
+Do not apply this pass to thesis, transition, broad synthesis, or conclusion sentences unless the sentence contains a specific generic mechanism slot whose precision is required by the question.
+
+Detect generic slots such as:
+
+```text
+receptor
+channel
+transporter
+enzyme isoform
+kinase or phosphatase
+transcription factor or partner
+response element
+morphogen or ligand
+cofactor or allosteric ligand
+chemical species or transport form
+protein domain
+cellular compartment
+afferent, interneuron, projection, or circuit class
+assay readout or experimental marker
+pathway intermediate
+```
+
+Candidate insertion rules:
+
+```yaml
+MicroExtraReadingInsertion:
+  original_sentence:
+  original_phrase:
+  inserted_phrase:
+  source_class: recommended_book | citation_original_source | classic_experiment_source
+  source_anchor:
+  highlight_colour: yellow | green
+  word_count_delta:
+  claim_delta: precision_only
+  qa_status: micro_detail_verified | rejected
+```
+
+Accept an insertion only when all conditions are true:
+
+- the sentence already has a lecture or official-source anchor;
+- the inserted phrase is supported directly by a verified source anchor;
+- the inserted phrase is compact enough to remain a phrase or short clause inside the original sentence;
+- the insertion names one concrete object, step, source, species, domain, compartment, readout, or module;
+- the insertion preserves the grammar and argument direction of the original sentence;
+- the addition improves causal precision, assay precision, or mechanistic specificity;
+- the essay remains inside the Extra Reading density limit.
+
+Use these low-risk insertion patterns:
+
+```text
+generic noun -> specific appositive
+generic transport or pathway claim -> named chemical form or step
+generic signal phrase -> named receptor, kinase, ligand, domain, or module
+generic readout -> named assay marker, flux, compartment, or experimental endpoint
+```
+
+Highlight and source mapping are mechanical:
+
+- uploaded recommended book or textbook chapter = yellow;
+- verified lecture-cited original paper or verified classic source = green;
+- ordinary lecture or official-source material = no highlight;
+- exemplar-only or remembered detail = reject.
+
+Reject an insertion when:
+
+- no exact source anchor exists;
+- author-year, DOI, PubMed, publisher, chapter, or section verification is missing where required;
+- the phrase requires a new explanatory sentence;
+- the phrase is long enough to become a new explanation or second argument;
+- it starts a new subtopic;
+- it replaces lecture logic with external-source logic;
+- it makes a stronger claim than the source supports;
+- it duplicates a molecule, method, or named detail already nearby;
+- it creates citation stacking;
+- it turns a concise exam answer into a review-style answer.
+
+Highlight span must be minimal. Highlight only the inserted phrase or short inserted clause. Do not highlight a whole lecture-derived sentence merely because one inserted term came from Extra Reading.
+
+QA flags for this pass:
+
+```text
+micro_detail_verified
+micro_detail_rejected_unverified
+micro_detail_insert_missing_source_anchor
+micro_detail_too_expansive
+micro_detail_claim_delta_not_precision_only
+highlight_span_too_broad
+source_type_colour_mismatch
+lecture_logic_replaced_by_extra_reading
+academic_paper_author_year_unverified
+recommended_book_section_not_found
+```
 
 ## High-Quality Essay Language Rules
 

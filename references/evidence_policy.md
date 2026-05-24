@@ -95,10 +95,13 @@ Extra reading may be inserted into essays only as:
 
 - one short enrichment paragraph;
 - one precise sentence inside a mechanism paragraph;
+- one short named-detail insertion inside an otherwise lecture-derived sentence;
 - one comparison point that sharpens the lecture argument;
 - one evidence-based example that strengthens the lecture mechanism.
 
 It must not replace lecture content, exceed 15% of the essay, introduce an unrelated mechanism, contradict slides without explanation, or appear without verified source anchoring. In explicit Example Essay Mode, uploaded Extra Reading Book content should be 10-15% of body words when a relevant chapter/section is found, and those words must be yellow-highlighted.
+
+For sentence-level micro-detail insertions, the source rule is stricter: the inserted phrase must be directly supported by a verified chapter, section, original paper, or classic source. Keep the addition compact enough that it remains a phrase or short clause inside the original sentence. Highlight only the inserted phrase. Reject the insertion if it changes the claim, starts a new topic, duplicates nearby detail, requires a new explanatory sentence, or makes the extra-reading detail dominate the lecture-derived claim.
 
 Classic-experiment fallback is not a licence to broaden the answer. Use it only after confirming that relevant lecture slides contain no usable citations, and only for directly relevant experiments with verified author-year/source details. Classic experiments are green-highlighted citation-source content, not yellow-highlighted Extra Reading Book content.
 

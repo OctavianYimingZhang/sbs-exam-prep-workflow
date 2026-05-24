@@ -19,6 +19,7 @@ def audit_from_source_map(path: Path) -> dict[str, Any]:
     citation_sources = []
     extra_sources = []
     lecture_logic_summary = []
+    micro_detail_enhancements = []
     yellow_words = 0
     green_words = 0
     total_words = 0
@@ -32,6 +33,21 @@ def audit_from_source_map(path: Path) -> dict[str, Any]:
             lecture_sources.setdefault(key, set()).add(pid)
         for run in paragraph.get("runs", []):
             total_words += int(run.get("word_count") or 0)
+            if run.get("micro_detail_insert"):
+                micro_detail_enhancements.append(
+                    {
+                        "paragraph_id": pid,
+                        "run_index": run.get("run_index"),
+                        "original_phrase": run.get("original_phrase"),
+                        "inserted_phrase": run.get("inserted_phrase"),
+                        "source_type": run.get("source_type"),
+                        "source_anchor": run.get("source_anchor"),
+                        "highlight": run.get("highlight"),
+                        "word_count": run.get("word_count", 0),
+                        "claim_delta": run.get("claim_delta"),
+                        "qa_status": run.get("qa_status"),
+                    }
+                )
             if run.get("source_type") in {"citation_original_source", "classic_experiment_source"}:
                 green_words += int(run.get("word_count") or 0)
                 citation_sources.append(
@@ -77,6 +93,7 @@ def audit_from_source_map(path: Path) -> dict[str, Any]:
         "lecture_logic_summary": lecture_logic_summary,
         "citation_sources_detected": citation_sources,
         "extra_reading_books": extra_sources,
+        "micro_detail_enhancements": micro_detail_enhancements,
         "word_counts": {
             "total_body_words": total_body_words,
             "lecture_core_words": max(total_body_words - audit_yellow_words - audit_green_words, 0),

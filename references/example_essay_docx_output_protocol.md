@@ -120,6 +120,44 @@ Rules:
 - Do not use green highlight for citations copied from secondary sources unless the original cited source was read.
 - Do not use yellow highlight for generic textbook knowledge unless it came from the uploaded Extra Reading material.
 
+## Micro-Detail Highlighting
+
+When the Micro Extra Reading Enhancement Pass inserts a short named detail into an otherwise lecture-derived sentence, the DOCX must preserve the source boundary at run level.
+
+Rules:
+
+- highlight only the inserted phrase or shortest source-derived clause;
+- do not highlight the full sentence if most of the sentence is lecture-derived synthesis;
+- yellow is valid only for an inserted phrase from an uploaded recommended book or matched textbook chapter/section;
+- green is valid only for an inserted phrase from a verified lecture-cited original source or verified classic/academic source;
+- ordinary lecture-derived precision receives no highlight;
+- unverified remembered details and exemplar-only details are rejected, not highlighted.
+
+Micro-detail insertions must remain short in function, not by a fixed word count. The addition should read as a phrase or short clause inside the original sentence. If the detail needs a new explanatory sentence, introduces a second argument, or dominates the lecture-derived sentence, it is not a micro-detail insertion and must go through normal paragraph planning.
+
+Each micro-detail run in the source map should record:
+
+```yaml
+micro_detail_insert: true
+original_phrase:
+inserted_phrase:
+source_type:
+source_anchor:
+highlight:
+word_count:
+claim_delta: precision_only
+qa_status:
+```
+
+Fail or flag the essay if:
+
+- a micro-detail insertion has no source anchor;
+- a micro-detail insertion is long enough to become a new explanation or second argument;
+- a micro-detail insertion has a source type that does not match its highlight colour;
+- a micro-detail insertion changes the original claim instead of making it more precise;
+- a highlighted span is broader than the source-derived insertion;
+- the insertion pushes Extra Reading above the allowed ratio.
+
 ## Extra Reading Ratio
 
 If relevant Extra Reading Books are uploaded:

@@ -407,7 +407,7 @@ It should not narrate pages, slides, source order, or instructions about how to 
 
 Example Essay mode is a separate DOCX-first revision-exemplar branch. It runs only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents, and it must not be framed as submission-ready assessed work.
 
-Before drafting, the Skill runs this internal sequence:
+For complete Example Essay generation, the Skill runs this internal sequence:
 
 ```text
 question analysis
@@ -420,6 +420,7 @@ extra-reading chapter matching or academic search
 knowledge inventory
 paragraph plan
 language compression plan
+sentence-level extra-reading micro-detail pass
 exam-ready refinement pass
 highlight plan
 source-to-run mapping
@@ -436,6 +437,7 @@ Essay language is controlled by the shared language contract:
 - build paragraphs through claim, mechanism, evidence, scope, and consequence;
 - convert evidence-heavy examples into `evidence -> mechanism -> interpretation -> limitation`;
 - compress repetition without deleting academic mechanisms;
+- use Extra Reading as a precision layer, inserting only verified phrase-level or short-clause details when they sharpen an unhighlighted mechanism sentence without changing the argument;
 - remove lecture-route narration and exam-guidance phrasing;
 - calibrate citation strength, using cautious verbs unless a source directly proves causality;
 - conclude by synthesis, not by adding new evidence.

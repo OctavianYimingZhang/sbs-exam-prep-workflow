@@ -29,7 +29,27 @@
                 "is_subtitle": { "type": "boolean" },
                 "is_heading": { "type": "boolean" },
                 "lecture_anchors": { "type": "array" },
-                "text_runs": { "type": "array" }
+                "text_runs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["text"],
+                    "properties": {
+                      "text": { "type": "string" },
+                      "source_type": { "type": ["string", "null"] },
+                      "source_anchor": { "type": ["string", "null"] },
+                      "highlight": { "enum": ["none", "yellow", "green"] },
+                      "in_text_citation": { "type": ["string", "null"] },
+                      "citation_original_read": { "type": ["boolean", "null"] },
+                      "micro_detail_insert": { "type": "boolean" },
+                      "original_phrase": { "type": ["string", "null"] },
+                      "inserted_phrase": { "type": ["string", "null"] },
+                      "claim_delta": { "type": ["string", "null"] },
+                      "qa_status": { "type": ["string", "null"] }
+                    },
+                    "additionalProperties": true
+                  }
+                }
               },
               "additionalProperties": true
             }

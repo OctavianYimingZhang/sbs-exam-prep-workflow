@@ -28,6 +28,8 @@ except Exception as exc:  # pragma: no cover
 
 BODY_KIND = {"body", "paragraph", "conclusion", "intro", "introduction", "mechanism", "evidence", "evaluation", "synthesis"}
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
+MICRO_DETAIL_SOURCE_TYPES = {"extra_reading_book", "citation_original_source", "classic_experiment_source"}
+MICRO_DETAIL_ALLOWED_CLAIM_DELTAS = {None, "", "precision_only", "none"}
 
 
 def safe_filename(text: str, max_len: int = 72) -> str:
@@ -130,6 +132,16 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
                 errors.append(f"paragraph_{idx}_run_{run_idx}_green_wrong_source_type")
             if highlight == "yellow" and source_type != "extra_reading_book":
                 errors.append(f"paragraph_{idx}_run_{run_idx}_yellow_wrong_source_type")
+            if run.get("micro_detail_insert") is True:
+                inserted_phrase = str(run.get("inserted_phrase", "")).strip()
+                if source_type not in MICRO_DETAIL_SOURCE_TYPES:
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_requires_verified_extra_source")
+                if not run.get("source_anchor"):
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_insert_missing_source_anchor")
+                if not inserted_phrase:
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_missing_inserted_phrase")
+                if run.get("claim_delta") not in MICRO_DETAIL_ALLOWED_CLAIM_DELTAS:
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_claim_delta_not_precision_only")
     return errors
 
 
@@ -160,6 +172,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
     total_body_words = 0
     yellow_words = 0
     green_words = 0
+    micro_detail_enhancements: list[dict[str, Any]] = []
 
     for p_idx, paragraph_data in enumerate(essay.get("paragraphs", []), start=1):
         kind = paragraph_kind(paragraph_data)
@@ -194,17 +207,28 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
                     yellow_words += wc
                 if run_data.get("highlight") == "green":
                     green_words += wc
-            para_map["runs"].append(
-                {
-                    "run_index": r_idx,
-                    "source_type": run_data.get("source_type"),
-                    "source_anchor": run_data.get("source_anchor"),
-                    "highlight": run_data.get("highlight", "none"),
-                    "in_text_citation": run_data.get("in_text_citation"),
-                    "citation_original_read": run_data.get("citation_original_read"),
-                    "word_count": word_count(str(run_data.get("text", ""))),
-                }
-            )
+            run_map = {
+                "run_index": r_idx,
+                "source_type": run_data.get("source_type"),
+                "source_anchor": run_data.get("source_anchor"),
+                "highlight": run_data.get("highlight", "none"),
+                "in_text_citation": run_data.get("in_text_citation"),
+                "citation_original_read": run_data.get("citation_original_read"),
+                "word_count": word_count(str(run_data.get("text", ""))),
+                "micro_detail_insert": run_data.get("micro_detail_insert", False),
+                "original_phrase": run_data.get("original_phrase"),
+                "inserted_phrase": run_data.get("inserted_phrase"),
+                "claim_delta": run_data.get("claim_delta"),
+                "qa_status": run_data.get("qa_status"),
+            }
+            para_map["runs"].append(run_map)
+            if run_map["micro_detail_insert"]:
+                micro_detail_enhancements.append(
+                    {
+                        "paragraph_id": para_map["paragraph_id"],
+                        **run_map,
+                    }
+                )
         if kind in {"title", "heading"}:
             for run in paragraph.runs:
                 run.bold = True
@@ -218,6 +242,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
         "citation_original_green_words": green_words,
         "extra_reading_ratio": (yellow_words / total_body_words) if total_body_words else 0.0,
     }
+    source_map["micro_detail_enhancements"] = micro_detail_enhancements
 
     doc.save(docx_path)
 
@@ -236,6 +261,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
         "qa": str(qa_path),
         "qa_flags": qa_flags,
         "word_counts": source_map["word_counts"],
+        "micro_detail_enhancements": micro_detail_enhancements,
     }
 
 
@@ -288,6 +314,7 @@ def main() -> int:
                 "source_map": doc["source_map"],
                 "qa_flags": doc["qa_flags"],
                 "word_counts": doc["word_counts"],
+                "micro_detail_enhancements": doc.get("micro_detail_enhancements", []),
             }
             for doc in manifest["documents"]
         ]

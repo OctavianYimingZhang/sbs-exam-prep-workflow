@@ -127,7 +127,27 @@
           ],
           "text_runs": [
             {
-              "text": "Mechanistically, the signal acts through a receptor-level decision step that constrains which downstream pathway becomes active. This explains why the same tissue can remain stable under weak stimulation but shift state when the signal crosses a threshold. ",
+              "text": "Mechanistically, the signal acts through a receptor-level decision step ",
+              "source_type": "lecture_slide_core",
+              "source_anchor": "fixture_lecture_slides.pdf slides 12-13",
+              "highlight": "none",
+              "in_text_citation": null
+            },
+            {
+              "text": "at a receptor phosphorylation site (Author et al., 2026)",
+              "source_type": "citation_original_source",
+              "source_anchor": "Author et al. 2026 original paper, read section receptor activation",
+              "highlight": "green",
+              "in_text_citation": "(Author et al., 2026)",
+              "citation_original_read": true,
+              "micro_detail_insert": true,
+              "original_phrase": "receptor-level decision step",
+              "inserted_phrase": "at a receptor phosphorylation site",
+              "claim_delta": "precision_only",
+              "qa_status": "micro_detail_verified"
+            },
+            {
+              "text": " that constrains which downstream pathway becomes active. This explains why the same tissue can remain stable under weak stimulation but shift state when the signal crosses a threshold. ",
               "source_type": "lecture_slide_core",
               "source_anchor": "fixture_lecture_slides.pdf slides 12-13",
               "highlight": "none",
