@@ -19,7 +19,7 @@
       "action_type": "ApproveStudentOutput",
       "status": "pass",
       "inputs": ["ART001"],
-      "outputs": ["outputs/Exam_Prep_Map.xlsx"]
+      "outputs": ["outputs/Lecture_Knowledge_Walkthrough.docx"]
     }
   ],
   "object_store": {
@@ -29,7 +29,7 @@
   "artifacts": [
     {
       "artifact_id": "ART001",
-      "path": "outputs/Exam_Prep_Map.xlsx",
+      "path": "outputs/Lecture_Knowledge_Walkthrough.docx",
       "student_visible": true,
       "qa_status": "pass"
     }

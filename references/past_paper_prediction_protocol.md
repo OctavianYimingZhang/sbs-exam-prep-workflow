@@ -3,10 +3,11 @@
 Past-paper analysis is not a guessing workflow. It is a constrained preparation-allocation workflow:
 
 ```text
-past papers -> current exam regime -> question-level records -> archetype registry -> slot grammar -> KP compatibility -> confidence band -> prep artifact
+past papers -> current exam regime -> question-level records -> archetype registry -> slot grammar -> KP compatibility -> internal confidence band -> chat-only Exam Analysis Brief -> output-route selection
 ```
 
 The prediction target is a question family and preparation action, not exact future wording.
+Do not package this analysis as a separate prediction file or workbook in ordinary student-facing output.
 
 ## Theoretical Model
 

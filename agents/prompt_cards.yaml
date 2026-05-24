@@ -8,13 +8,14 @@ prompt_cards:
       - "Do not infer hidden content from unreadable or unsupported files."
     hard_stops:
       - "No supplied or discoverable sources."
-  - card_id: "full_excel_workbook"
-    preset: "full_excel_workbook"
-    purpose: "Build the explicit student-facing workbook from valid source objects."
+  - card_id: "mcq_exam_prep"
+    preset: "mcq_exam_prep"
+    purpose: "Build the lecture walkthrough plus a student-facing MCQ point-card report."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
-      - "Generate workbook content from source-linked knowledge points."
-      - "Keep helper files outside the student-facing folder unless an audit package is requested."
+      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate MCQ Exam Analysis Report DOCX using point cards only."
+      - "Do not expose source anchors, confidence, discriminator axes, answer keys, practice questions, or contrast tables."
     hard_stops:
       - "No lecture slides or official notes."
       - "Blocking ontology or language QA flag."
@@ -29,22 +30,33 @@ prompt_cards:
       - "Do not show source anchors, confidence, recurrence, examiner operations, essay plans, practice questions, or answer keys."
     hard_stops:
       - "No lecture slides or official notes."
-  - card_id: "past_paper_prediction"
-    preset: "past_paper_prediction"
-    purpose: "Build archetypes and preparation priorities without claiming exact future wording."
-    minimum_inputs: ["formal_past_papers", "lecture_or_official_notes"]
-    output_contract:
-      - "Use question-level records before ranking patterns."
-      - "Report confidence bands, not fake precision."
-    hard_stops:
-      - "No formal paper evidence."
-      - "No target lecture or official content for KP compatibility."
-  - card_id: "example_essay_docx"
-    preset: "example_essay_docx"
-    purpose: "Produce complete Example Essay documents from verified source logic."
+  - card_id: "short_answer_exam_prep"
+    preset: "short_answer_exam_prep"
+    purpose: "Build the lecture walkthrough plus short-answer point cards and Example Answers."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
-      - "Generate one DOCX per essay."
+      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate module logic, point cards, highlighted keywords, and Example Answers."
+      - "Do not expose mark-producing schema, source anchors, confidence, task verbs, or reference expansion."
+    hard_stops:
+      - "No lecture slides or official notes."
+  - card_id: "long_answer_project_scenario_prep"
+    preset: "long_answer_project_scenario_prep"
+    purpose: "Build the lecture walkthrough plus a long-answer/project/scenario report with analysis and Example Answer."
+    minimum_inputs: ["lecture_or_official_notes"]
+    output_contract:
+      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate question analysis, answer order, reusable answer blocks, Example Answer, and adaptation notes."
+      - "Do not expose evidence rationale, confidence, recurrence, or source anchors."
+    hard_stops:
+      - "No lecture slides or official notes."
+  - card_id: "essay_exam_prep"
+    preset: "essay_exam_prep"
+    purpose: "Produce module-level Example Essays from verified source logic for essay exams."
+    minimum_inputs: ["lecture_or_official_notes"]
+    output_contract:
+      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate module-level big Example Essays with adaptation maps and paragraph banks."
       - "Verify citations or use an explicit classic-study fallback plan."
       - "Run DOCX formatting and language lint before delivery."
     hard_stops:

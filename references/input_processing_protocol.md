@@ -156,7 +156,7 @@ ExampleContribution:
     - example_essay_mode
     - long_answer_project_mode
     - extra_reading_and_exemplars
-    - excel_generation
+    - docx_add_on_generation
     - qa
     - cross_subject_regression
   anti_patterns_prevented:
@@ -325,13 +325,13 @@ condition or biological problem -> regulator/sensor/molecular feature -> molecul
 
 ## Lecture-Order Coverage
 
-For student-facing visual workbooks, analysis must proceed from the first slide/page to the last slide/page in source order.
+For student-facing lecture walkthroughs and DOCX add-ons, analysis must proceed from the first slide/page to the last slide/page in source order where lecture order matters.
 
 Do not:
 
 - analyse only high-yield slides;
 - skip middle lecture sections without a QA flag;
-- reorder KPs by predicted importance in the main student-facing workbook;
+- reorder KPs by predicted importance in the main lecture walkthrough;
 - merge several unrelated mechanisms into one huge KP;
 - split one mechanism/evidence block into isolated slide fragments.
 
@@ -339,4 +339,4 @@ Allowed:
 
 - group several consecutive slides/pages into one KP when they form one mechanism, process chain, experimental-evidence block, data-operation block, or essay paragraph block;
 - mark a block low examinability, but still preserve its position;
-- place detailed evidence in diagnostics or an evidence workbook while keeping the student sheet clean.
+- place detailed evidence in diagnostics or an explicit audit package while keeping the student-facing output clean.

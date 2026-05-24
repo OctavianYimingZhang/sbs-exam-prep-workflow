@@ -11,7 +11,7 @@ Use this protocol before committing and pushing Skill updates.
 5. Run the fragment-index fixture.
 6. Run the runtime ontology validator fixture, including a negative cross-target leakage case.
 7. Run the run-manifest and lineage fixture.
-8. Run workbook prose fixture lint.
+8. Run student-facing prose fixture lint.
 9. Run benchmark metadata/regression checks.
 10. Generate the positive Example Essay DOCX fixture in strict mode.
 11. Lint the generated DOCX formatting and source mapping.

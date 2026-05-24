@@ -22,10 +22,10 @@
     "treat_examples_as_style_only": true
   },
   "output_mode": {
-    "preset": "past_paper_prediction",
+    "preset": "exam_format_diagnosis",
     "include_audit_package": false,
     "student_visible_only": true,
-    "requested_artifacts": ["prediction workbook"]
+    "requested_artifacts": ["chat-only exam analysis brief"]
   },
   "qa": {
     "strict_publish_gate": true,

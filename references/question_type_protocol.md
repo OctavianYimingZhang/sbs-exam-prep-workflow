@@ -83,7 +83,7 @@ Internal `MCQ_HighFrequency` fields may include:
 - Source slide/page;
 - Confidence.
 
-The default student-facing MCQ report must not expose those internal fields. Convert the internal map into `MCQStudentPointCard` objects:
+The default student-facing MCQ report is a Point Card report only. Convert the internal map into `MCQStudentPointCard` objects:
 
 ```yaml
 MCQStudentPointCard:
@@ -120,7 +120,7 @@ p > d / (c + d)
 
 This policy supports answer strategy. It must not be used to invent official answers.
 
-MCQ preparation output should be:
+Internal MCQ analysis may contain:
 
 - term-pair contrast table;
 - formula flashcards;
@@ -203,7 +203,7 @@ If marks are visible, infer minimum scoring points from marks and wording, but d
 
 Extra reading may appear only under `Optional extra-reading refinement` unless lecture content is insufficient.
 
-Generate mark-length skeletons where relevant:
+Generate mark-length skeletons only when the user explicitly asks for length variants or when a visible prompt requires them:
 
 - 2-mark version: one-line definition or two named points.
 - 4-mark version: definition plus two to three linked explanatory points.
@@ -375,11 +375,11 @@ EssayThemePrediction:
   confidence: High | Medium | Low
 ```
 
-Use `Predicted essay theme` as the student-facing label. If a practice stem is useful, label it `Practice variant from predicted theme`.
+Use `Predicted essay theme` only inside the chat-only exam-analysis brief or an explicit audit/selection note. If a practice stem is useful, label it `Practice variant from predicted theme`.
 
 For answer-one essay sections with several options, add an `EssayCoveragePlan`. The aim is to prepare enough lecture blocks for at least one high-quality answer, not to claim exact future titles or force equal-depth preparation for every source block unless requested.
 
-When Example Essay Mode is triggered, follow `essay_generation_protocol.md`.
+When Essay Exam Prep or Example Essay Mode is triggered, follow `essay_generation_protocol.md` and package the student-facing result as `Essay_Module_Example_Essays.docx` unless the user explicitly asks for separate essay files.
 
 If the exam-format gate classifies the target as `long_answer_project`, follow `long_answer_example_protocol.md` instead of the essay-generation protocol.
 
@@ -400,7 +400,7 @@ For every essay output, require:
 
 Use K/C/U/A/R only for essay-based theory answers.
 
-Every essay paragraph must be split into separate Excel rows:
+Every essay paragraph must have internal planning metadata:
 
 - paragraph number;
 - paragraph text;
@@ -412,7 +412,7 @@ Every essay paragraph must be split into separate Excel rows:
 
 Do not write slide-by-slide summaries. Each paragraph must serve the question command verb.
 
-For the default student-facing visual workbook, include predicted essay themes and optional practice variants only. Do not include full example essays unless the user explicitly requests examples.
+For the default essay-prep DOCX add-on, include module-level Example Essays, adaptation maps, and paragraph banks. Do not create a prediction workbook or put complete essays into spreadsheet rows.
 
 The essay must be built from paragraph functions, not from slide order alone. Slide order informs lecture logic; paragraph order is determined by the command word, expected scope, and lecturer intent.
 

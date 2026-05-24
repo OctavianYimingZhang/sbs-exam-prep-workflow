@@ -77,7 +77,7 @@
       "required_properties": ["slot_grammar_id", "archetype_id", "slot_types", "allowed_fillers", "forbidden_fillers", "source_scope"]
     },
     "EvidenceClaim": {
-      "description": "A claim eligible for workbook or essay prose only after support and source permissions are verified.",
+      "description": "A claim eligible for student-facing walkthrough, report, or essay prose only after support and source permissions are verified.",
       "required_properties": ["claim_id", "claim_text", "support_level", "verification_status", "source_anchors", "claim_strength"]
     },
     "ReadingSource": {
@@ -234,9 +234,9 @@
     "workflow_plan_preview": ["request_scope", "selected_preset", "target_group_key", "actions", "skipped_modules", "blockers", "publish_gate"],
     "student_output_filter": ["internal_objects", "student_visible_structure", "forbidden_student_fields", "output_mode"],
     "knowledge_walkthrough_docx": ["lecture_order", "lecture_overview", "module_map", "lecture_modules", "lecture_recap", "forbidden_student_fields"],
-    "essay_theme": ["current_regime", "essay_archetype", "compatible_kps", "lecture_scope", "confidence_band", "qa_flags"],
-    "mcq_prep": ["mcq_archetype", "discriminator_axes", "distractor_families", "mcq_scoring_policy", "confidence_band"],
-    "data_problem_prep": ["practical_operation", "linked_kps", "input_operation_inference_limitation_follow_up"],
+    "essay_exam_prep": ["current_regime", "essay_archetype", "compatible_kps", "lecture_scope", "module_example_essays", "adaptation_map", "qa_flags"],
+    "mcq_exam_prep": ["mcq_archetype", "point_cards", "common_traps", "must_remember", "student_field_filter"],
+    "long_answer_project_scenario_prep": ["practical_operation", "method_blocks", "linked_kps", "input_operation_inference_limitation_follow_up", "example_answer"],
     "extra_reading_insert": ["verified_reading_source", "matched_kp", "matched_chapter_or_section", "sentence_budget_decision"]
   }
 }

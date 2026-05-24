@@ -8,7 +8,7 @@ Do only the requested scope unless the next module is required to make the reque
 
 Examples:
 
-- If the user asks only for source inventory, do not generate predictions or workbooks.
+- If the user asks only for source inventory, do not generate exam-analysis briefs or DOCX reports.
 - If the user asks only for DOCX linting, do not rewrite essays.
 - If the user asks only for Example Essay DOCX generation and already supplies a valid document plan, do not rerun past-paper prediction.
 - If the user asks for the complete default lecture-review workflow, route to `knowledge_walkthrough_docx` and run only its dependencies.
@@ -24,7 +24,7 @@ Every module must define:
 - standalone-use behaviour;
 - composition behaviour when used inside the full workflow.
 
-Modules must write their results in a reusable format when practical: JSON, workbook, DOCX, or a concise direct answer. Diagnostics should state which modules were run and which were intentionally skipped.
+Modules must write their results in a reusable format when practical: JSON, DOCX, or a concise direct answer. Diagnostics should state which modules were run and which were intentionally skipped.
 
 ## Independent Modules
 
@@ -155,17 +155,17 @@ Outputs:
 
 Standalone behaviour:
 
-- do not generate workbook unless requested.
+- do not generate question-type reports unless requested.
 
 ### 7. KP Essay Synthesis
 
 Trigger:
 
-- user asks to rewrite KP explanations, remove page-by-page narration, make essay-style synthesis, or lint workbook language.
+- user asks to rewrite KP explanations, remove page-by-page narration, make essay-style synthesis, or lint student-facing prose.
 
 Minimum inputs:
 
-- KP records or workbook explanation cells plus source anchors.
+- KP records or student-facing explanation drafts plus source anchors.
 
 Outputs:
 
@@ -196,7 +196,7 @@ Outputs:
 
 Standalone behaviour:
 
-- do not generate workbook unless requested.
+- do not generate a DOCX report unless requested.
 
 ### 9. Question-Type Output Generation
 
@@ -240,25 +240,27 @@ Standalone behaviour:
 - if supplied with a valid `KnowledgeWalkthroughPlan`, generate/lint the DOCX without rerunning upstream modules.
 - preserve lecture order while splitting each lecture by conceptual function rather than slide/page number.
 
-### 11. Explicit Excel Workbook Generation
+### 11. Question-Type DOCX Add-On Generation
 
 Trigger:
 
-- user asks for revision Excel, exam-prep workbook, visual workbook, or spreadsheet output.
+- user asks for MCQ, short-answer, essay, practical/data, long-answer, project, scenario, or method-focused exam preparation beyond the lecture walkthrough.
 
 Minimum inputs:
 
-- KP map, slide images, KP synthesis, and exam-facing prep outputs.
+- lecture slides or official notes;
+- knowledge points;
+- exam-format evidence when the requested add-on depends on past-paper structure.
 
 Outputs:
 
-- student-facing Excel workbook;
+- the matching student-facing DOCX add-on report;
 - diagnostics JSON;
-- optional separate evidence workbook.
+- optional audit package only when requested.
 
 Standalone behaviour:
 
-- if supplied with valid intermediate JSON/KP records, build the workbook without rerunning upstream modules.
+- if supplied with valid intermediate JSON/KP records, build the requested DOCX add-on without rerunning upstream modules.
 
 ### 12. Example Essay DOCX Mode
 
@@ -337,7 +339,7 @@ Trigger:
 
 Minimum inputs:
 
-- workbook, DOCX directory, source maps, diagnostics, or generated artefacts.
+- DOCX directory, source maps, diagnostics, or generated artefacts.
 
 Outputs:
 
@@ -358,12 +360,12 @@ Trigger:
 
 Minimum inputs:
 
-- regression suite and optionally generated workbooks/DOCX folders.
+- regression suite and optionally generated DOCX folders.
 
 Outputs:
 
 - regression report JSON;
-- workbook/DOCX lint results where supplied.
+- DOCX/prose lint results where supplied.
 
 Standalone behaviour:
 
@@ -424,7 +426,7 @@ When the user requests the complete exam-prep workflow, run modules in this orde
 8. Archetype / Past-Paper / Pattern Analysis.
 9. Question-Type Output Generation.
 10. Knowledge Walkthrough DOCX Generation for the default lecture-review output.
-11. Explicit Excel Workbook Generation only when requested.
+11. Question-Type DOCX Add-On Generation.
 12. QA / Linting.
 13. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
 14. Gap Closure Report when modifying the Skill itself.
@@ -450,8 +452,8 @@ If the user supplies a valid intermediate artefact, prefer using it directly:
 
 - source inventory JSON can feed target grouping;
 - lecture segmentation can feed KP optimisation;
-- KP map can feed synthesis, predictions, or workbook generation;
-- workbook can feed essay-style linter;
+- KP map can feed synthesis, exam-analysis selection, or DOCX report generation;
+- student-facing prose drafts can feed the essay-style linter;
 - ExampleEssayDocumentPlan can feed DOCX generation;
 - DOCX + source map can feed DOCX format linter;
 - source audit can feed regression;

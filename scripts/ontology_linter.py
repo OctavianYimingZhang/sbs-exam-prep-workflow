@@ -191,9 +191,9 @@ def validate_ontology(data: dict[str, Any]) -> dict[str, Any]:
         "workflow_plan_preview",
         "student_output_filter",
         "knowledge_walkthrough_docx",
-        "essay_theme",
-        "mcq_prep",
-        "data_problem_prep",
+        "essay_exam_prep",
+        "mcq_exam_prep",
+        "long_answer_project_scenario_prep",
         "extra_reading_insert",
     ]:
         if template not in data.get("query_templates", {}):

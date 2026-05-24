@@ -25,7 +25,7 @@ The setup wizard has these sections:
 
 ## SkillConfig Rules
 
-Create a `SkillConfig` object when the run has more than one source role, any prediction request, any Example Essay request, or any public artifact.
+Create a `SkillConfig` object when the run has more than one source role, any past-paper/exam-format analysis request, any Example Essay request, or any public artifact.
 
 The required sections are:
 
@@ -47,17 +47,13 @@ Use the narrowest preset that can answer the user's request:
 | File roles and evidence limits only | `source_inventory_only` |
 | Exam sections, question types, and answer rules | `exam_format_diagnosis` |
 | Default lecture knowledge review | `knowledge_walkthrough_docx` |
-| Explicit Excel workbook | `full_excel_workbook` |
-| Paper-derived preparation priorities | `past_paper_prediction` |
-| MCQ strategy and content drills | `mcq_prep` |
-| Short-answer variants and mark schemas | `short_answer_prep` |
-| Practical, graph, data, case, protocol, or calculation prep | `practical_data_problem_prep` |
-| Scenario or project-style long answer planning | `project_scenario_long_answer` |
-| Essay themes and coverage plans, without complete essays | `essay_theme_plan` |
-| Complete Example Essay Word documents | `example_essay_docx` |
+| MCQ strategy and content drills | `mcq_exam_prep` |
+| Short-answer variants and Example Answers | `short_answer_exam_prep` |
+| Practical, graph, data, case, protocol, calculation, scenario, project, or long-answer prep | `long_answer_project_scenario_prep` |
+| Essay preparation or complete Example Essays | `essay_exam_prep` |
 | Checks only | `audit_lint_only` or `github_ready_qa` |
 
-Do not run a full workbook path when a narrower audit, inventory, or format diagnosis is sufficient.
+Do not generate a DOCX report when a narrower audit, inventory, or format diagnosis is sufficient. Do not use legacy Excel workbook paths as public output routes.
 
 ## Plan Preview
 
@@ -84,4 +80,4 @@ Ask at most one clarification question only when the missing input blocks the re
 
 ## Output Boundary
 
-Student-facing outputs may include the requested workbook, Example Essay DOCX files, direct explanations, or concise reports. Internal QA artifacts may be generated under an internal folder, but they must not be mixed into the student-facing output unless the user explicitly asks for an audit package.
+Student-facing outputs may include the requested Lecture Knowledge Walkthrough DOCX, question-type DOCX add-on reports, Example Essay DOCX content, direct explanations, or concise reports. Internal QA artifacts may be generated under an internal folder, but they must not be mixed into the student-facing output unless the user explicitly asks for an audit package.

@@ -36,8 +36,9 @@ EvidenceClaim, ReadingSource, MethodBlock, QAFlag.
 
 Serving layer
 Student-facing artifacts:
-Exam_Prep_Map workbook, Example Essay DOCX, direct answer,
-plus hidden diagnostics, lineage, and source audit when requested.
+Lecture Knowledge Walkthrough DOCX, question-type DOCX reports,
+Essay Module Example Essays DOCX, direct answer, plus hidden
+diagnostics, lineage, and source audit when requested.
 ```
 
 Student-visible output may only be generated from Gold objects whose support links pass validation.

@@ -19,6 +19,7 @@ HELPER_NAMES = {
     "target_groups.json",
 }
 HELPER_SUFFIXES = ("_source_map.json", "_qa.json", "_render_qa.json")
+FORBIDDEN_PUBLIC_SUFFIXES = {".xlsx", ".xlsm"}
 
 
 def main() -> int:
@@ -36,6 +37,8 @@ def main() -> int:
         name = item.name
         if name in HELPER_NAMES or any(name.endswith(suffix) for suffix in HELPER_SUFFIXES):
             failures.append({"type": "helper_artifact_in_public_output", "path": str(item)})
+        elif item.suffix.lower() in FORBIDDEN_PUBLIC_SUFFIXES:
+            failures.append({"type": "legacy_workbook_in_public_output", "path": str(item), "suffix": item.suffix})
         elif allowed and item.suffix.lower() not in allowed:
             failures.append({"type": "non_deliverable_file", "path": str(item), "suffix": item.suffix})
     result = {

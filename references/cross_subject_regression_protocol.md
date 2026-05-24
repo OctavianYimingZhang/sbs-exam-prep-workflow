@@ -41,7 +41,7 @@ BenchmarkContribution:
     - regime split
     - question-type routing
     - answer-shape modelling
-    - workbook layout
+    - output layout
     - Example Essay language quality
     - citation or extra-reading discipline
     - QA rule
@@ -84,12 +84,12 @@ Knowledge-point construction:
 
 - KPs are built from examinable reasoning blocks rather than slide count;
 - adjacent source pages are merged only when they teach one examinable mechanism, process, comparison, method, data operation, or scenario;
-- source order is preserved in the visual workbook;
+- source order is preserved in the lecture walkthrough;
 - page/slide coverage is kept in images/source maps, not narrated inside student prose.
 
 Language quality:
 
-- workbook explanations use `claim -> mechanism/process/evidence -> consequence`;
+- student-facing explanations use `claim -> mechanism/process/evidence -> consequence`;
 - complete Example Essays use paragraph functions, not slide summaries;
 - examples support wider claims instead of becoming disconnected case descriptions;
 - repeated low-value detail is compressed;
@@ -99,10 +99,10 @@ Language quality:
 
 Output layout:
 
-- student workbook keeps evidence/provenance columns out unless requested;
-- original slide/page images remain visible and aspect-ratio-preserved;
-- the exam-facing prep area adapts to question type;
-- complete Example Essays are standalone DOCX files, not workbook cells.
+- student-facing outputs keep evidence/provenance fields out unless an audit package is requested;
+- original slide/page images remain visible and aspect-ratio-preserved when included;
+- the add-on report adapts to question type;
+- complete Example Essays are in DOCX output, not spreadsheet cells.
 
 QA:
 
@@ -116,9 +116,9 @@ QA:
 
 When an Example Essay DOCX directory is supplied to the regression checker, validate:
 
-- each complete essay is a separate `.docx`;
-- internal QA artefacts such as `example_essay_manifest.json` and `example_essay_source_audit.json` exist in the public DOCX directory or a separate internal QA directory;
-- no generated Example Essay exists only as an Excel row;
+- complete essays are present in the requested DOCX output, either inside `Essay_Module_Example_Essays.docx` or as separate `.docx` files when separate files are requested;
+- internal QA artefacts such as `example_essay_manifest.json` and `example_essay_source_audit.json` exist in a separate internal QA directory unless the user explicitly asks for an audit package;
+- no generated Example Essay exists only as a spreadsheet row;
 - DOCX formatting passes the current contract: Arial, 2.5 cm margins, 1.5 line spacing, justified body, centered title, left-aligned subtitles/headings, and no empty spacer paragraphs;
 - yellow-highlighted runs map to uploaded Extra Reading Book chapter/section anchors;
 - green-highlighted runs map to read lecture-slide citation originals and include author-year in-text citation;
@@ -158,8 +158,8 @@ Fail regression if:
 - a benchmark lacks generic contribution metadata;
 - a benchmark lacks non-transferable-content metadata;
 - old or structurally different papers drive current-regime predictions without comparability evidence;
-- generated workbook prose contains slide/page narration as the main explanation;
-- complete Example Essays are exported only as Excel rows;
+- generated student-facing prose contains slide/page narration as the main explanation;
+- complete Example Essays are exported only as spreadsheet rows;
 - Example Essay DOCX formatting or source-highlighting checks fail;
 - extra-reading or citation-source content is used without verification.
 
@@ -172,7 +172,7 @@ The regression suite passes when benchmark examples improve only generic workflo
 - question-type routing;
 - KP granularity;
 - source-order coverage;
-- workbook layout adaptation;
+- output layout adaptation;
 - Example Essay language quality;
 - citation and extra-reading discipline;
 - no factual leakage from examples into new work.

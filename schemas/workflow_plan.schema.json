@@ -36,14 +36,10 @@
         "source_inventory_only",
         "exam_format_diagnosis",
         "knowledge_walkthrough_docx",
-        "full_excel_workbook",
-        "past_paper_prediction",
-        "mcq_prep",
-        "short_answer_prep",
-        "practical_data_problem_prep",
-        "project_scenario_long_answer",
-        "essay_theme_plan",
-        "example_essay_docx",
+        "mcq_exam_prep",
+        "short_answer_exam_prep",
+        "long_answer_project_scenario_prep",
+        "essay_exam_prep",
         "audit_lint_only",
         "github_ready_qa"
       ]

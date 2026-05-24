@@ -22,10 +22,10 @@
     "treat_examples_as_style_only": true
   },
   "output_mode": {
-    "preset": "example_essay_docx",
+    "preset": "essay_exam_prep",
     "include_audit_package": false,
     "student_visible_only": true,
-    "requested_artifacts": ["Example Essay DOCX"]
+    "requested_artifacts": ["Essay Module Example Essays DOCX"]
   },
   "qa": {
     "strict_publish_gate": true,

@@ -156,8 +156,8 @@ Do not:
 - use more than one focused extra-reading insert unless the user explicitly requests more;
 - overfill essays to reach word count;
 - put full essays into single unreadable cells;
-- hide source evidence in diagnostics or evidence workbooks;
-- expose evidence columns in the student-facing single-sheet workbook unless the user explicitly asks for an evidence workbook;
+- keep source evidence in diagnostics or explicit audit packages;
+- expose evidence columns or helper artifacts in student-facing output unless the user explicitly asks for an audit package;
 - present predictions as official exam questions;
 - apply SBS essay rubric to short-answer/MCQ answers;
 - edit, rename, delete, or overwrite source files.

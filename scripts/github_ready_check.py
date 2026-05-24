@@ -91,6 +91,7 @@ def main() -> int:
         knowledge_walkthrough_dir = tmp_dir / "knowledge_walkthrough_docx"
         knowledge_walkthrough_qa_dir = tmp_dir / "knowledge_walkthrough_internal_qa"
         bad_public_dir = tmp_dir / "bad_public_output"
+        bad_workbook_dir = tmp_dir / "bad_public_workbook"
         citation_fallback_dir = tmp_dir / "citation_fallback"
         past_paper_extract_dir = tmp_dir / "past_paper_question_extract"
         fragment_index_dir = tmp_dir / "fragment_index"
@@ -102,6 +103,8 @@ def main() -> int:
         lineage_report_path = planner_dir / "lineage_report.json"
         bad_public_dir.mkdir(parents=True, exist_ok=True)
         (bad_public_dir / "example_essay_manifest.json").write_text("{}", encoding="utf-8")
+        bad_workbook_dir.mkdir(parents=True, exist_ok=True)
+        (bad_workbook_dir / "legacy_output.xlsx").write_bytes(b"placeholder")
         checks.extend(
             [
                 run_command("compile_scripts", [py, "-m", "compileall", "-q", "scripts"]),
@@ -116,7 +119,7 @@ def main() -> int:
                         py,
                         "scripts/plan_workflow.py",
                         "--config",
-                        "tests/fixtures/planner/skill_config_full_excel.json",
+                        "tests/fixtures/planner/skill_config_mcq_exam_prep.json",
                         "--source-scan",
                         "tests/fixtures/control_plane/source_scan.json",
                         "--output",
@@ -140,7 +143,7 @@ def main() -> int:
                         py,
                         "scripts/input_readiness_check.py",
                         "--config",
-                        "tests/fixtures/planner/skill_config_full_excel.json",
+                        "tests/fixtures/planner/skill_config_mcq_exam_prep.json",
                         "--source-scan",
                         "tests/fixtures/control_plane/source_scan.json",
                         "--output",
@@ -351,6 +354,13 @@ def main() -> int:
             run_command(
                 "public_output_rejects_helper_artifacts",
                 [py, "scripts/final_deliverable_linter.py", str(bad_public_dir)],
+                expect_failure=True,
+            )
+        )
+        checks.append(
+            run_command(
+                "public_output_rejects_legacy_workbook",
+                [py, "scripts/final_deliverable_linter.py", str(bad_workbook_dir)],
                 expect_failure=True,
             )
         )

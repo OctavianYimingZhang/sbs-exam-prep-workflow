@@ -25,14 +25,11 @@ Start from the requested artifact, then choose the minimum valid route:
 | "What files do I have and what can they support?" | `source_inventory_only` |
 | "What is the exam format?" | `exam_format_diagnosis` |
 | "Go through the lecture knowledge." | `knowledge_walkthrough_docx` |
-| "Make the revision workbook." | `full_excel_workbook` |
-| "Use past papers to prioritize revision." | `past_paper_prediction` |
-| "Prepare me for MCQs." | `mcq_prep` |
-| "Prepare short answers." | `short_answer_prep` |
-| "Prepare data/practical/problem questions." | `practical_data_problem_prep` |
-| "Prepare scenario or project long answers." | `project_scenario_long_answer` |
-| "Prepare essay themes but not full essays." | `essay_theme_plan` |
-| "Write complete Example Essays." | `example_essay_docx` |
+| "Use past papers to prioritize revision before generation." | `exam_format_diagnosis` |
+| "Prepare me for MCQs." | `mcq_exam_prep` |
+| "Prepare short answers." | `short_answer_exam_prep` |
+| "Prepare data/practical/problem/scenario/project questions." | `long_answer_project_scenario_prep` |
+| "Prepare essay themes or write complete Example Essays." | `essay_exam_prep` |
 | "Only check the Skill/repo/output." | `audit_lint_only` or `github_ready_qa` |
 
 ## Strategy Rules
@@ -40,12 +37,11 @@ Start from the requested artifact, then choose the minimum valid route:
 The exam strategy controls the output strategy:
 
 - lecture-review default: lecture-first Word walkthrough with conceptual modules;
-- essay or problem-essay: themes, coverage plans, paragraph skeletons, evidence banks, and optional DOCX Example Essays;
-- MCQ: discriminators, contrast tables, traps, wrong-option diagnosis, and scoring policy only when marking rules are visible;
-- short answer: bounded variants, mark-producing answer schemas, concise answers, and reference expansions;
-- data/problem/practical: input, operation, inference, limitation, and follow-up drills;
-- scenario/project long answer: method, readout, interpretation, control, and caveat blocks;
-- mixed format: one workbook may be used, but each section keeps its own route.
+- essay or problem-essay: module-level Example Essays, adaptation maps, paragraph banks, and source-boundary checks;
+- MCQ: student-facing Point Cards only by default, with traps folded into the card rather than exposed as separate audit tables;
+- short answer: module logic, highlighted keywords, and natural Example Answers rather than visible mark-schema tables;
+- data/problem/practical/scenario/project long answer: question analysis, answer order, reusable method/readout/interpretation/control/limitation blocks, Example Answer, and adaptation rules;
+- mixed format: one walkthrough foundation may be used, but each add-on report keeps its own question-type route.
 
 ## Evidence Rules
 

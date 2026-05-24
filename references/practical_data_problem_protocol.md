@@ -50,9 +50,9 @@ When an answer key or worked solution is supplied:
 3. Record distractor traps and common wrong operations.
 4. Do not treat answer-key content as independent factual authority unless verified against lecture/practical sources.
 
-## Workbook Output
+## DOCX Report Output
 
-The far-right prep area should show the concrete operation:
+The student-facing practical/data/problem report should show the concrete operation:
 
 ```text
 Read the graph -> identify trend -> infer mechanism -> state limitation -> propose control

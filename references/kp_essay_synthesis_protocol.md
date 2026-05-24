@@ -1,6 +1,6 @@
 # KP Essay Synthesis Protocol
 
-This protocol governs explicit workbook knowledge-point explanations. It is not full Example Essay Mode and not the default lecture-review DOCX route. It is the synthesis pass that converts source coverage into a student-facing essay paragraph fragment when workbook output is requested.
+This protocol governs knowledge-point explanation prose for legacy workbook compatibility and internal prose linting. It is not full Example Essay Mode and not the default lecture-review DOCX route. Current public exam-prep outputs should use the lecture walkthrough DOCX and question-type DOCX add-ons.
 
 Use `language_quality_contract.md` for shared prose-quality rules. This file adds workbook-specific constraints: no source tracing in explanation cells, no how-to-write language, and no page/slide narration.
 
@@ -111,7 +111,7 @@ Do not write all facts for one side followed by all facts for the other. Compare
 
 ## Mandatory KP Essay Synthesis Pass
 
-Run this pass after Knowledge-point optimisation and before Excel generation:
+Run this pass after Knowledge-point optimisation and before student-facing prose is written:
 
 ```yaml
 KPEssaySynthesisPass:
@@ -130,7 +130,7 @@ KPEssaySynthesisPass:
     - draft direct student-facing prose
     - run a de-slide rewrite pass
     - run the essay-style linter or an equivalent banned-pattern check
-    - write only the cleaned synthesis into the visible workbook
+    - write only the cleaned synthesis into the student-facing explanation section
   output:
     - clean explanation paragraph
     - diagnostics for omitted/uncertain/low-OCR evidence
@@ -138,7 +138,7 @@ KPEssaySynthesisPass:
 
 ## De-Slide Rewrite Pass
 
-Before writing to Excel, remove:
+Before publishing student-facing prose, remove:
 
 - page numbers used as prose structure;
 - slide numbers used as prose structure;

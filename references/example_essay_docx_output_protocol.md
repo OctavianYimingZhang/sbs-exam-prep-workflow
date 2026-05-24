@@ -2,17 +2,23 @@
 
 ## Trigger
 
-Use this protocol only when Example Essay Mode is explicitly requested by the user, such as `Example Essay`, `model essay`, `full essay-style answer`, or an equivalent request for complete essay answers/documents.
+Use this protocol when Essay Exam Prep or Example Essay Mode is explicitly requested by the user, such as `essay preparation`, `Example Essay`, `model essay`, `full essay-style answer`, or an equivalent request for complete essay answers/documents.
 
-Do not trigger this DOCX protocol for ordinary workbook KP explanations, prediction-only outputs, or a request for a single essay-style paragraph unless the user explicitly asks for complete Example Essay documents.
+Do not trigger this DOCX protocol for MCQ, short-answer, long-answer/project/scenario, prediction-only, or ordinary lecture-walkthrough requests.
 
-The normal default lecture-review workflow is `knowledge_walkthrough_docx`. This DOCX protocol does not apply to prediction-only, workbook-only, MCQ, short-answer, or ordinary lecture-walkthrough requests.
+The normal default lecture-review workflow is `knowledge_walkthrough_docx`. Essay prep is a DOCX add-on built on top of the lecture walkthrough unless the user explicitly opts out.
 
 ## Primary Output
 
-Each Example Essay must be exported as one standalone `.docx` file.
+Default essay-prep output is one module-level Word document:
 
-If N Example Essays are generated, produce N Word documents:
+- `Essay_Module_Example_Essays.docx`
+
+It should contain the selected examinable modules, one or more full Example Essays where support is sufficient, adaptation maps, and reusable paragraph banks.
+
+If the user explicitly asks for separate essay files, each Example Essay may instead be exported as one standalone `.docx` file.
+
+If separate essay files are requested and N Example Essays are generated, produce N Word documents:
 
 - `EE01_<short_safe_question_title>.docx`
 - `EE02_<short_safe_question_title>.docx`
@@ -22,9 +28,9 @@ Also produce:
 
 - internal QA artefacts for validation, such as `example_essay_manifest.json`, `example_essay_source_audit.json`, source maps, QA JSON, and citation-resolution logs.
 
-Do not place a complete essay into one Excel cell. Do not merge multiple complete essays into one Word document. Excel paragraph-row output is allowed only as an optional audit artefact when the user explicitly requests it.
+Do not place a complete essay into one Excel cell. Do not create an Excel workbook as the ordinary essay-prep output. Excel paragraph-row output is allowed only as an internal or explicitly requested audit artefact.
 
-Final user-facing output may include the requested final artefacts, such as Example Essay DOCX files, an Exam-Prep Excel workbook, or another explicitly requested final format. Do not return or package helper JSON, source maps, manifests, source-audit files, render previews, or citation-resolution logs unless the user explicitly asks for an audit package.
+Final user-facing output may include the requested final artefacts, such as `Essay_Module_Example_Essays.docx`, separate Example Essay DOCX files, or another explicitly requested final format. Do not return or package helper JSON, source maps, manifests, source-audit files, render previews, or citation-resolution logs unless the user explicitly asks for an audit package.
 
 ## Word Document Formatting
 

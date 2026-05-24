@@ -1,4 +1,4 @@
-# Visual Workbook Regression Acceptance Criteria
+# Visual Output Regression Acceptance Criteria
 
 This file is a generic regression acceptance note. It does not define production triggers and contains no transferable factual content.
 
@@ -8,7 +8,7 @@ Observed benchmark behaviour:
 
 - older papers may contain answer-all short-answer/problem-style evidence;
 - recent papers may use answer-one essay/problem-essay formal evidence;
-- the student-facing workbook is most usable when lecture locator, original slide image, essay-style explanation, and prediction area are aligned horizontally in source order.
+- student-facing outputs are most usable when lecture order, original visual/source context, student-facing explanation, and question-type preparation are kept aligned.
 
 Transferable rule:
 
@@ -29,7 +29,7 @@ Expected generic behaviour:
 3. Use only high-comparability recent formal papers as current formal evidence.
 4. Detect answer-one rules when present.
 5. Detect essay/problem-essay themes as operation slots, not as guaranteed recurring factual topics.
-6. Generate the final Excel workbook when requested.
+6. Generate the Word-first walkthrough or question-type DOCX add-on requested by the selected route.
 7. Create the requested output folder or report a safe fallback path.
-8. Save a student-facing workbook plus diagnostics/QA files.
-9. The student-facing workbook must use one sheet named `Exam_Prep_Map`, paste original source images into the middle region, place essay-style explanation immediately to the right, and place predicted essay themes or question-type-specific prep further right. It must not include evidence columns.
+8. Save student-facing DOCX output separately from diagnostics/QA files.
+9. The student-facing DOCX output must preserve source order where relevant, keep explanation and question-type preparation visibly connected, and exclude evidence/provenance columns or helper artifacts unless an audit package is explicitly requested.

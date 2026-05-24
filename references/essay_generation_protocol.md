@@ -1,6 +1,6 @@
 # Essay Generation Protocol
 
-Example Essay generation is a DOCX-first branch used only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents. Workbook KP explanations and single essay-style paragraphs do not trigger this branch unless the user asks for full Example Essays.
+Example Essay generation is a DOCX-first branch used when the user explicitly asks for essay preparation, complete Example Essays, model essays, full essay-style answers, or complete essay documents. KP explanations and single essay-style paragraphs do not trigger this branch unless the user asks for essay prep or full Example Essays.
 
 The protocol applies across biological and non-biological science-style essays. The factual source base changes by subject; the writing discipline does not.
 
@@ -539,9 +539,9 @@ For DOCX output:
 
 Do not highlight content whose source has not been verified.
 
-## Default KP Workbook Synthesis
+## Default KP Synthesis
 
-Workbook KP explanations are not complete Example Essays, but they must follow the same low-level prose rules:
+KP explanations are not complete Example Essays, but they must follow the same low-level prose rules:
 
 ```text
 claim -> mechanism/process/evidence -> consequence
@@ -611,10 +611,12 @@ Primary file output:
 
 ```yaml
 ExampleEssayDOCXOutput:
-  output_folder: Example_Essays_DOCX/
+  default_document: Essay_Module_Example_Essays.docx
+  optional_separate_output_folder: Example_Essays_DOCX/
   documents:
-    - EE01_<short_safe_question_title>.docx
-    - EE02_<short_safe_question_title>.docx
+    - Essay_Module_Example_Essays.docx
+    - optional EE01_<short_safe_question_title>.docx
+    - optional EE02_<short_safe_question_title>.docx
   user_facing_only:
     - requested final artefacts
   internal_qa_artifacts_not_returned_unless_requested:
@@ -625,7 +627,7 @@ ExampleEssayDOCXOutput:
     - citation_resolution_log.json
 ```
 
-For Excel, never place a complete essay into one cell. Excel paragraph-row output is an optional audit export only when explicitly requested.
+Never place a complete essay into one spreadsheet cell. Paragraph-row output is an optional audit export only when explicitly requested.
 
 ## Success Condition
 

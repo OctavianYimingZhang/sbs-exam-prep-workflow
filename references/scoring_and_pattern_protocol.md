@@ -47,7 +47,7 @@ Only compare papers within the same normalized `target_group_key` or compatible 
 Allowed external-example use:
 
 - identifying a generic question-writing structure;
-- borrowing an Excel layout or annotation style;
+- borrowing an output layout or annotation style;
 - learning how a good short-answer/MCQ explanation is phrased.
 
 Forbidden external-example use:

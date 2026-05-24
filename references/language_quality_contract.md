@@ -1,6 +1,6 @@
 # Language Quality Contract
 
-This contract is the shared prose-quality standard for workbook KP explanations, Example Essays, long-answer model answers, and any essay-style revision output.
+This contract is the shared prose-quality standard for lecture walkthrough explanations, question-type reports, Example Essays, long-answer model answers, and any essay-style revision output.
 
 The contract is subject-independent. Biological, chemical, quantitative, clinical, methodological, and sector-level essays use different factual evidence, but the same language discipline.
 

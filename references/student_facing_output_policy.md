@@ -45,7 +45,7 @@ mark_producing_schema
 reference_expansion
 ```
 
-These may appear only in internal QA, an explicit audit package, or a separate evidence workbook requested by the user.
+These may appear only in internal QA or an explicit audit package requested by the user.
 
 ## Allowed Priority Labels
 

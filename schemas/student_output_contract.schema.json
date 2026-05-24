@@ -9,12 +9,10 @@
     "output_mode": {
       "enum": [
         "knowledge_walkthrough_docx",
-        "mcq_prep",
-        "short_answer_prep",
-        "project_scenario_long_answer",
-        "essay_theme_plan",
-        "example_essay_docx",
-        "full_excel_workbook"
+        "mcq_exam_prep",
+        "short_answer_exam_prep",
+        "long_answer_project_scenario_prep",
+        "essay_exam_prep"
       ]
     },
     "allowed_visible_fields": { "type": "array", "items": { "type": "string" } },
