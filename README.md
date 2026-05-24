@@ -1,8 +1,37 @@
-# SBS Exam Prep Workflow
+# Everything Exam Preparation
 
-`sbs-exam-prep-workflow` is a Codex Skill for building evidence-grounded exam preparation outputs from lecture slides, formal past papers, practical materials, MCQs, short-answer questions, long-answer prompts, essay prompts, exemplars, extra reading recommendations, and recommended books.
+`sbs-exam-prep-workflow` is the Codex Skill in this repository. It turns a student's exam materials into evidence-grounded revision artifacts: Word walkthroughs, Excel workbooks, MCQ point cards, short-answer reports, long-answer playbooks, past-paper prediction workbooks, essay-theme plans, and optional Example Essay DOCX files.
 
-The Skill is designed around one principle:
+The `sbs` prefix is a package name. The workflow itself is course-agnostic: it must learn from uploaded materials and validated sources, not from hard-coded course, topic, or example names.
+
+The project exists because exam preparation is not one task. The correct output depends on the evidence available and on the way the exam asks questions. A student who uploads slides and MCQs should not receive essay-theme planning by default; a student who uploads essay prompts should not receive a generic flashcard table unless that is the requested artifact.
+
+## What This Skill Does
+
+The Skill reads the supplied materials, classifies their evidence role, detects the relevant exam format, and chooses the narrowest valid preparation route. The default route for general lecture review is a Word-first `Lecture Knowledge Walkthrough DOCX`: it follows lecture order, splits content into conceptual modules, and explains the knowledge in directly revisable prose.
+
+Other routes are available when requested or when the plan selects them: Excel workbooks, MCQ point cards, short-answer reports, practical/data drills, project/scenario long-answer playbooks, past-paper prediction workbooks, essay-theme plans, and complete Example Essay DOCX files.
+
+The invariant is that process helper files stay separate. Public outputs may include any requested student-facing artifact, but run manifests, source maps, QA JSON, lineage files, citation logs, rendered previews, and other internal validation files must not be mixed into the student-facing folder unless the user explicitly requests an audit package.
+
+## What This Skill Does Not Do
+
+- It does not use hard-coded course, lecture, or example names as trigger logic.
+- It does not claim exact future exam questions.
+- It does not treat frequency or recency as sufficient evidence for prediction.
+- It does not invent citations, statistics, source names, mechanisms, mark schemes, or lecturer preferences.
+- It does not use external examples as factual evidence for a new source set.
+- It does not support live exams, active assessed submissions, or contract-cheating requests.
+
+## Safety And Privacy
+
+This repository should contain only the Skill, public fixtures, sanitized benchmark metadata, protocols, schemas, and helper scripts. Do not commit private lecture slides, past papers, books, student data, generated student outputs, run manifests, source maps, QA JSON, citation logs, or internal audit folders.
+
+Example Essay outputs are revision exemplars. They are not submission-ready assessed work, and the Skill must not present them as work the student can submit for credit.
+
+## Core Principle
+
+The Skill is designed around one first-principles chain:
 
 ```text
 inputs -> exam format -> question type -> examiner operation -> knowledge point -> preparation output
@@ -10,7 +39,7 @@ inputs -> exam format -> question type -> examiner operation -> knowledge point 
 
 It is not a topic-hotness predictor. Frequency and recency are useful signals, but the main task is to infer how the examiner asks, what kind of reasoning the question rewards, and what preparation artefact best matches that strategy.
 
-For any non-trivial run, the Skill now uses a typed planning chain before generation:
+For any non-trivial run, the Skill uses a typed planning chain before generation:
 
 ```text
 User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> validated output
@@ -18,13 +47,71 @@ User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> validated
 
 This makes the workflow configurable and auditable. The Skill first decides the requested output mode, then checks which source classes are needed, then plans the minimum action path, then blocks only the conclusions that lack evidence.
 
-The default lecture-review output is now Word-first:
+## At A Glance
 
-```text
-Lecture Knowledge Walkthrough DOCX
+| Area | Behaviour |
+| --- | --- |
+| Default route | `knowledge_walkthrough_docx`, a Word-first lecture walkthrough. |
+| Explicit table route | `full_excel_workbook`, an Excel map from sources to knowledge points and prep actions. |
+| Question-type routes | MCQ, short-answer, practical/data/problem, long-answer, essay-theme, and Example Essay branches. |
+| Prediction route | Past-paper archetype and confidence-band planning, not exact future stems. |
+| Planning layer | `SkillConfig -> WorkflowPlan -> InputReadinessReport`. |
+| Evidence model | Each source has a role and a limit before it can support a claim. |
+| Public boundary | Student-facing artifacts are separated from internal helper and QA files. |
+| Release gate | Local validation, identity-trigger linting, public-output linting, and repository QA. |
+
+## Core Workflow
+
+1. Classify source files by role, trust level, extraction quality, and evidence limits.
+2. Diagnose the exam format and split incompatible exam regimes before comparing papers.
+3. Classify question types before choosing a preparation strategy.
+4. Convert source fragments into knowledge points and examiner operations.
+5. Select the output route that matches the evidence and requested artifact.
+6. Rewrite internal reasoning into student-facing revision content.
+7. Run QA so unsupported claims and process helper files do not enter the final public output.
+
+## Quick Start
+
+Clone the public repository as a Codex Skill:
+
+```bash
+mkdir -p ~/.codex/skills
+git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/sbs-exam-prep-workflow
+cd ~/.codex/skills/sbs-exam-prep-workflow
 ```
 
-It is not an Excel table converted into Word. It preserves lecture order, splits each lecture into conceptual modules, and explains each module in directly revisable prose. Excel workbooks, MCQ reports, short-answer reports, long-answer playbooks, prediction workbooks, and Example Essays remain available as explicit routes.
+Install helper-script dependencies:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+Run a fixture-based planning check:
+
+```bash
+python scripts/plan_workflow.py \
+  --config tests/fixtures/planner/skill_config_knowledge_walkthrough.json \
+  --output /tmp/sbs_workflow_plan.json
+```
+
+Generate a fixture-based Lecture Knowledge Walkthrough DOCX while keeping public output and internal QA separate:
+
+```bash
+python scripts/generate_knowledge_walkthrough_docx.py \
+  --plan tests/fixtures/knowledge_walkthrough/knowledge_walkthrough_plan.json \
+  --output-dir /tmp/sbs_public_output \
+  --qa-dir /tmp/sbs_internal_qa \
+  --deliverable-only \
+  --strict
+```
+
+Run the main repository QA gate:
+
+```bash
+python scripts/github_ready_check.py --ci
+```
 
 ## Operational Ontology
 
@@ -47,7 +134,7 @@ The machine-readable ontology contract lives in [`ontology/ontology.json`](ontol
 
 ## Runtime Control Plane
 
-The Skill now treats each non-trivial run as a small auditable data product. Internal helper artifacts stay out of the student-facing folder, but they can be generated under `internal_qa/` to make the run reproducible:
+The Skill treats each non-trivial run as a small auditable data product. Internal helper artifacts stay out of the student-facing folder, but they can be generated under `internal_qa/` to make the run reproducible:
 
 ```text
 Bronze: source inventory, extraction status, source hashes
@@ -68,9 +155,9 @@ No QA pass -> no publish.
 
 This is implemented with a fragment metadata index, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
 
-## Interactive Use
+## Output Routes
 
-Choose one mode, or provide materials and ask for exam prep to use the default `full_workflow` mode.
+Choose one mode, or provide materials and ask for exam prep. General lecture-review requests use `full_workflow`, which resolves to the Word-first lecture walkthrough route unless a narrower artifact is requested.
 
 | Mode | Use when | Output |
 | --- | --- | --- |
@@ -78,7 +165,7 @@ Choose one mode, or provide materials and ask for exam prep to use the default `
 | `source_inventory` | You only want file roles and extraction status. | Source inventory and evidence-use limits. |
 | `exam_format_diagnosis` | You want to know how the exam is structured. | Sections, question types, rules, and route recommendation. |
 | `knowledge_walkthrough_docx` | You want to go through lecture knowledge in order. | Lecture-first Word walkthrough with module overviews, knowledge walkthroughs, key logic, common confusions, and recap. |
-| `prediction_workbook` | You want past-paper prediction and workbook output. | Archetypes, confidence bands, and prep actions. |
+| `prediction_workbook` | You want past-paper prediction and workbook output. | Archetypes, slot grammar, confidence bands, and prep actions. |
 | `mcq_prep` | You need MCQ-focused preparation. | Point cards with explanations, exam-use pattern, traps, and must-remember rules. |
 | `short_answer_prep` | You need short-answer practice. | Module logic plus point cards with highlighted keywords and example answers. |
 | `practical_data_prep` | You need practical, data, graph, protocol, calculation, or case prep. | Input -> operation -> inference -> limitation drills. |
@@ -89,6 +176,15 @@ Choose one mode, or provide materials and ask for exam prep to use the default `
 | `incremental_refresh` | You add new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects and artifacts are refreshed. |
 
 The strongest source pack includes lecture slides/official notes, formal past papers, mark schemes or answer keys where available, practical/data materials, essay or long-answer prompts, extra reading recommendations/books, and any user weak areas or time budget if personalization is requested. Missing sources do not automatically stop the run; only unsupported conclusions are blocked.
+
+Mode names are user-facing entry points. Preset names are planning-layer objects. The main differences are:
+
+| User mode | Planning preset |
+| --- | --- |
+| `prediction_workbook` | `past_paper_prediction` |
+| `practical_data_prep` | `practical_data_problem_prep` |
+| `long_answer_plan` | `project_scenario_long_answer` |
+| `evidence_gap_audit` | `audit_lint_only` when the user asks only for checks, otherwise the selected route plus blockers |
 
 ## Setup And Planning Layer
 
@@ -122,7 +218,9 @@ The planning layer supports these presets:
 
 The setup protocol is in [`references/interactive_setup_protocol.md`](references/interactive_setup_protocol.md). Practical usage guidance is in [`references/best_usage_guide.md`](references/best_usage_guide.md).
 
-## What It Produces
+## Student-Facing Outputs
+
+Student-facing outputs are not restricted to Example Essays or Excel files. The selected route controls the artifact. The hard rule is only that internal helper and QA files are not mixed into ordinary student-facing output.
 
 Default lecture-review output is a Word-first revision walkthrough. Complete Example Essays are generated only when explicitly requested.
 
@@ -135,11 +233,11 @@ Typical student-facing outputs:
 | Exam-prep workbook | `Exam_Prep_Map` Excel workbook | Explicit table-style map from lecture material to knowledge points and exam-facing prep actions. |
 | Past-paper prediction | Archetype registry, slot grammar, confidence bands | Convert papers into auditable preparation targets rather than exact-stem guesses. |
 | Essay/problem-essay prep | Predicted essay themes, coverage plans, paragraph skeletons, evidence banks | Prepare broad examinable themes without inventing exact future stems. |
-| MCQ prep | Discriminator axes, contrast tables, traps, scoring policy, concise flashcards | Train recognition of close alternatives, common distractors, and expected-value answer strategy. |
-| Short-answer prep | Bounded variant space, mark-scaled schemas, reference expansions | Convert content into source-linked 2/4/6/8-mark answer shapes. |
+| MCQ prep | MCQ Point Cards and optional separate practice packs | Train recognition of close alternatives, common distractors, and expected-value answer strategy. |
+| Short-answer prep | Module logic, point cards, highlighted keywords, and example answers | Convert content into source-linked mark-scaled answer shapes. |
 | Practical/data/problem prep | Input -> operation -> inference -> limitation -> follow-up logic | Train graph, protocol, case, calculation, and result interpretation. |
 | Scenario/project long answer | Method block library: method -> readout -> interpretation -> control -> caveat | Match method-heavy or scenario-based questions. |
-| Example Essay mode | One standalone `.docx` per essay | Produce polished, source-grounded model essays with DOCX formatting and source audit. |
+| Example Essay mode | One standalone `.docx` per essay | Produce source-grounded revision exemplars with DOCX formatting and source audit. |
 
 Internal helper files such as manifests, source maps, QA JSON, citation logs, rendered previews, and source-audit files may be generated for validation. They are not mixed into the final user-facing output unless an audit package is explicitly requested.
 
@@ -307,7 +405,7 @@ It should not narrate pages, slides, source order, or instructions about how to 
 
 ## Example Essay Mode
 
-Example Essay mode is a separate DOCX-first branch. It runs only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents.
+Example Essay mode is a separate DOCX-first revision-exemplar branch. It runs only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents, and it must not be framed as submission-ready assessed work.
 
 Before drafting, the Skill runs this internal sequence:
 
@@ -372,12 +470,23 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | --- | --- |
 | `SKILL.md` | Top-level Codex Skill instructions and output contract. |
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
-| `references/` | Protocols for evidence handling, routing, scoring, language quality, Example Essays, Excel output, regression, and release. |
+| `references/` | Protocols for evidence handling, routing, planning, student-facing filters, language quality, Example Essays, Excel output, regression, and release. |
 | `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, DOCX generation, student-output linting, language linting, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
 | `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, student output contracts, knowledge walkthrough plans, Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
 | `tests/fixtures/` | Small public fixtures for DOCX, source-grounding, and citation-fallback checks. |
 | `agents/` | Optional Skill interface metadata, presets, prompt cards, and setup wizard metadata. |
+
+Key public contracts:
+
+| Contract | File |
+| --- | --- |
+| Student-facing output filter | `references/student_facing_output_policy.md` |
+| Lecture walkthrough route | `references/knowledge_walkthrough_docx_protocol.md` |
+| Setup and planning route | `references/interactive_setup_protocol.md` |
+| Past-paper prediction route | `references/past_paper_prediction_protocol.md` |
+| Example Essay route | `references/essay_generation_protocol.md` and `references/example_essay_docx_output_protocol.md` |
+| Release gate | `references/github_release_protocol.md` |
 
 ## Install
 
@@ -387,6 +496,8 @@ Clone as a Codex Skill:
 mkdir -p ~/.codex/skills
 git clone https://github.com/OctavianYimingZhang/Everything-Exam-Preparation.git ~/.codex/skills/sbs-exam-prep-workflow
 ```
+
+The GitHub repository is named `Everything-Exam-Preparation`; the local folder name `sbs-exam-prep-workflow` is the Codex Skill id.
 
 Install Python dependencies for helper scripts:
 
@@ -399,7 +510,7 @@ python -m pip install -r requirements.txt
 
 The scripts are plain Python files. Extraction and DOCX quality depend on the installed document libraries and source-file quality.
 
-## Common Commands
+## Command Catalog
 
 Generate a Lecture Knowledge Walkthrough DOCX:
 
