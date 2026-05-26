@@ -39,6 +39,24 @@
       "text": "The review supports inflammation as the single cause of the syndrome, so all other mechanisms can be treated as secondary. This overstates source strength and collapses a multi-hit mechanism into one cause."
     },
     {
+      "id": "channel_catalogue_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Central pattern generation can involve persistent Na currents, low-threshold Ca currents, NMDA-dependent plateaus, HCN conductance and Ca-dependent K currents. Adding this conductance catalogue makes the paragraph sound technical, but it does not explain whether the exam question needs cellular conductance detail or a circuit-level distinction between central rhythm generation and sensory adjustment."
+    },
+    {
+      "id": "descriptive_list_without_analysis_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Renshaw cells inhibit motor neurons during spinal output. Ia interneurons mediate reciprocal inhibition between antagonist muscles. Ib interneurons regulate force-sensitive feedback from tendon organs. The paragraph lists named interneurons but never explains what distinction the list proves for the question."
+    },
+    {
+      "id": "compression_scope_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Because spinal networks can generate rhythmic motor output in reduced preparations, sensory feedback is unnecessary for locomotion. This compression removes the distinction between basic rhythm generation and feedback-dependent adjustment to load, speed and phase."
+    },
+    {
       "id": "claim_mechanism_good",
       "expected": "pass",
       "has_lecture_anchor": true,
@@ -55,6 +73,12 @@
       "expected": "pass",
       "has_lecture_anchor": true,
       "text": "The perturbation experiment supports a specific control claim rather than a general statement that feedback is important. A sudden balance disturbance activates a rapid corrective pathway, showing that sensory evidence can alter motor output when the ongoing pattern is mechanically unsafe. The limitation is equally important: the result supports feedback-dependent correction, not the claim that sensory input creates the basic rhythm from zero."
+    },
+    {
+      "id": "ppt_anchored_cpg_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "A central pattern generator is best treated as a spinal or brainstem network, not a single pacemaker cell. Its recurrent circuitry can produce timed flexor-extensor sequences without sensory reafference, whereas sensory input entrains and adjusts that rhythm to load, speed and phase. The exam-relevant point is therefore layered control: movement has a central timing source, but useful locomotion remains feedback-tuned rather than sensory-independent."
     }
   ]
 }

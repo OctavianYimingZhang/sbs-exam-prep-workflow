@@ -27,6 +27,7 @@ Acceptable variants:
 - Remove repeated definitions, repeated claims, decorative transitions, and low-value case details.
 - Remove lecture-route narration and exam-guidance phrasing from the answer body.
 - Add words only when they add mechanism, evidence, interpretation, limitation, or a required contrast.
+- Add named biological, chemical, quantitative, clinical, methodological, or sector-specific detail only when it sharpens a lecture/source-derived mechanism slot or evidence function.
 - When writing essay/problem-essay prediction outputs, phrase the prediction as an examinable theme with scope and operation, not as a guaranteed future question.
 - Use examples as evidence for a wider claim.
 - Convert experiments, data, and examples into evidence, mechanism, interpretation, and limitation when the question is evidence-heavy.
@@ -53,6 +54,9 @@ Reject or rewrite paragraphs that:
 - hide uncertainty behind confident language;
 - turn supporting or associative evidence into a single-cause claim;
 - use a citation copied from lecture slides without verifying the original source when source-derived content is included.
+- include a list of named channels, receptors, genes, cell classes, methods, examples, firms, or pathways without explaining what the list proves or distinguishes;
+- use true but unneeded detail that makes the answer more encyclopedic but less exam-efficient;
+- compress wording so that a modulating, gating, entraining, stabilising, supporting, or associative mechanism becomes the primary generator or proof.
 
 ## Compression Standard
 
@@ -70,6 +74,33 @@ Does it link back to the question?
 ```
 
 Delete or merge sentences that do none of these.
+
+Compression must preserve causal strength, scope qualifiers, negative distinctions, model boundaries, and evidence interpretation. Do not rewrite `not necessary for generating the core rhythm` as `not necessary for locomotion`, or `supports a mechanism` as `proves the mechanism`, unless the source warrants the stronger claim.
+
+## Detail-Level Discipline
+
+Named detail is valuable only when it improves the answer's function. Do not include a list of channels, receptors, nuclei, genes, cell classes, molecules, methods, firms, case names, equations, or pathways unless the lecture/source logic or exact question requires that level.
+
+When a list is illustrative, compress it to a higher-level mechanism. When a list is examiner-relevant, keep only the items that distinguish mechanisms, evidence, limitations, or consequences.
+
+For every named detail, ask:
+
+- Does this detail map to a PPT/source mechanism slot?
+- Does it distinguish this mechanism from another?
+- Does it explain an experiment, method readout, clinical consequence, sector consequence, or limitation?
+- Would deleting it make the answer less accurate, or only less encyclopedic?
+
+## Analytic-Over-Descriptive Standard
+
+A paragraph fails if it contains more than two consecutive descriptive sentences without an analytic sentence.
+
+A valid analytic sentence must do at least one of the following:
+
+- explain why the mechanism solves a control, causal, methodological, clinical, or sector-level problem;
+- state what an experiment, example, dataset, or figure proves or fails to prove;
+- compare two models, pathways, cases, mechanisms, or methods;
+- define the scope or boundary of a claim;
+- link a named detail to system-level function or the essay question.
 
 ## Example Use
 

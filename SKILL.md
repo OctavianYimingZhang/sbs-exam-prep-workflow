@@ -314,7 +314,11 @@ classic-experiment fallback when slide citations are absent
 extra-reading chapter matching and reading
 knowledge inventory
 paragraph plan
-language compression plan
+first draft
+citation and Extra Reading integration
+expression-efficiency compression pass
+accuracy-preservation pass
+analytic argument pass
 sentence-level extra-reading micro-detail pass
 highlight plan
 source-to-run mapping
@@ -344,16 +348,23 @@ Example Essay language must follow these rules:
 
 Use `references/language_quality_contract.md` as the source of truth for prose quality. Use `scripts/example_essay_language_linter.py` or an equivalent check before treating the language gap as closed.
 
-After the draft is coherent, run the sentence-level Extra Reading micro-detail pass before highlight planning. This pass does not rewrite the essay. It scans unhighlighted mechanism, evidence, and interpretation sentences for generic slots such as channel, transporter, receptor, kinase, phosphatase, transcription factor, morphogen, ligand, cofactor, chemical species, cellular compartment, assay readout, or pathway intermediate. Insert only a short verified named detail when it improves precision without changing the claim.
+Example Essays must be PPT/source-anchored and study-efficient. Do not treat high detail as automatically high quality. High-quality exam-prep prose maximises examinable mechanism per word while preserving source accuracy.
+
+Before adding molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail, identify the parent lecture/PPT/source mechanism slot. If the source does not contain the parent slot, reject the detail unless the question explicitly requires that deeper level.
+
+Final compression must run after citation and Extra Reading integration. Compression is function filtering, not mechanical shortening. Preserve causal strength, scope qualifiers, model boundaries, and experimental interpretation. Reject compressed wording if it changes `adjusts`, `gates`, `entrains`, `stabilises`, `modulates`, `supports`, or `implicates` into `generates` or `proves` without source support.
+
+After the draft is coherent, run the sentence-level Extra Reading micro-detail pass before highlight planning. This pass does not rewrite the essay. It scans unhighlighted mechanism, evidence, and interpretation sentences whose parent mechanism is explicitly present in the PPT/source logic. Insert only a short verified named detail when it sharpens that source-derived slot without changing the claim level, scope, or exam function.
 
 Micro-detail rules:
 
 - use only verified recommended-book chapters/sections, lecture-cited original sources, or verified academic/classic sources;
+- identify the parent PPT/source slot before accepting the insertion;
 - keep the insertion as a phrase or short clause; it must not become a new explanatory sentence, paragraph, or second argument;
 - highlight only the inserted phrase, not the whole lecture-derived sentence;
 - recommended-book detail is yellow, verified original-paper or classic-source detail is green, and lecture-only detail is not highlighted;
-- reject any insertion that lacks a source anchor, needs a new explanatory sentence, duplicates nearby detail, becomes too expansive, shifts the answer away from the question, creates citation stacking, or replaces lecture logic with extra-reading logic;
-- record original phrase, inserted phrase, source class, source anchor, highlight colour, word-count delta, claim delta, and QA status in the source map or audit.
+- reject any insertion that lacks a parent source slot, lacks a source anchor, needs a new explanatory sentence, duplicates nearby detail, becomes too expansive, shifts the answer away from the question, creates a true-but-not-needed catalogue, creates citation stacking, or replaces lecture logic with extra-reading logic;
+- record original phrase, inserted phrase, parent source slot, question function, source class, source anchor, highlight colour, word-count delta, claim delta, and QA status in the source map or audit.
 
 DOCX formatting for essay-style Word output must follow the workspace rule: Arial, 2.5 cm margins, body text justified, subheadings left-aligned, main titles centered, 1.5 line spacing, and all other settings left at default unless the user specifies otherwise.
 
@@ -365,7 +376,7 @@ If recommended books are supplied, match the relevant chapter/section before use
 
 Extra reading should normally contribute only a small enrichment layer. It must not replace lecture logic or introduce unrelated mechanisms.
 
-For complete Example Essays, treat Extra Reading as a precision layer. Do not ask whether more external material can be added in general. Ask whether an unhighlighted mechanism sentence contains a generic slot that can be made more specific by one verified named object, reaction step, transport form, domain, ligand, readout, or pathway module. If not, leave the sentence unchanged.
+For complete Example Essays, treat Extra Reading as a precision layer. Do not ask whether more external material can be added in general. Ask whether an unhighlighted mechanism sentence contains a PPT/source-anchored generic slot that can be made more specific by one verified named object, reaction step, transport form, domain, ligand, readout, or pathway module. If no parent source slot exists, leave the sentence unchanged.
 
 ### 11. Removed Public Routes
 

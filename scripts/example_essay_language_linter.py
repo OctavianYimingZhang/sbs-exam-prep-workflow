@@ -69,6 +69,27 @@ SUPPORT_TO_CAUSE_OVERCLAIM = re.compile(
     r"\b(?:supports?|implicates?|suggests?|is consistent with|is associated with)\b[^.!?]{0,140}\b(?:the|a|single|sole)\s+cause\b",
     re.I,
 )
+CHANNEL_CATALOGUE_TERMS = re.compile(
+    r"\b(?:persistent\s+Na\+?|persistent\s+sodium|low-threshold\s+Ca(?:2\+|\²\+)?|low-threshold\s+calcium|"
+    r"NMDA(?:-dependent)?|HCN|Ca(?:2\+|\²\+)?-dependent\s+K\+?|calcium-dependent\s+potassium|"
+    r"sodium\s+current|calcium\s+current|potassium\s+current|ionic\s+conductance|conductances?)\b",
+    re.I,
+)
+SCOPE_COLLAPSE = re.compile(
+    r"\b(?:sensory\s+(?:feedback|input|reafference)\s+(?:is\s+)?(?:unnecessary|dispensable|not\s+necessary)\s+for\s+locomotion|"
+    r"feedback\s+(?:is\s+)?(?:unnecessary|dispensable)\s+for\s+movement)\b",
+    re.I,
+)
+DESCRIPTIVE_START = re.compile(
+    r"^\s*[A-Z][A-Za-z0-9βγα/+\-\s]{1,45}\s+"
+    r"(?:is|are|mediates?|regulates?|controls?|provides?|encodes?|expresses?|contains?|projects?|activates?|inhibits?)\b",
+    re.I,
+)
+ANALYTIC_SENTENCE_MARKERS = re.compile(
+    r"\b(because|therefore|so|whereas|although|while|thereby|this\s+(?:means|shows|demonstrates|limits|explains)|"
+    r"solves?|distinguish(?:es)?|rather than|in contrast|as a result|consequently|link(?:s|ed)?\s+to)\b",
+    re.I,
+)
 
 
 @dataclass
@@ -97,6 +118,18 @@ def first_sentence(text: str) -> str:
 
 def sentences(text: str) -> list[str]:
     return [match.group(0).strip() for match in SENTENCE_RE.finditer(text.strip()) if match.group(0).strip()]
+
+
+def has_three_descriptive_sentences_without_analysis(items: list[str]) -> bool:
+    streak = 0
+    for sentence in items:
+        if DESCRIPTIVE_START.search(sentence) and not ANALYTIC_SENTENCE_MARKERS.search(sentence):
+            streak += 1
+            if streak >= 3:
+                return True
+        else:
+            streak = 0
+    return False
 
 
 def paragraph_text(paragraph: dict[str, Any]) -> str:
@@ -266,6 +299,14 @@ def lint_paragraph(record: ParagraphRecord, min_words: int, max_words: int) -> t
         failures.append({"type": "example_overload_without_inference", "example_terms": example_count})
     if SUPPORT_TO_CAUSE_OVERCLAIM.search(text):
         failures.append({"type": "citation_strength_overclaim", "phrase": SUPPORT_TO_CAUSE_OVERCLAIM.search(text).group(0)[:180]})
+    channel_terms = {match.group(0).lower() for match in CHANNEL_CATALOGUE_TERMS.finditer(text)}
+    if len(channel_terms) >= 4:
+        failures.append({"type": "unnecessary_channel_catalogue", "terms": sorted(channel_terms)[:8]})
+    if SCOPE_COLLAPSE.search(text):
+        failures.append({"type": "compression_changed_claim_scope", "phrase": SCOPE_COLLAPSE.search(text).group(0)})
+    sentence_items = sentences(text)
+    if has_three_descriptive_sentences_without_analysis(sentence_items):
+        failures.append({"type": "descriptive_list_without_analysis"})
     if len(NEGATIVE_FRAMING.findall(text)) >= 4:
         warnings.append({"type": "repeated_negative_framing"})
     if BROAD_IMPORTANCE.search(text) and not IMPORTANCE_WITH_CONSEQUENCE.search(text):

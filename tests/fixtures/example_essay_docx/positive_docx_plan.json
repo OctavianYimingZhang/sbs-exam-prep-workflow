@@ -143,6 +143,8 @@
               "micro_detail_insert": true,
               "original_phrase": "receptor-level decision step",
               "inserted_phrase": "at a receptor phosphorylation site",
+              "parent_ppt_or_source_slot": "lecture receptor-level decision step controlling downstream pathway activation",
+              "question_function": "mechanism",
               "claim_delta": "precision_only",
               "qa_status": "micro_detail_verified"
             },

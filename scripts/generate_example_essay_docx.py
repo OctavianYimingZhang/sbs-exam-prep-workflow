@@ -136,6 +136,8 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
                 inserted_phrase = str(run.get("inserted_phrase", "")).strip()
                 if source_type not in MICRO_DETAIL_SOURCE_TYPES:
                     errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_requires_verified_extra_source")
+                if not run.get("parent_ppt_or_source_slot"):
+                    errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_parent_slot_missing")
                 if not run.get("source_anchor"):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_micro_detail_insert_missing_source_anchor")
                 if not inserted_phrase:
@@ -218,6 +220,8 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
                 "micro_detail_insert": run_data.get("micro_detail_insert", False),
                 "original_phrase": run_data.get("original_phrase"),
                 "inserted_phrase": run_data.get("inserted_phrase"),
+                "parent_ppt_or_source_slot": run_data.get("parent_ppt_or_source_slot"),
+                "question_function": run_data.get("question_function"),
                 "claim_delta": run_data.get("claim_delta"),
                 "qa_status": run_data.get("qa_status"),
             }

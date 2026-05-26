@@ -166,6 +166,8 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
             if source_run.get("micro_detail_insert"):
                 if source_run.get("source_type") not in {"extra_reading_book", "citation_original_source", "classic_experiment_source"}:
                     micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_requires_verified_extra_source"})
+                if not source_run.get("parent_ppt_or_source_slot"):
+                    micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_parent_slot_missing"})
                 if not source_run.get("source_anchor"):
                     micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_insert_missing_source_anchor"})
                 if not source_run.get("inserted_phrase"):

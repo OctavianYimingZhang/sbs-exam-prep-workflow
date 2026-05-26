@@ -44,6 +44,8 @@
                       "micro_detail_insert": { "type": "boolean" },
                       "original_phrase": { "type": ["string", "null"] },
                       "inserted_phrase": { "type": ["string", "null"] },
+                      "parent_ppt_or_source_slot": { "type": ["string", "null"] },
+                      "question_function": { "type": ["string", "null"] },
                       "claim_delta": { "type": ["string", "null"] },
                       "qa_status": { "type": ["string", "null"] }
                     },

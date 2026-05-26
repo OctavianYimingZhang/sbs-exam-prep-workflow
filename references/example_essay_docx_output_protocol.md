@@ -126,6 +126,18 @@ Rules:
 - Do not use green highlight for citations copied from secondary sources unless the original cited source was read.
 - Do not use yellow highlight for generic textbook knowledge unless it came from the uploaded Extra Reading material.
 
+## Highlight Relevance Gate
+
+Highlighting does not justify inclusion. A yellow or green phrase may appear only if the sentence also passes the PPT/source-anchor and question-relevance gate.
+
+Reject highlighted content when:
+
+- it is accurate but not needed for the essay question;
+- it creates a molecular, channel, receptor, gene, pathway, method, case, or example list not present in the PPT/source logic;
+- it increases Extra Reading ratio by replacing rather than sharpening lecture-derived claims;
+- it makes revision harder without improving answer precision;
+- it has no paragraph function beyond raising citation or Extra Reading density.
+
 ## Micro-Detail Highlighting
 
 When the Micro Extra Reading Enhancement Pass inserts a short named detail into an otherwise lecture-derived sentence, the DOCX must preserve the source boundary at run level.
@@ -147,6 +159,8 @@ Each micro-detail run in the source map should record:
 micro_detail_insert: true
 original_phrase:
 inserted_phrase:
+parent_ppt_or_source_slot:
+question_function:
 source_type:
 source_anchor:
 highlight:
@@ -158,11 +172,13 @@ qa_status:
 Fail or flag the essay if:
 
 - a micro-detail insertion has no source anchor;
+- a micro-detail insertion has no parent PPT/source slot;
 - a micro-detail insertion is long enough to become a new explanation or second argument;
 - a micro-detail insertion has a source type that does not match its highlight colour;
 - a micro-detail insertion changes the original claim instead of making it more precise;
 - a highlighted span is broader than the source-derived insertion;
 - the insertion pushes Extra Reading above the allowed ratio.
+- the insertion is true but not needed for the question.
 
 ## Extra Reading Ratio
 
@@ -259,6 +275,8 @@ Fail DOCX generation or mark the essay as non-compliant if:
 - the essay is generic and not traceable to lecture logic;
 - the essay contains slide/page narration, repeated filler, unsupported claims, citation stacking, or examples used as standalone case detail rather than evidence for the answer;
 - the essay contains lecture-route narration, exam-guidance phrasing, or citation-strength overclaiming;
+- the essay contains true-but-not-needed detail, review-style drift, or a channel/receptor/gene/pathway catalogue without analytic use;
+- compression changes claim scope, causal strength, model boundaries, or experimental interpretation;
 - a citation printed on a slide is copied into the essay without resolving and reading the original source;
 - an uploaded formatting PDF or style exemplar is used as biological content.
 

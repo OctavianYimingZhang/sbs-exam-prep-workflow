@@ -25,15 +25,18 @@ ExampleEssayMode:
   question_analysis:
   source_scope_detection:
   lecture_or_material_reading:
-  source_logic_reconstruction:
+  ppt_or_source_logic_reconstruction:
   citation_detection:
   citation_original_source_resolution_and_reading:
   classic_experiment_fallback_if_slide_citations_absent:
-  extra_reading_book_or_academic_search:
+  extra_reading_scope_matching:
   knowledge_inventory:
   paragraph_plan:
-  language_compression_plan:
-  exam_ready_refinement_pass:
+  first_draft:
+  citation_and_extra_reading_integration:
+  expression_efficiency_compression_pass:
+  accuracy_preservation_pass:
+  analytic_argument_pass:
   micro_extra_reading_enhancement_pass:
   highlight_plan:
   source_to_run_mapping:
@@ -155,6 +158,65 @@ sector/system problem -> theoretical frame -> examples as evidence -> implementa
 
 Slide/source order informs the storyline, but paragraph order is determined by question command word and examiner expectation.
 
+## PPT-Anchored Detail Control
+
+Example Essays must be lecture-first and PPT/source-anchored. Extra Reading, recommended books, lecture-cited originals, and academic papers may sharpen only a mechanism, evidence point, comparison, limitation, or interpretation slot that is already present in the relevant lecture/source logic.
+
+Do not add a named molecular, cellular, channel, receptor, pathway, assay, circuit, gene, material, equation, or method detail merely because it is true or academically impressive. A detail is admissible only if it passes all five tests:
+
+1. PPT/source anchor: the relevant lecture/source contains the parent mechanism, model, evidence point, or comparison slot.
+2. Question relevance: the detail helps answer the exact essay question, not a broader review topic.
+3. Precision-only: the detail makes an existing claim more precise without changing the level, scope, or direction of the claim.
+4. Efficiency: the detail increases examinable mechanism per word and does not create a catalogue, second argument, or review-style digression.
+5. Accuracy: the final compressed wording preserves causal strength, scope qualifiers, lecture distinctions, and evidence boundaries.
+
+Reject details that are:
+
+- true but not anchored in the lecture/PPT/source logic;
+- more detailed than the question or source level requires;
+- a list of molecules, channels, receptors, genes, examples, or methods without analytic use;
+- a new subtopic introduced by Extra Reading;
+- a detail that requires a new explanatory sentence before it is intelligible.
+
+Use a `DetailAdmissionMatrix` internally when adding or rejecting detail:
+
+```yaml
+DetailAdmissionMatrix:
+  paragraph_id:
+  ppt_core_claim:
+  ppt_mechanism_slot:
+  question_function:
+    - thesis
+    - mechanism
+    - evidence
+    - interpretation
+    - limitation
+    - synthesis
+  candidate_detail:
+  source_class:
+    - lecture
+    - recommended_book
+    - lecture_cited_original_paper
+    - verified_classic_source
+    - rejected
+  admission_decision:
+    - keep
+    - compress
+    - reject
+  reason:
+  risk_flags:
+    - no_ppt_anchor
+    - true_but_unnecessary
+    - review_article_drift
+    - list_without_analysis
+    - mechanism_level_shift
+    - compression_risks_inaccuracy
+    - citation_stack
+    - extra_reading_replaces_ppt_logic
+```
+
+High detail is not automatically high quality. The standard is: PPT/source-anchored, citation-supported, analytically interpreted mechanism per word.
+
 ## Knowledge Inventory
 
 Before writing, classify material:
@@ -210,9 +272,21 @@ Default paragraph logic:
 Claim -> mechanism/process/evidence -> scope or limitation -> consequence -> link back.
 ```
 
-## Language Compression Plan
+## Expression Efficiency And Study-Time Density
 
-Before drafting the final version, run a compression pass. Compression means removing repeated or low-value wording while preserving the academic mechanism.
+Run citation and Extra Reading integration before final compression. If the essay is compressed first and then enriched, density, paragraph function, and source balance can drift.
+
+Compression is not a word-count operation. It is an exam-preparation efficiency operation: maximise useful examinable knowledge per word while preserving mechanism accuracy.
+
+A sentence should stay only if it performs at least one of these functions:
+
+- states the paragraph claim;
+- explains a required mechanism, process, method, or control problem;
+- gives evidence that changes the strength or scope of the claim;
+- interprets what an experiment, example, dataset, or figure proves;
+- states a limitation, contrast, or boundary condition;
+- adds a verified named detail that sharpens a PPT/source-derived mechanism slot;
+- links the paragraph back to the question.
 
 Remove:
 
@@ -242,9 +316,38 @@ Keep:
 
 Do not compress by simply shortening every sentence. Compress by deciding what function each sentence performs.
 
-## Exam-Ready Refinement Pass
+## Accuracy-Preserving Compression
 
-After the compression pass, run a second pass focused on answer quality rather than length.
+After compression, run an accuracy preservation pass. The compressed essay must preserve:
+
+1. Causal strength: `supports`, `implicates`, `is consistent with`, and `contributes to` must not become `proves` unless the source proves causality.
+2. Scope qualifiers: do not collapse specific phrases such as `core rhythm`, `normal locomotion`, `basic output`, `precision movement`, `clinical recovery`, `under these assay conditions`, or `in this model` into one broad claim.
+3. Negative distinctions: `not necessary for generating the core rhythm` must not become `not necessary for locomotion`.
+4. Model boundaries: a mechanism that adjusts, gates, entrains, stabilises, or modulates output must not be rewritten as the primary generator unless the source says so.
+5. Evidence interpretation: experiments, examples, and figures must retain what they show and what they do not show.
+
+Reject compressed wording when it changes the claim scope, removes a required qualifier, or turns a support/modulation claim into a generation/proof claim.
+
+## Analytic Argument Pass
+
+After the accuracy pass, run a pass focused on analytic value. A paragraph fails if it contains more than two consecutive descriptive sentences without an analytic sentence.
+
+A valid analytic sentence must do at least one of the following:
+
+- explain why the mechanism solves a control, causal, methodological, clinical, or sector-level problem;
+- state what an experiment proves or fails to prove;
+- compare two models, mechanisms, pathways, or methods;
+- define the scope of a claim;
+- link a molecular, cellular, circuit, method, or source detail to system-level function;
+- explain why the detail matters for the essay question.
+
+Use this pattern:
+
+```text
+description -> description -> analysis
+```
+
+Do not leave named components as a list. Rewrite list-like content into an answer function: which problem each component solves, what distinction it supports, or what consequence follows.
 
 Reject and rewrite:
 
@@ -271,13 +374,13 @@ Purpose:
 
 - do not rewrite the essay;
 - do not add new paragraphs;
-- add only short verified named details to unhighlighted sentences;
-- increase molecular, circuit, method, chemical, or pathway precision without changing the lecture-derived argument.
+- add only short verified named details to unhighlighted sentences whose parent mechanism is explicit in the lecture/PPT/source logic;
+- increase molecular, circuit, method, chemical, or pathway precision without changing the lecture-derived argument, level, scope, or exam function.
 
 The correct question is not "Can extra reading add more content?". The correct question is:
 
 ```text
-Is there an unhighlighted mechanism, evidence, or interpretation sentence with a generic slot that can be made more precise by one verified named detail?
+Is there an unhighlighted mechanism, evidence, or interpretation sentence whose parent mechanism is explicitly present in the PPT/source logic, and whose generic slot can be made more precise by one verified named detail without changing the level, scope, or exam function of the sentence?
 ```
 
 Eligible sentence functions:
@@ -316,6 +419,8 @@ MicroExtraReadingInsertion:
   original_sentence:
   original_phrase:
   inserted_phrase:
+  parent_ppt_or_source_slot:
+  question_function:
   source_class: recommended_book | citation_original_source | classic_experiment_source
   source_anchor:
   highlight_colour: yellow | green
@@ -327,6 +432,7 @@ MicroExtraReadingInsertion:
 Accept an insertion only when all conditions are true:
 
 - the sentence already has a lecture or official-source anchor;
+- the parent PPT/source mechanism slot is identified explicitly;
 - the inserted phrase is supported directly by a verified source anchor;
 - the inserted phrase is compact enough to remain a phrase or short clause inside the original sentence;
 - the insertion names one concrete object, step, source, species, domain, compartment, readout, or module;
@@ -352,6 +458,7 @@ Highlight and source mapping are mechanical:
 
 Reject an insertion when:
 
+- no parent PPT/source slot exists;
 - no exact source anchor exists;
 - author-year, DOI, PubMed, publisher, chapter, or section verification is missing where required;
 - the phrase requires a new explanatory sentence;
@@ -360,6 +467,7 @@ Reject an insertion when:
 - it replaces lecture logic with external-source logic;
 - it makes a stronger claim than the source supports;
 - it duplicates a molecule, method, or named detail already nearby;
+- it creates a molecular, channel, receptor, gene, pathway, method, or case catalogue without analytic use;
 - it creates citation stacking;
 - it turns a concise exam answer into a review-style answer.
 
@@ -369,10 +477,17 @@ QA flags for this pass:
 
 ```text
 micro_detail_verified
+micro_detail_parent_slot_missing
 micro_detail_rejected_unverified
 micro_detail_insert_missing_source_anchor
 micro_detail_too_expansive
 micro_detail_claim_delta_not_precision_only
+true_but_not_needed_detail
+unnecessary_channel_catalogue
+unnecessary_receptor_catalogue
+descriptive_list_without_analysis
+compression_changed_claim_scope
+compression_removed_required_qualifier
 highlight_span_too_broad
 source_type_colour_mismatch
 lecture_logic_replaced_by_extra_reading
@@ -578,6 +693,18 @@ Add QA flags when needed:
 - `exam_guidance_sentence_present`;
 - `citation_strength_overclaim`;
 - `slide_or_page_narration_present`.
+- `ppt_anchor_missing`;
+- `true_but_not_needed_detail`;
+- `review_article_drift`;
+- `unnecessary_channel_catalogue`;
+- `unnecessary_receptor_catalogue`;
+- `descriptive_list_without_analysis`;
+- `compression_changed_claim_scope`;
+- `compression_removed_required_qualifier`;
+- `extra_reading_inserted_before_ppt_logic`;
+- `extra_reading_replaces_lecture_logic`;
+- `citation_added_without_paragraph_function`;
+- `word_count_reduced_but_density_not_improved`.
 
 Fail safe by omitting uncertain material rather than inventing mechanisms, citations, mark schemes, dates, names, statistics, or lecturer preferences.
 
@@ -591,7 +718,11 @@ ExampleEssayOutput:
   question_deconstruction:
   knowledge_inventory:
   paragraph_plan:
-  language_compression_plan:
+  detail_admission_matrix:
+  citation_and_extra_reading_integration:
+  expression_efficiency_compression_pass:
+  accuracy_preservation_pass:
+  analytic_argument_pass:
   extra_reading_insert:
   high_score_example_essay:
   paragraph_function_map:
@@ -599,12 +730,21 @@ ExampleEssayOutput:
   excluded_content:
   examiner_fit_checklist:
     - source_scope_covered:
+    - lecture_logic_preserved:
+    - ppt_anchor_for_each_extra_detail:
+    - no_true_but_unneeded_detail:
+    - no_review_article_drift:
+    - analytical_sentences_present:
+    - compression_preserves_claim_scope:
+    - compression_improves_expression_efficiency:
     - examples_used_as_evidence:
+    - evidence_interpreted_not_listed:
     - causal_logic_clear:
     - comparison_explicit:
     - evidence_use_controlled:
+    - citation_density_controlled:
     - extra_reading_controlled:
-    - word_efficiency:
+    - extra_reading_precision_layer_only:
 ```
 
 Primary file output:

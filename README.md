@@ -396,15 +396,18 @@ For complete Example Essay generation, the Skill runs this internal sequence:
 question analysis
 source scope detection
 source reading
-source logic reconstruction
+ppt/source logic reconstruction
 citation detection and original-source reading
 classic-experiment fallback when slide citations are absent
-extra-reading chapter matching or academic search
+extra-reading scope matching
 knowledge inventory
 paragraph plan
-language compression plan
-sentence-level extra-reading micro-detail pass
-exam-ready refinement pass
+first draft
+citation and Extra Reading integration
+expression-efficiency compression pass
+accuracy-preservation pass
+analytic argument pass
+sentence-level Extra Reading micro-detail pass
 highlight plan
 source-to-run mapping
 DOCX generation
@@ -419,10 +422,13 @@ Essay language is controlled by the shared language contract:
 - start with the answer or problem, not metacommentary;
 - build paragraphs through claim, mechanism, evidence, scope, and consequence;
 - convert evidence-heavy examples into `evidence -> mechanism -> interpretation -> limitation`;
-- compress repetition without deleting academic mechanisms;
-- use Extra Reading as a precision layer, inserting only verified phrase-level or short-clause details when they sharpen an unhighlighted mechanism sentence without changing the argument;
+- use lecture/PPT/source logic as the skeleton and Extra Reading only as a precision layer;
+- add named molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent PPT/source mechanism slot;
+- reject true-but-unneeded catalogues, review-style drift, and details that need a new explanatory sentence before they are useful;
+- run final compression after citation and Extra Reading integration, preserving causal strength, scope qualifiers, model boundaries, and evidence interpretation;
 - remove lecture-route narration and exam-guidance phrasing;
 - calibrate citation strength, using cautious verbs unless a source directly proves causality;
+- require analytic sentences, not just descriptive lists of components;
 - conclude by synthesis, not by adding new evidence.
 
 DOCX output uses Arial, 2.5 cm margins, justified body text, centered title, left-aligned headings, and 1.5 line spacing.
