@@ -43,7 +43,7 @@ def public_safety_scan() -> dict[str, Any]:
     regex = re.compile("|".join(re.escape(pattern) for pattern in patterns))
     hits = []
     for path in ROOT.rglob("*"):
-        if any(part in {".git", "__pycache__", ".venv"} for part in path.parts) or not path.is_file():
+        if any(part in {".git", "__pycache__", ".venv", ".pytest_cache", ".mypy_cache", ".skill_backups"} for part in path.parts) or not path.is_file():
             continue
         try:
             text = path.read_text(encoding="utf-8", errors="ignore")
@@ -113,6 +113,7 @@ def main() -> int:
                 run_command("interaction_contract", [py, "scripts/validate_interaction_contract.py"]),
                 run_command("workflow_planning_contract", [py, "scripts/validate_workflow_planning_contract.py"]),
                 run_command("student_output_contract", [py, "scripts/validate_student_output_contract.py"]),
+                run_command("skill_maintenance_doctor_offline", [py, "scripts/skill_maintenance.py", "doctor", "--offline", "--skip-health", "--json"]),
                 run_command(
                     "workflow_plan_fixture",
                     [

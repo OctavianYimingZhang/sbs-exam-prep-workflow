@@ -9,6 +9,7 @@ __pycache__/
 venv/
 dist/
 build/
+.skill_backups/
 
 # Generated workflow outputs
 outputs/

@@ -1,6 +1,6 @@
 ---
 name: everything-exam-preparation
-description: Word-first exam-preparation workflow for lecture slides, official notes, ordered course notes, past papers, practical materials, MCQ, short-answer, long-answer, project/scenario prompts, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, Academic Exam-Ready Notes, optional visual aids, and DOCX add-on reports.
+description: Word-first exam-preparation workflow for lecture slides, official notes, ordered course notes, past papers, practical materials, MCQ, short-answer, long-answer, project/scenario prompts, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, Academic Exam-Ready Notes, optional visual aids, DOCX add-on reports, and explicit repository self-check/update maintenance.
 ---
 
 # Everything Exam Preparation
@@ -19,7 +19,7 @@ Trigger this Skill for:
 
 - lecture slides, official notes, past papers, practical/data/problem materials, answer keys, rubrics, mocks, quizzes, exemplars, feedback, extra reading, recommended books, or academic papers used for exam preparation;
 - general lecture review, exam-format diagnosis, MCQ prep, short-answer prep, long-answer/project/scenario prep, practical/data prep, essay prep, complete Example Essays, or audit-only checks;
-- requests to update, validate, or release this Skill package.
+- requests to doctor, self-check, update, validate, repair, refresh, or release this Skill package.
 
 Default behaviour:
 
@@ -37,6 +37,7 @@ Hard boundaries:
 - Do not claim exact future exam questions, official answers, mark schemes, citations, statistics, mechanisms, dates, source names, or lecturer preferences unless verified from reliable evidence.
 - Do not generate Excel workbooks, prediction workbooks, confidence-band files, archetype-registry files, or helper JSON as ordinary student-facing outputs.
 - Do not edit, rename, delete, or overwrite source files.
+- Do not self-update the Skill package silently; package updates must be previewed, approved, backed up, and health-checked.
 
 ## Routing Decision Tree
 
@@ -150,8 +151,41 @@ Examples, regression, and release:
 - `references/gap_closure_loop_protocol.md`: iterative example-analysis, update, lint, and gap-closure completion condition.
 - `references/subagent_protocol.md`: optional modular/subagent responsibilities and validation discipline.
 - `references/github_release_protocol.md`: local QA, installed Skill sync, commit, and push requirements.
+- `skill_manifest.json`: package identity, repository metadata, health commands, and post-update commands.
+- `scripts/skill_maintenance.py`: read-only doctor, explicit update preview, gated fast-forward update, backup, and health validation.
 
 Use helper scripts when available for deterministic planning, extraction, validation, linting, DOCX generation, source audit, render QA, gap reporting, and release checks. Scripts are implementation aids; production behaviour must be controlled by source evidence and route selection, not by benchmark names.
+
+## Maintenance And Safe Update
+
+When the user asks to check, doctor, validate, update, repair, refresh, sync, or release this Skill package:
+
+1. Run the read-only doctor first:
+
+```bash
+python3 scripts/skill_maintenance.py doctor
+```
+
+2. For update requests, preview before modifying files:
+
+```bash
+python3 scripts/skill_maintenance.py update --dry-run
+```
+
+3. Run the real update only after explicit user approval:
+
+```bash
+python3 scripts/skill_maintenance.py update --yes
+```
+
+Maintenance rules:
+
+- Do not run update on a dirty git working tree.
+- Do not update non-git installed copies in place; replace them only by preserving a backup and installing from the public repository.
+- Do not modify private source materials, generated student outputs, helper artifacts, source maps, QA JSON, run manifests, lineage files, citation logs, rendered previews, or local audit folders.
+- After a real update, run every health command in `skill_manifest.json`.
+- If health validation fails, treat the update as failed and do not rely on the new Skill state.
+- For proposed Skill improvements, produce a patch, issue, or PR-style proposal unless the user explicitly asks you to edit the package.
 
 ## QA And Release Gate
 

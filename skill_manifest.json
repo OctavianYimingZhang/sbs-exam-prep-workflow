@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "skill_id": "everything-exam-preparation",
+  "repo": "OctavianYimingZhang/Everything-Exam-Preparation",
+  "branch": "main",
+  "entrypoint": "SKILL.md",
+  "health_commands": [
+    "python3 -m compileall -q scripts",
+    "python3 scripts/no_identity_trigger_linter.py --forbid-legacy-label",
+    "python3 scripts/validate_workflow_planning_contract.py",
+    "python3 scripts/validate_interaction_contract.py",
+    "python3 scripts/validate_student_output_contract.py",
+    "python3 scripts/github_ready_check.py --ci"
+  ],
+  "post_update_commands": [
+    "python3 -m pip install -r requirements.txt"
+  ]
+}

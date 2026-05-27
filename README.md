@@ -58,7 +58,8 @@ This makes the workflow configurable and auditable. The Skill first decides the 
 | Planning layer | `SkillConfig -> WorkflowPlan -> InputReadinessReport`. |
 | Evidence model | Each source has a role and a limit before it can support a claim. |
 | Public boundary | Student-facing artifacts are separated from internal helper and QA files. |
-| Release gate | Local validation, identity-trigger linting, public-output linting, and repository QA. |
+| Maintenance layer | Read-only doctor, dry-run update preview, explicit approved update, backup, and health checks. |
+| Release gate | Local validation, identity-trigger linting, public-output linting, repository QA, and Skill health CI. |
 
 ## Skill Package Architecture
 
@@ -69,6 +70,8 @@ SKILL.md -> route selection, hard boundaries, reference navigation
 references/ -> protocol layer for evidence, Academic Exam-Ready Notes, routing, outputs, essays, visual aids, QA, and release
 schemas/ -> typed contracts for configs, plans, objects, claims, outputs, and lineage
 scripts/ -> deterministic planning, generation, linting, audit, and release checks
+skill_manifest.json -> package identity, health commands, and post-update commands
+.github/workflows/ -> CI checks for repository and Skill health
 benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour only
 ```
 
@@ -126,6 +129,30 @@ Run the main repository QA gate:
 ```bash
 python scripts/github_ready_check.py --ci
 ```
+
+## Self-Check And Safe Update
+
+The Skill includes a controlled maintenance layer. It is explicit by design: self-checks are read-only, update previews do not modify files, and real updates require approval and health validation.
+
+Run a read-only package doctor:
+
+```bash
+python3 scripts/skill_maintenance.py doctor
+```
+
+Preview remote changes before updating:
+
+```bash
+python3 scripts/skill_maintenance.py update --dry-run
+```
+
+Apply a fast-forward update only after reviewing the dry run:
+
+```bash
+python3 scripts/skill_maintenance.py update --yes
+```
+
+The updater refuses dirty working trees, creates a local backup before changing code, runs post-update commands from `skill_manifest.json`, and then runs every health command in the manifest. If validation fails, the update is treated as failed. Installed Skill copies should be git checkouts rather than static file copies so this maintenance flow can inspect and fast-forward them safely.
 
 ## Operational Ontology
 
@@ -483,6 +510,7 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | Path | Role |
 | --- | --- |
 | `SKILL.md` | Top-level Codex Skill instructions and output contract. |
+| `skill_manifest.json` | Skill identity, repository metadata, health commands, and post-update commands for doctor/update maintenance. |
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
 | `references/` | Protocols for evidence handling, routing, Academic Exam-Ready Notes, visual aids, planning, student-facing filters, language quality, Example Essays, legacy internal workbook compatibility, regression, and release. |
 | `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, DOCX generation, student-output linting, language linting, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
@@ -490,6 +518,7 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
 | `tests/fixtures/` | Small public fixtures for DOCX, source-grounding, and citation-fallback checks. |
 | `agents/` | Optional Skill interface metadata, presets, prompt cards, and setup wizard metadata. |
+| `.github/workflows/` | Repository CI and scheduled Skill health checks. |
 
 Key public contracts:
 
@@ -692,6 +721,12 @@ Run the full local QA gate:
 
 ```bash
 python scripts/github_ready_check.py --ci
+```
+
+Run the maintenance doctor:
+
+```bash
+python3 scripts/skill_maintenance.py doctor
 ```
 
 ## Benchmark Sanitization

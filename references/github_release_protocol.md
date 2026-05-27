@@ -42,6 +42,21 @@ Forbidden:
 
 Commit only after local GitHub-ready checks pass. Push only the repository changes, not generated temporary artefacts or private source material.
 
+## Maintenance Doctor And Safe Update
+
+The repository exposes a controlled maintenance layer through `skill_manifest.json` and `scripts/skill_maintenance.py`.
+
+Use it when the user asks to check, doctor, validate, update, repair, refresh, sync, or release the Skill package:
+
+1. Run `python3 scripts/skill_maintenance.py doctor` first. This is read-only.
+2. For update requests, run `python3 scripts/skill_maintenance.py update --dry-run` and summarize incoming commits and changed files before modifying anything.
+3. Run `python3 scripts/skill_maintenance.py update --yes` only after explicit user approval.
+4. Refuse to update a dirty git working tree.
+5. After any real update, run the manifest health commands.
+6. If health checks fail, treat the update as failed and do not rely on the updated state.
+
+Installed copies should be git checkouts. If an installed copy is a plain file copy, preserve it as a backup before replacing it with a fresh clone from the public repository.
+
 ## Runtime Control-Plane Rule
 
 When a run generates public artifacts through helper scripts, the internal QA folder should be able to provide:
