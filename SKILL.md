@@ -1,6 +1,6 @@
 ---
 name: everything-exam-preparation
-description: Word-first exam-preparation workflow for lecture slides, past papers, practical materials, MCQ, short-answer, long-answer, project/scenario prompts, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, and DOCX add-on reports.
+description: Word-first exam-preparation workflow for lecture slides, official notes, ordered course notes, past papers, practical materials, MCQ, short-answer, long-answer, project/scenario prompts, essay prompts, extra reading recommendations, recommended books, exemplars, marking guidance, Academic Exam-Ready Notes, optional visual aids, and DOCX add-on reports.
 ---
 
 # Everything Exam Preparation
@@ -10,7 +10,7 @@ Use this Skill to turn a student's supplied exam materials into evidence-grounde
 The first-principles chain is:
 
 ```text
-inputs -> exam format -> question type -> examiner operation -> knowledge point -> preparation output
+inputs -> source authority -> exam format -> question type -> examiner operation -> course-section reconstruction -> knowledge point -> preparation output
 ```
 
 ## Purpose And Trigger Boundary
@@ -23,8 +23,9 @@ Trigger this Skill for:
 
 Default behaviour:
 
-- If the user provides materials and asks to revise, go through lectures, or prepare generally without naming a narrower artifact, select `knowledge_walkthrough_docx`.
-- If the user asks for MCQ, Short Answer, Long Answer/Project/Scenario, Practical/Data, or Essay preparation, generate the lecture walkthrough as the foundation unless the user explicitly opts out, then add the matching DOCX report.
+- If the user provides materials and asks to revise, make notes, go through the material, or prepare generally without naming a narrower artifact, select `exam_prep_notes_docx`. This route emits the compatible `Lecture_Knowledge_Walkthrough.docx` public artifact while using exam-informed Academic Exam-Ready Notes logic.
+- Keep `knowledge_walkthrough_docx` as a compatibility route when the user explicitly asks for a lecture-first walkthrough in source order.
+- If the user asks for MCQ, Short Answer, Long Answer/Project/Scenario, Practical/Data, or Essay preparation, generate the Academic Exam-Ready Notes foundation unless the user explicitly opts out, then add the matching DOCX report.
 - If the user asks only for past-paper analysis, exam format, or likely emphasis before generation, produce a chat-only `exam_analysis_brief`; do not create a public prediction file.
 - For essay/problem-essay prediction language, use `Predicted essay theme` as the default label, not predicted question wording.
 - If the user asks only for inventory, linting, QA, or release checks, run the narrow audit route and do not generate study artifacts.
@@ -49,13 +50,14 @@ Use `references/user_interaction_protocol.md` as the source of truth for mode se
 
 | User signal | Route | Student-facing output |
 | --- | --- | --- |
-| general lecture review, revise the material, go through the lectures | `knowledge_walkthrough_docx` | `Lecture_Knowledge_Walkthrough.docx` |
+| general revision, make exam-prep notes, revise the material, go through the material | `exam_prep_notes_docx` | `Lecture_Knowledge_Walkthrough.docx` |
+| explicitly lecture-first walkthrough in source order | `knowledge_walkthrough_docx` | `Lecture_Knowledge_Walkthrough.docx` |
 | inspect/classify/extract supplied files only | `source_inventory_only` | source coverage or inventory response |
 | exam format, past-paper pattern, what the exam rewards | `exam_format_diagnosis` / `exam_analysis_brief` | chat-only brief unless a report is explicitly requested |
-| MCQ, single-best-answer, option traps | `mcq_exam_prep` | walkthrough plus `MCQ_Exam_Analysis_Report.docx` |
-| short answer, fill-blank, concise answer practice | `short_answer_exam_prep` | walkthrough plus `ShortAnswer_Exam_Analysis_Report.docx` |
-| long answer, project, scenario, practical, data, graph, protocol, calculation, case | `long_answer_project_scenario_prep` | walkthrough plus `LongAnswer_Project_Scenario_Report.docx` |
-| essay prep, model essay, complete Example Essay, full essay-style answer | `essay_exam_prep` | walkthrough plus `Essay_Module_Example_Essays.docx` |
+| MCQ, single-best-answer, option traps | `mcq_exam_prep` | base notes plus `MCQ_Exam_Analysis_Report.docx` |
+| short answer, fill-blank, concise answer practice | `short_answer_exam_prep` | base notes plus `ShortAnswer_Exam_Analysis_Report.docx` |
+| long answer, project, scenario, practical, data, graph, protocol, calculation, case | `long_answer_project_scenario_prep` | base notes plus `LongAnswer_Project_Scenario_Report.docx` |
+| essay prep, model essay, complete Example Essay, full essay-style answer | `essay_exam_prep` | base notes plus `Essay_Module_Example_Essays.docx` |
 | gap audit, output lint, repository QA, release check | `audit_lint_only` or `github_ready_qa` | QA result only |
 
 Routing rules:
@@ -70,7 +72,9 @@ Routing rules:
 
 Evidence hierarchy:
 
-- Lecture slides and official notes are the primary factual source for course content.
+- Official lecture slides, official notes, official handouts, and lecturer-provided PDF/DOCX notes are the primary factual source for course content.
+- Student typed notes, handwritten notes, annotated screenshots, flashcards, Notion-style notes, and unknown-provenance summaries may be used as intake cues only unless verified against official course material or reliable academic sources.
+- AI-generated notes have no factual authority. Use them only as structure hints after independent verification.
 - Formal past papers define exam format, answer rules, question families, and current pattern evidence.
 - Practical materials, mocks, quizzes, answer keys, rubrics, and exemplars support operations, answer style, and practice planning only within their evidence limits.
 - Extra Reading recommendations, recommended books, lecture-cited originals, classic studies, and academic search results may enrich claims only after the relevant chapter, section, paper, DOI, PubMed record, publisher page, or textbook source is verified.
@@ -124,6 +128,7 @@ Evidence, ontology, and pattern analysis:
 Student-facing outputs:
 
 - `references/student_facing_output_policy.md`: visible output filters and final report contracts.
+- `references/exam_prep_notes_protocol.md`: default Academic Exam-Ready Notes route, source-authority rules, exam-emphasis mapping, question-type add-ons, and definition policy.
 - `references/knowledge_walkthrough_docx_protocol.md`: lecture-first walkthrough route and DOCX structure.
 - `references/question_type_protocol.md`: MCQ, short-answer, essay, and long-answer routing.
 - `references/kp_essay_synthesis_protocol.md`: knowledge-point synthesis.
@@ -136,6 +141,7 @@ Example Essays and prose:
 - `references/example_essay_docx_output_protocol.md`: DOCX-first Example Essay formatting, highlighting, source mapping, and source audit.
 - `references/language_quality_contract.md`: shared prose-quality rules for KP synthesis, Example Essays, and long-answer prose.
 - `references/essay_synthesis_protocol.md`: essay-style lecture knowledge synthesis.
+- `references/visual_aid_generation_protocol.md`: optional generated schematic planning, captions, source boundaries, and visual QA.
 
 Examples, regression, and release:
 

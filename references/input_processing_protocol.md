@@ -7,6 +7,10 @@ Classify every file before analysis:
 - `lecture_slide`
 - `lecture_note`
 - `annotated_lecture_slide`
+- `student_typed_note`
+- `student_handwritten_note`
+- `structured_revision_note`
+- `ai_generated_note`
 - `formal_past_paper`
 - `formal_past_paper_with_answers`
 - `example_paper`
@@ -28,6 +32,8 @@ Classify every file before analysis:
 - `docx_format_reference`
 - `source_policy`
 - `output_protocol`
+- `visual_aid_spec`
+- `generated_visual_aid`
 - `helper_script`
 - `unsupported_binary`
 - `unknown`
@@ -45,7 +51,15 @@ Each file record must include:
 - allowed evidence use.
 - source feature flags, such as answer key, example paper, practical protocol, essay guidance, problem/data/case, and recommended reading.
 
-Student handwritten annotations on slides may be used as interpretation hints, but must not be treated as authoritative course facts unless supported by slide text, official notes, or reliable sources.
+The Skill accepts any readable course-note source: slides, official notes, lecturer-provided PDF/DOCX notes, student typed notes, handwritten notes, annotated screenshots, flashcards, structured revision notes, and AI-generated summaries. Acceptance for intake is not the same as authority for factual claims.
+
+Ordered course-note processing uses:
+
+```text
+CourseContentSource -> OrderedContentItem -> SourceFragment -> KnowledgePoint -> PrepArtifact
+```
+
+Student handwritten annotations, typed notes, flashcards, and unknown-provenance summaries may be used as interpretation hints, definition candidates, and gap cues, but must not be treated as authoritative course facts unless supported by slide text, official notes, official course material, verified textbooks, or verified academic sources. AI-generated notes have no factual authority and may only help with structure after independent verification.
 
 ## Source Trust Levels
 
@@ -70,6 +84,10 @@ Student handwritten annotations on slides may be used as interpretation hints, b
 - `lecture_slide_core`
 - `lecture_slide_citation_original`
 - `classic_experiment_source`
+- `student_note_hint`
+- `definition_candidate`
+- `exam_emphasis_hint`
+- `visual_explanation_only`
 - `docx_format_reference`
 - `excluded`
 
@@ -101,7 +119,7 @@ Hard rule:
 
 ```text
 Only `target_current_regime` may directly control current blueprint prediction.
-Only target lecture slides, official notes, and verified official materials may directly control factual content.
+Only target lecture slides, official notes, lecturer-provided course notes, verified official materials, and independently verified academic sources may directly control factual content.
 Cross-target examples must be converted into transferable workflow contributions, not content evidence.
 ```
 
@@ -325,13 +343,15 @@ condition or biological problem -> regulator/sensor/molecular feature -> molecul
 
 ## Lecture-Order Coverage
 
-For student-facing lecture walkthroughs and DOCX add-ons, analysis must proceed from the first slide/page to the last slide/page in source order where lecture order matters.
+For compatibility lecture walkthroughs and DOCX add-ons, analysis must proceed from the first slide/page to the last slide/page in source order where lecture order matters.
+
+For `exam_prep_notes_docx`, source order is a diagnostic input, not a binding output order. Use it to infer prerequisites, source intent, and causal development; then organise the final notes by course-section logic, KnowledgePoint dependency, and supported exam emphasis.
 
 Do not:
 
 - analyse only high-yield slides;
 - skip middle lecture sections without a QA flag;
-- reorder KPs by predicted importance in the main lecture walkthrough;
+- reorder KPs by predicted importance in the compatibility lecture-first walkthrough;
 - merge several unrelated mechanisms into one huge KP;
 - split one mechanism/evidence block into isolated slide fragments.
 

@@ -4,6 +4,35 @@ This contract is the shared prose-quality standard for lecture walkthrough expla
 
 The contract is subject-independent. Biological, chemical, quantitative, clinical, methodological, and sector-level essays use different factual evidence, but the same language discipline.
 
+## Academic Exam-Ready Notes Language
+
+For `exam_prep_notes_docx`, write notes as exam-ready academic synthesis, not as tutor narration or slide commentary.
+
+Prefer section functions such as:
+
+- `Core Exam Claim`;
+- `Exam-Ready Knowledge Synthesis`;
+- `Mechanism / Process Logic`;
+- `Evidence / Example Function`;
+- `Common Error / Trap`;
+- `Must Master`.
+
+Avoid:
+
+- `In this section we will learn...`;
+- `This slide explains...`;
+- `The notes are trying to say...`;
+- `You should understand...`;
+- source-route narration such as page, slide, or upload-order commentary inside the answer body.
+
+The paragraph shape is:
+
+```text
+examinable claim or problem -> mechanism/process -> evidence/example function -> scope or limitation -> exam use
+```
+
+Do not preserve the original notes' order when that order is weaker than the exam logic. Use the original order only to infer prerequisites, source intent, and causal development.
+
 ## Core Paragraph Shape
 
 Every substantive paragraph should have a visible function:

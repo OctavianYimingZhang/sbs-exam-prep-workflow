@@ -8,6 +8,9 @@ wizard:
       fields:
         - "lecture_slides"
         - "official_notes"
+        - "course_notes"
+        - "student_notes"
+        - "ai_generated_notes"
         - "formal_past_papers"
         - "practical_materials"
         - "mocks_quizzes_answer_keys"

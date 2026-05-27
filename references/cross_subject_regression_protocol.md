@@ -84,7 +84,7 @@ Knowledge-point construction:
 
 - KPs are built from examinable reasoning blocks rather than slide count;
 - adjacent source pages are merged only when they teach one examinable mechanism, process, comparison, method, data operation, or scenario;
-- source order is preserved in the lecture walkthrough;
+- source order is preserved in the compatibility lecture walkthrough and used diagnostically in Academic Exam-Ready Notes;
 - page/slide coverage is kept in images/source maps, not narrated inside student prose.
 
 Language quality:

@@ -57,6 +57,50 @@ Use only these visible priority labels when priority is useful:
 
 Do not explain why a point is `必备` by exposing recurrence, confidence, or source-scoring logic. Convert the reason into useful content: what to know, how it is tested, and what trap to avoid.
 
+## Exam Prep Notes Student Contract
+
+`exam_prep_notes_docx` is the default general-revision route. It emits Academic Exam-Ready Notes in the compatible public artifact `Lecture_Knowledge_Walkthrough.docx`.
+
+Visible structure:
+
+```yaml
+ExamPrepNotesStudentContract:
+  course_level_exam_map: string
+  course_sections: list[string]
+  lecture_mapping: list[string]
+  exam_ready_knowledge_notes: list[ExamPrepKnowledgeCard]
+  question_type_addons: list[QuestionTypeAddOn]
+  optional_visual_aids: list[GeneratedVisualAidCaption]
+```
+
+Visible knowledge card:
+
+```yaml
+ExamPrepKnowledgeCard:
+  priority: 必备 | 重点 | 补充
+  core_exam_claim: string
+  exam_ready_knowledge_synthesis: string
+  mechanism_or_process_logic: string
+  evidence_or_example_function: string
+  common_error_or_trap: string
+  must_master: list[string]
+```
+
+Allowed visible add-on items:
+
+- testable statement;
+- possible wrong or distractor statement;
+- common trap;
+- must-remember rule;
+- bounded example question;
+- concise example answer;
+- required terms bolded inside answer text;
+- `Avoid this mistake`;
+- essay-ready paragraph block;
+- generated schematic caption.
+
+Question-type add-ons must come after the base notes. They do not replace the base notes and must not expose source anchors, recurrence, confidence, internal scoring, or past-paper year mapping.
+
 ## MCQ Student Contract
 
 MCQ reports are point-card reports. They must not contain practice questions, answer keys, contrast tables, or a separate trap bank by default.
@@ -177,4 +221,10 @@ The useful student-facing pair is:
 Full Example Essay + how to adapt it to specific essay questions
 ```
 
-Do not generate Essay Module Packs as the default lecture-review product.
+Do not generate Essay Module Packs as the default revision product.
+
+## Visual Aid Student Boundary
+
+Generated visual aids may be embedded or attached only as revision schematics. The visible caption must state that the image is generated for revision and is not an official course figure.
+
+Do not use a generated image as evidence, a citation, an official answer, or a replacement for written explanation. If the platform cannot generate images, omit the visual-aid section from the student-facing output.

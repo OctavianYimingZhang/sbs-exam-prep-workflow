@@ -15,6 +15,9 @@ from typing import Any
 SOURCE_INPUT_KEYS = (
     "lecture_slides",
     "official_notes",
+    "course_notes",
+    "student_notes",
+    "ai_generated_notes",
     "formal_past_papers",
     "practical_materials",
     "mocks_quizzes_answer_keys",
@@ -23,8 +26,11 @@ SOURCE_INPUT_KEYS = (
 )
 
 PRESET_ALIASES = {
-    "full_workflow": "knowledge_walkthrough_docx",
+    "full_workflow": "exam_prep_notes_docx",
     "source_inventory": "source_inventory_only",
+    "exam_prep_notes": "exam_prep_notes_docx",
+    "exam_ready_notes": "exam_prep_notes_docx",
+    "notes_generation": "exam_prep_notes_docx",
     "lecture_walkthrough_docx": "knowledge_walkthrough_docx",
     "knowledge_walkthrough": "knowledge_walkthrough_docx",
     "prediction_workbook": "exam_format_diagnosis",
@@ -39,12 +45,13 @@ PRESET_ALIASES = {
     "example_essay": "essay_exam_prep",
     "example_essay_docx": "essay_exam_prep",
     "evidence_gap_audit": "audit_lint_only",
-    "incremental_refresh": "knowledge_walkthrough_docx",
+    "incremental_refresh": "exam_prep_notes_docx",
 }
 
 PRESET_REQUIRED_CLASSES = {
     "source_inventory_only": ["any_source"],
     "exam_format_diagnosis": ["formal_past_papers"],
+    "exam_prep_notes_docx": ["readable_course_notes"],
     "knowledge_walkthrough_docx": ["lecture_or_official_notes"],
     "mcq_exam_prep": ["lecture_or_official_notes"],
     "short_answer_exam_prep": ["lecture_or_official_notes"],
@@ -57,6 +64,21 @@ PRESET_REQUIRED_CLASSES = {
 PRESET_MODULES = {
     "source_inventory_only": ["source_inventory"],
     "exam_format_diagnosis": ["source_inventory", "exam_regime", "question_type"],
+    "exam_prep_notes_docx": [
+        "source_inventory",
+        "fragment_index",
+        "course_section_reconstruction",
+        "lecture_session_mapping",
+        "lecture_concept_module_extraction",
+        "knowledge_points",
+        "exam_emphasis_profile",
+        "exam_prep_notes_plan",
+        "question_type_addon_generation",
+        "visual_aid_planning",
+        "visual_aid_generation_optional",
+        "exam_prep_notes_docx_generation",
+        "deliverable_qa",
+    ],
     "knowledge_walkthrough_docx": [
         "source_inventory",
         "fragment_index",
@@ -68,10 +90,16 @@ PRESET_MODULES = {
     "mcq_exam_prep": [
         "source_inventory",
         "fragment_index",
-        "lecture_module_extraction",
-        "knowledge_walkthrough_plan",
-        "knowledge_walkthrough_docx_generation",
+        "course_section_reconstruction",
+        "lecture_session_mapping",
+        "lecture_concept_module_extraction",
         "knowledge_points",
+        "exam_emphasis_profile",
+        "exam_prep_notes_plan",
+        "question_type_addon_generation",
+        "visual_aid_planning",
+        "visual_aid_generation_optional",
+        "exam_prep_notes_docx_generation",
         "mcq_policy",
         "mcq_exam_report_docx",
         "deliverable_qa",
@@ -79,10 +107,16 @@ PRESET_MODULES = {
     "short_answer_exam_prep": [
         "source_inventory",
         "fragment_index",
-        "lecture_module_extraction",
-        "knowledge_walkthrough_plan",
-        "knowledge_walkthrough_docx_generation",
+        "course_section_reconstruction",
+        "lecture_session_mapping",
+        "lecture_concept_module_extraction",
         "knowledge_points",
+        "exam_emphasis_profile",
+        "exam_prep_notes_plan",
+        "question_type_addon_generation",
+        "visual_aid_planning",
+        "visual_aid_generation_optional",
+        "exam_prep_notes_docx_generation",
         "short_answer_variants",
         "short_answer_exam_report_docx",
         "deliverable_qa",
@@ -90,10 +124,16 @@ PRESET_MODULES = {
     "long_answer_project_scenario_prep": [
         "source_inventory",
         "fragment_index",
-        "lecture_module_extraction",
-        "knowledge_walkthrough_plan",
-        "knowledge_walkthrough_docx_generation",
+        "course_section_reconstruction",
+        "lecture_session_mapping",
+        "lecture_concept_module_extraction",
         "knowledge_points",
+        "exam_emphasis_profile",
+        "exam_prep_notes_plan",
+        "question_type_addon_generation",
+        "visual_aid_planning",
+        "visual_aid_generation_optional",
+        "exam_prep_notes_docx_generation",
         "method_blocks",
         "long_answer_project_report_docx",
         "deliverable_qa",
@@ -101,10 +141,16 @@ PRESET_MODULES = {
     "essay_exam_prep": [
         "source_inventory",
         "fragment_index",
-        "lecture_module_extraction",
-        "knowledge_walkthrough_plan",
-        "knowledge_walkthrough_docx_generation",
+        "course_section_reconstruction",
+        "lecture_session_mapping",
+        "lecture_concept_module_extraction",
         "knowledge_points",
+        "exam_emphasis_profile",
+        "exam_prep_notes_plan",
+        "question_type_addon_generation",
+        "visual_aid_planning",
+        "visual_aid_generation_optional",
+        "exam_prep_notes_docx_generation",
         "essay_coverage_plan",
         "citation_resolution",
         "essay_module_example_essays_docx",
@@ -132,6 +178,24 @@ MODULE_DEFS = {
         "minimum_inputs": ["lecture_or_official_notes"],
         "expected_outputs": ["LectureModule"],
         "qa_checks": ["lecture order", "conceptual module boundaries", "student-facing filter"],
+    },
+    "course_section_reconstruction": {
+        "action_type": "ReconstructCourseSections",
+        "minimum_inputs": ["readable_course_notes"],
+        "expected_outputs": ["CourseSection"],
+        "qa_checks": ["source authority", "course-section boundaries", "no note-order leakage"],
+    },
+    "lecture_session_mapping": {
+        "action_type": "MapLectureSessions",
+        "minimum_inputs": ["CourseSection"],
+        "expected_outputs": ["LectureSession"],
+        "qa_checks": ["source order used for prerequisites", "section mapping"],
+    },
+    "lecture_concept_module_extraction": {
+        "action_type": "BuildLectureConceptModules",
+        "minimum_inputs": ["LectureSession"],
+        "expected_outputs": ["LectureConceptModule"],
+        "qa_checks": ["conceptual boundaries", "source-backed module function", "student-facing filter"],
     },
     "knowledge_walkthrough_plan": {
         "action_type": "BuildKnowledgeWalkthroughPlan",
@@ -171,9 +235,45 @@ MODULE_DEFS = {
     },
     "knowledge_points": {
         "action_type": "SegmentKnowledgePoints",
-        "minimum_inputs": ["lecture_or_official_notes"],
+        "minimum_inputs": ["readable_course_notes"],
         "expected_outputs": ["KnowledgePoint", "EvidenceClaim"],
         "qa_checks": ["source anchors", "claim strength"],
+    },
+    "exam_emphasis_profile": {
+        "action_type": "BuildExamEmphasisProfile",
+        "minimum_inputs": ["KnowledgePoint"],
+        "expected_outputs": ["ExamEmphasisProfile"],
+        "qa_checks": ["formal papers used when available", "no invented frequency", "public priority filter"],
+    },
+    "exam_prep_notes_plan": {
+        "action_type": "BuildExamPrepNotesPlan",
+        "minimum_inputs": ["CourseSection", "LectureSession", "LectureConceptModule", "KnowledgePoint", "ExamEmphasisProfile"],
+        "expected_outputs": ["ExamPrepNotesPlan"],
+        "qa_checks": ["Academic Exam-Ready Notes structure", "definition policy", "student note verification"],
+    },
+    "question_type_addon_generation": {
+        "action_type": "BuildQuestionTypeAddOns",
+        "minimum_inputs": ["ExamPrepNotesPlan"],
+        "expected_outputs": ["QuestionTypeAddOn"],
+        "qa_checks": ["add-ons after base notes", "question-type separation", "forbidden field filter"],
+    },
+    "visual_aid_planning": {
+        "action_type": "PlanVisualAid",
+        "minimum_inputs": ["ExamPrepNotesPlan"],
+        "expected_outputs": ["VisualAidSpec"],
+        "qa_checks": ["optional final layer", "source-backed labels", "copyright boundary"],
+    },
+    "visual_aid_generation_optional": {
+        "action_type": "GenerateVisualAid",
+        "minimum_inputs": ["VisualAidSpec"],
+        "expected_outputs": ["GeneratedVisualAid"],
+        "qa_checks": ["not evidence", "caption boundary", "skip if unavailable"],
+    },
+    "exam_prep_notes_docx_generation": {
+        "action_type": "GeneratePrepArtifact",
+        "minimum_inputs": ["ExamPrepNotesPlan"],
+        "expected_outputs": ["PrepArtifact"],
+        "qa_checks": ["DOCX format", "Academic Exam-Ready Notes language", "public output boundary"],
     },
     "examiner_operations": {
         "action_type": "InferQuestionArchetype",
@@ -287,7 +387,7 @@ def stable_id(prefix: str, payload: Any) -> str:
 
 
 def normalize_preset(raw: str | None) -> str:
-    value = (raw or "knowledge_walkthrough_docx").strip()
+    value = (raw or "exam_prep_notes_docx").strip()
     value = PRESET_ALIASES.get(value, value)
     if value not in PRESET_MODULES:
         raise ValueError(f"unsupported output preset: {raw}")
@@ -307,6 +407,8 @@ def list_items(value: Any) -> list[Any]:
 def class_for_source_key(key: str) -> str:
     if key in {"lecture_slides", "official_notes"}:
         return "lecture_or_official_notes"
+    if key in {"course_notes", "student_notes", "ai_generated_notes"}:
+        return "readable_course_notes"
     if key == "formal_past_papers":
         return "formal_past_papers"
     if key == "practical_materials":
@@ -324,6 +426,8 @@ def class_for_scan_role(role: str) -> str | None:
     role = role.lower()
     if "lecture" in role or role in {"official_note", "official_notes"}:
         return "lecture_or_official_notes"
+    if ("student" in role and "note" in role) or role in {"course_note", "course_notes", "structured_revision_note", "ai_generated_note"}:
+        return "readable_course_notes"
     if "past_paper" in role:
         return "formal_past_papers"
     if "practical" in role or "protocol" in role:
@@ -343,6 +447,8 @@ def available_source_classes(config: dict[str, Any], source_scan: dict[str, Any]
     for key in SOURCE_INPUT_KEYS:
         if list_items(source_inputs.get(key)):
             available.add(class_for_source_key(key))
+    if "lecture_or_official_notes" in available:
+        available.add("readable_course_notes")
     if source_scan:
         for item in source_scan.get("files", []):
             if not isinstance(item, dict):
@@ -350,6 +456,8 @@ def available_source_classes(config: dict[str, Any], source_scan: dict[str, Any]
             source_class = class_for_scan_role(str(item.get("role", "")))
             if source_class and item.get("status", "ok") != "missing":
                 available.add(source_class)
+    if "lecture_or_official_notes" in available:
+        available.add("readable_course_notes")
     if available:
         available.add("any_source")
     return available
@@ -363,6 +471,7 @@ def blocker_for_missing(index: int, missing_input: str, selected_preset: str) ->
     labels = {
         "any_source": "at least one readable source",
         "lecture_or_official_notes": "lecture slides or official notes",
+        "readable_course_notes": "at least one readable course-note source",
         "formal_past_papers": "formal past papers",
         "practical_materials": "practical or data/problem materials",
     }
@@ -398,7 +507,7 @@ def action_for_module(index: int, module: str, modules: list[str], reuse_existin
 
 def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> dict[str, Any]:
     output_mode = config.get("output_mode", {})
-    raw_mode = output_mode.get("preset") or output_mode.get("mode") or "knowledge_walkthrough_docx"
+    raw_mode = output_mode.get("preset") or output_mode.get("mode") or "exam_prep_notes_docx"
     selected_preset = normalize_preset(str(raw_mode))
     required = PRESET_REQUIRED_CLASSES[selected_preset]
     available = available_source_classes(config, source_scan)

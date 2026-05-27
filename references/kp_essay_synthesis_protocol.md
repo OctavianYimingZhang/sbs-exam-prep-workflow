@@ -1,6 +1,6 @@
 # KP Essay Synthesis Protocol
 
-This protocol governs knowledge-point explanation prose for legacy workbook compatibility and internal prose linting. It is not full Example Essay Mode and not the default lecture-review DOCX route. Current public exam-prep outputs should use the lecture walkthrough DOCX and question-type DOCX add-ons.
+This protocol governs knowledge-point explanation prose for legacy workbook compatibility and internal prose linting. It is not full Example Essay Mode and not the default revision DOCX route. Current public exam-prep outputs should use Academic Exam-Ready Notes and question-type DOCX add-ons.
 
 Use `language_quality_contract.md` for shared prose-quality rules. This file adds workbook-specific constraints: no source tracing in explanation cells, no how-to-write language, and no page/slide narration.
 

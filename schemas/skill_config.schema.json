@@ -22,6 +22,9 @@
       "properties": {
         "lecture_slides": { "type": "array", "items": { "type": ["string", "object"] } },
         "official_notes": { "type": "array", "items": { "type": ["string", "object"] } },
+        "course_notes": { "type": "array", "items": { "type": ["string", "object"] } },
+        "student_notes": { "type": "array", "items": { "type": ["string", "object"] } },
+        "ai_generated_notes": { "type": "array", "items": { "type": ["string", "object"] } },
         "formal_past_papers": { "type": "array", "items": { "type": ["string", "object"] } },
         "practical_materials": { "type": "array", "items": { "type": ["string", "object"] } },
         "mocks_quizzes_answer_keys": { "type": "array", "items": { "type": ["string", "object"] } },
@@ -54,6 +57,7 @@
           "enum": [
             "source_inventory_only",
             "exam_format_diagnosis",
+            "exam_prep_notes_docx",
             "knowledge_walkthrough_docx",
             "mcq_exam_prep",
             "short_answer_exam_prep",

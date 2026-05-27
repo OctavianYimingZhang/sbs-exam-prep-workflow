@@ -27,10 +27,11 @@ Classify the request into one mode before deep analysis. This table is the autho
 
 | Mode | Use when | Main output |
 | --- | --- | --- |
-| `full_workflow` | User wants default lecture review or does not specify a narrower mode. | Source coverage card plus Lecture Knowledge Walkthrough DOCX. |
+| `full_workflow` | User wants default revision, exam-prep notes, or does not specify a narrower mode. | Source coverage card plus Academic Exam-Ready Notes in `Lecture_Knowledge_Walkthrough.docx`. |
 | `source_inventory` | User asks only to inspect or classify files. | File roles, extraction status, trust level, and evidence permissions. |
 | `exam_format_diagnosis` | User asks what the exam format rewards. | Sections, question types, answer rules, and recommended prep routes. |
-| `knowledge_walkthrough_docx` | User asks to go through lecture knowledge in order. | Lecture-first Word walkthrough with conceptual modules. |
+| `exam_prep_notes_docx` | User asks for notes, revision, exam-prep notes, or to go through the material generally. | Exam-informed Academic Exam-Ready Notes in a Word document. |
+| `knowledge_walkthrough_docx` | User explicitly asks to go through lecture knowledge in source order. | Lecture-first Word walkthrough with conceptual modules. |
 | `exam_analysis_brief` | User asks for past-paper analysis before file generation. | Chat-only brief covering exam type, evidence limits, module/point selection, and recommended output route. |
 | `mcq_exam_prep` | User asks for MCQ preparation. | Lecture walkthrough plus MCQ Point Card DOCX report. |
 | `short_answer_exam_prep` | User asks for short-answer practice. | Lecture walkthrough plus module logic, point cards, highlighted keywords, and Example Answers. |
@@ -39,15 +40,16 @@ Classify the request into one mode before deep analysis. This table is the autho
 | `evidence_gap_audit` | User asks what is missing or why output is blocked. | Source coverage map, blocking gaps, stale evidence, and next-source checklist. |
 | `incremental_refresh` | User supplies new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects, sections, artifacts, and QA results are refreshed. |
 
-If the user provides only materials and asks for general lecture review or exam prep without naming a narrower artifact, default to `full_workflow`, which maps to `knowledge_walkthrough_docx`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
+If the user provides only materials and asks for general lecture review, notes, or exam prep without naming a narrower artifact, default to `full_workflow`, which maps to `exam_prep_notes_docx`. If the user asks for a specific artifact, choose the narrowest mode that can produce it validly.
 
 Map interaction modes to execution presets before planning:
 
 | Interaction mode | Execution preset |
 | --- | --- |
-| `full_workflow` | `knowledge_walkthrough_docx` |
+| `full_workflow` | `exam_prep_notes_docx` |
 | `source_inventory` | `source_inventory_only` |
 | `exam_format_diagnosis` | `exam_format_diagnosis` |
+| `exam_prep_notes_docx` | `exam_prep_notes_docx` |
 | `knowledge_walkthrough_docx` | `knowledge_walkthrough_docx` |
 | `exam_analysis_brief` | `exam_format_diagnosis` |
 | `mcq_exam_prep` | `mcq_exam_prep` |
@@ -86,6 +88,7 @@ Before generating a major DOCX report, Example Essay package, or exam-analysis b
 Mode:
 Target source set:
 Lecture slides / official notes:
+Readable course notes:
 Formal past papers:
 Answer keys / mark schemes:
 Practical or data materials:
@@ -116,7 +119,7 @@ The plan preview is not a student-facing deliverable unless the user asks for an
 
 For the strongest exam-prep run, request or search for these source classes as applicable:
 
-1. lecture slides and official notes;
+1. lecture slides, official notes, lecturer-provided notes, and readable ordered course notes;
 2. formal past papers and exam guidance;
 3. mark schemes, answer keys, rubrics, or feedback where available;
 4. practical protocols, data/problem sheets, workshops, mocks, quizzes, and exemplars;
@@ -134,6 +137,7 @@ Allowed focused views:
 
 - `source_inventory`;
 - `source_coverage_card`;
+- `exam_prep_notes_docx`;
 - `knowledge_walkthrough_docx`;
 - `exam_analysis_brief`;
 - `mcq_exam_prep`;

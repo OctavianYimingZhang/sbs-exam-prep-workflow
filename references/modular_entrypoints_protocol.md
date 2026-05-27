@@ -11,7 +11,8 @@ Examples:
 - If the user asks only for source inventory, do not generate exam-analysis briefs or DOCX reports.
 - If the user asks only for DOCX linting, do not rewrite essays.
 - If the user asks only for Example Essay DOCX generation and already supplies a valid document plan, do not rerun past-paper prediction.
-- If the user asks for the complete default lecture-review workflow, route to `knowledge_walkthrough_docx` and run only its dependencies.
+- If the user asks for the complete default revision workflow, route to `exam_prep_notes_docx` and run only its dependencies.
+- If the user explicitly asks for a lecture-order walkthrough, route to `knowledge_walkthrough_docx` and run only its dependencies.
 
 ## Module Contract
 
@@ -220,11 +221,31 @@ Standalone behaviour:
 
 - output only the requested question-type product.
 
-### 10. Knowledge Walkthrough DOCX Generation
+### 10. Academic Exam-Ready Notes DOCX Generation
 
 Trigger:
 
-- user asks to go through lecture knowledge, revise lecture content in order, or requests the default full workflow without a narrower artifact.
+- user asks for revision, exam-prep notes, to go through the material generally, or requests the default full workflow without a narrower artifact.
+
+Minimum inputs:
+
+- at least one readable course-note source, with factual-authority limits applied.
+
+Outputs:
+
+- Academic Exam-Ready Notes in `Lecture_Knowledge_Walkthrough.docx`;
+- internal manifest or QA JSON outside the public output folder unless an audit package is requested.
+
+Standalone behaviour:
+
+- if supplied with a valid `ExamPrepNotesPlan`, generate/lint the DOCX without rerunning upstream modules.
+- reconstruct course sections, map lecture sessions, and use supported exam emphasis before writing.
+
+### 10b. Compatibility Knowledge Walkthrough DOCX Generation
+
+Trigger:
+
+- user explicitly asks for lecture knowledge in source order.
 
 Minimum inputs:
 
@@ -232,8 +253,7 @@ Minimum inputs:
 
 Outputs:
 
-- one student-facing Word walkthrough;
-- internal manifest or QA JSON outside the public output folder unless an audit package is requested.
+- one student-facing lecture-first Word walkthrough.
 
 Standalone behaviour:
 
@@ -244,7 +264,7 @@ Standalone behaviour:
 
 Trigger:
 
-- user asks for MCQ, short-answer, essay, practical/data, long-answer, project, scenario, or method-focused exam preparation beyond the lecture walkthrough.
+- user asks for MCQ, short-answer, essay, practical/data, long-answer, project, scenario, or method-focused exam preparation beyond the base notes.
 
 Minimum inputs:
 
@@ -420,17 +440,18 @@ When the user requests the complete exam-prep workflow, run modules in this orde
 2. Automatic Example Analysis when examples, answer keys, feedback, existing analyses, or external review notes are supplied.
 3. Target Grouping / Regime Split.
 4. Question-Type Gate / Exam-Format Diagnosis.
-5. Lecture Segmentation.
-6. Knowledge-Point Optimisation.
-7. KP Essay Synthesis.
-8. Archetype / Past-Paper / Pattern Analysis.
-9. Question-Type Output Generation.
-10. Knowledge Walkthrough DOCX Generation for the default lecture-review output.
+5. Course-Section Reconstruction.
+6. Lecture Session Mapping.
+7. Knowledge-Point Optimisation.
+8. KP Essay Synthesis when a paragraph-style explanation layer is requested.
+9. Archetype / Past-Paper / Pattern Analysis.
+10. Academic Exam-Ready Notes DOCX Generation for the default revision output.
 11. Question-Type DOCX Add-On Generation.
-12. QA / Linting.
-13. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
-14. Gap Closure Report when modifying the Skill itself.
-15. GitHub Ready QA before commit or push.
+12. Optional Visual-Aid Planning.
+13. QA / Linting.
+14. Cross-Subject Regression when benchmark inputs or generated outputs are supplied.
+15. Gap Closure Report when modifying the Skill itself.
+16. GitHub Ready QA before commit or push.
 
 If the user also explicitly requests complete Example Essays, run Example Essay DOCX Mode as a separate branch after lecture-source grounding and question selection:
 

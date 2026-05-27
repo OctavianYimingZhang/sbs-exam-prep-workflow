@@ -1,6 +1,8 @@
 # Knowledge Walkthrough DOCX Protocol
 
-`knowledge_walkthrough_docx` is the default lecture-review route when the user supplies lecture materials and asks to go through the course knowledge. It is Word-first and lecture-first. It is not an Excel workbook converted into a DOCX file.
+`knowledge_walkthrough_docx` is the compatibility lecture-first route when the user explicitly asks to go through lecture knowledge in source order. It is Word-first and lecture-first. It is not an Excel workbook converted into a DOCX file.
+
+For general revision, exam-prep notes, or "go through the material" requests, prefer `exam_prep_notes_docx` in `exam_prep_notes_protocol.md`. That route uses exam-informed Academic Exam-Ready Notes logic while preserving the public artifact name `Lecture_Knowledge_Walkthrough.docx`.
 
 ## Purpose
 

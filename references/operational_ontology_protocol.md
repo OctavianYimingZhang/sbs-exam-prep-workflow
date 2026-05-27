@@ -3,7 +3,7 @@
 The Skill uses an operational ontology to control workflow, evidence permissions, and output generation. The ontology is not a topic taxonomy and not an embedding index. It is an object-link-action model:
 
 ```text
-SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
+SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> CourseSection -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
 ```
 
 ## Purpose
@@ -31,12 +31,14 @@ SourceFragment, FragmentPartition, PastPaperQuestion, AssessmentRegime, ExamBlue
 
 Gold layer
 Validated semantic objects:
-KnowledgePoint, ExaminerOperation, QuestionArchetype, SlotGrammar,
-EvidenceClaim, ReadingSource, MethodBlock, QAFlag.
+CourseSection, LectureSession, LectureConceptModule, KnowledgePoint,
+ExamEmphasisProfile, ExaminerOperation, QuestionArchetype, SlotGrammar,
+EvidenceClaim, ReadingSource, MethodBlock, QuestionTypeAddOn, VisualAidSpec,
+GeneratedVisualAid, QAFlag.
 
 Serving layer
 Student-facing artifacts:
-Lecture Knowledge Walkthrough DOCX, question-type DOCX reports,
+Academic Exam-Ready Notes DOCX, Lecture Knowledge Walkthrough DOCX, question-type DOCX reports,
 Essay Module Example Essays DOCX, direct answer, plus hidden
 diagnostics, lineage, and source audit when requested.
 ```
@@ -50,7 +52,9 @@ Use `ontology/ontology.json` as the machine-readable contract for object types.
 Core objects:
 
 - `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, `WorkflowPlan`, and `OutputView`: interaction-layer objects that select mode, plan actions, expose source coverage, and prevent hidden blockers.
-- `LectureModule` and `KnowledgeWalkthroughPlan`: Word-first lecture-review objects that preserve lecture order while converting slides or notes into conceptual modules.
+- `LectureModule` and `KnowledgeWalkthroughPlan`: compatibility lecture-review objects that preserve lecture order while converting slides or notes into conceptual modules.
+- `CourseSection`, `LectureSession`, `LectureConceptModule`, `ExamEmphasisProfile`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure before writing.
+- `QuestionTypeAddOn`, `VisualAidSpec`, and `GeneratedVisualAid`: final-layer add-on objects that may extend notes without becoming factual authority.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
 - `FragmentPartition`: metadata partition used to prune irrelevant fragments before expensive reasoning or generation.
@@ -115,6 +119,9 @@ SourceDocument PARTITIONED_AS FragmentPartition
 FragmentPartition GROUPS_FRAGMENT SourceFragment
 SourceFragment SUPPORTS_KP KnowledgePoint
 SourceFragment SUPPORTS_LECTURE_MODULE LectureModule
+SourceFragment SUPPORTS_COURSE_SECTION CourseSection
+LectureSession HAS_LECTURE_CONCEPT_MODULE LectureConceptModule
+KnowledgePoint MAPS_KP_TO_EXAM_EMPHASIS ExamEmphasisProfile
 KnowledgePoint SUPPORTS_CLAIM EvidenceClaim
 PastPaperQuestion INSTANTIATES QuestionArchetype
 QuestionArchetype USES_OPERATION ExaminerOperation
@@ -122,6 +129,8 @@ KnowledgePoint COMPATIBLE_WITH QuestionArchetype
 ReadingSource ENRICHES_KP KnowledgePoint
 PrepArtifact GENERATED_FROM_KP KnowledgePoint
 PrepArtifact GENERATED_FROM_LECTURE_MODULE LectureModule
+PrepArtifact GENERATED_FROM_EXAM_PREP_NOTES_PLAN ExamPrepNotesPlan
+GeneratedVisualAid GENERATED_FROM_VISUAL_AID_SPEC VisualAidSpec
 PrepArtifact GENERATED_FROM_MCQ_POLICY MCQScoringPolicy
 PrepArtifact GENERATED_FROM_SHORT_ANSWER_VARIANT ShortAnswerVariant
 PrepArtifact GENERATED_FROM_ESSAY_COVERAGE_PLAN EssayCoveragePlan
@@ -139,6 +148,7 @@ cross_target_example SUPPORTS_FACTUAL_CLAIM EvidenceClaim
 old_or_different_regime CONTROLS_CURRENT_BLUEPRINT ExamBlueprint
 unverified_external_source SUPPORTS_CLAIM EvidenceClaim
 unreadable_source SUPPORTS_KP KnowledgePoint
+generated_visual_aid SUPPORTS_CLAIM EvidenceClaim
 ```
 
 ## Action Layer
@@ -156,6 +166,14 @@ ExtractFragments
 BuildFragmentIndex
 BuildLectureModules
 BuildKnowledgeWalkthroughPlan
+ReconstructCourseSections
+MapLectureSessions
+BuildLectureConceptModules
+BuildExamEmphasisProfile
+BuildExamPrepNotesPlan
+BuildQuestionTypeAddOns
+PlanVisualAid
+GenerateVisualAid
 NormalizeTargetGroup
 SplitExamRegime
 ExtractPastPaperQuestions
@@ -199,6 +217,12 @@ Student output filter query:
 
 ```text
 internal objects + selected output mode + allowed visible fields + forbidden visible fields
+```
+
+Academic Exam-Ready Notes query:
+
+```text
+course sections + lecture mapping + knowledge cards + exam emphasis profile + question-type add-ons + optional visual aids + forbidden student fields
 ```
 
 Essay theme query:

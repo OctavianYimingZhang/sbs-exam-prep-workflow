@@ -191,6 +191,26 @@ EssayCoveragePlan:
 
 If a section presents several essay options and the student answers one, prepare enough lecture blocks to make at least one high-quality answer likely. Do not force equal-depth preparation for every possible block unless the user asks for exhaustive coverage.
 
+## Exam-Informed Notes Control
+
+When formal past papers are supplied with a general notes or revision request, past-paper analysis feeds `exam_prep_notes_docx` before notes are generated:
+
+```text
+formal papers -> current regime split -> PastPaperQuestion records -> question families -> KP compatibility -> ExamEmphasisProfile -> Academic Exam-Ready Notes
+```
+
+The `ExamEmphasisProfile` may control density, ordering, and visible priority labels for source-backed KnowledgePoints. It may also decide whether MCQ, short-answer, long-answer, practical/data, or essay add-ons are useful after the base notes.
+
+The `ExamEmphasisProfile` must not control:
+
+- exact future wording;
+- unsupported official answers;
+- fake numerical prediction;
+- content outside supplied or verified source scope;
+- public recurrence counts, confidence bands, or past-paper year mappings.
+
+If no formal papers exist, generate notes from official source centrality, conceptual dependency, learning-objective emphasis, and source coverage only. Do not invent exam frequency.
+
 ## Lecturer Style
 
 Lecturer or source-block style is a weak auxiliary variable.

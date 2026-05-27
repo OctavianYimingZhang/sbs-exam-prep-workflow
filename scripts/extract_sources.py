@@ -94,7 +94,7 @@ def detect_year(path: Path, text: str, role: str | None = None) -> int | None:
     # Lecture decks often contain citation/reference years in slide text. Do
     # not treat those as source years; use metadata or explicit file names in
     # downstream code if a lecture-source year is required.
-    if role in {"lecture_slide", "lecture_note", "annotated_lecture_slide", "essay_guidance"}:
+    if role in {"lecture_slide", "lecture_note", "annotated_lecture_slide", "student_typed_note", "student_handwritten_note", "structured_revision_note", "ai_generated_note", "essay_guidance"}:
         return None
 
     header = text[:3000]
@@ -239,6 +239,14 @@ def detect_role(path: Path, text: str, target_hint: str | None = None, source_fe
         return "formal_past_paper"
     if suffix == ".pdf" and any(term in body for term in ("lecture", "module", "learning objectives", "slide")):
         return "lecture_slide"
+    if any(term in name or term in path_text for term in ("ai generated", "ai-generated", "chatgpt", "gpt notes")):
+        return "ai_generated_note"
+    if any(term in name or term in path_text for term in ("handwritten", "hand written", "annotation", "annotated notes")):
+        return "student_handwritten_note"
+    if any(term in name or term in path_text for term in ("typed notes", "personal notes", "class notes")):
+        return "student_typed_note"
+    if any(term in name or term in path_text for term in ("anki", "flashcard", "notion", "revision notes", "student notes", "my notes")):
+        return "structured_revision_note"
     if any(term in name for term in ("notes", "summary", "revision")):
         return "lecture_note"
     if "recommended_reading" in features:
@@ -249,6 +257,10 @@ def detect_role(path: Path, text: str, target_hint: str | None = None, source_fe
 def trust_and_evidence(role: str) -> tuple[str, str]:
     if role in {"lecture_slide", "lecture_note", "annotated_lecture_slide"}:
         return "official_course", "factual_course_content"
+    if role in {"student_typed_note", "student_handwritten_note", "structured_revision_note"}:
+        return "student_or_unknown", "student_note_hint"
+    if role == "ai_generated_note":
+        return "student_or_unknown", "excluded"
     if role == "formal_past_paper":
         return "official_course", "formal_prediction_evidence"
     if role == "formal_past_paper_with_answers":
@@ -342,9 +354,10 @@ def infer_analysis_context(
 
 def allowed_use_flags(analysis_context: str, role: str) -> dict[str, bool]:
     style_roles = {"answer_key", "practice_answer_key", "exemplar_answer", "exemplar_image", "essay_guidance", "formal_past_paper_with_answers"}
+    non_authoritative_note_roles = {"student_typed_note", "student_handwritten_note", "structured_revision_note", "ai_generated_note"}
     if analysis_context == "target_current_regime":
         return {
-            "allowed_factual_use": role not in {"formal_past_paper", "formal_past_paper_with_answers"},
+            "allowed_factual_use": role not in {"formal_past_paper", "formal_past_paper_with_answers", *non_authoritative_note_roles},
             "allowed_prediction_use": role in {"formal_past_paper", "formal_past_paper_with_answers"},
             "allowed_style_use": role in style_roles,
             "allowed_layout_use": False,

@@ -28,6 +28,48 @@ Classify before prediction:
 
 Never apply SBS K/C/U/A/R to MCQ, fill-blank, short-answer, or problem-based questions. Apply K/C/U/A/R only to essay-based theory answers.
 
+## Question-Type Add-On Layer
+
+For `exam_prep_notes_docx`, question-type logic is an add-on layer after the base Academic Exam-Ready Notes. It must not replace the base notes and must not cause essay-only logic to leak into MCQ, short-answer, practical/data, project, scenario, or long-answer routes.
+
+MCQ add-on output:
+
+```yaml
+MCQAddOn:
+  testable_statement:
+  possible_wrong_or_distractor_statement:
+  common_trap:
+  must_remember_rule:
+```
+
+Do not claim an official answer unless an answer key or official solution is supplied.
+
+Short-answer add-on output:
+
+```yaml
+ShortAnswerAddOn:
+  bounded_example_question:
+  concise_example_answer:
+  required_terms_in_answer_text:
+  avoid_this_mistake:
+```
+
+Bold required terms inside the answer text. Do not expose `common omissions`.
+
+Essay add-on output:
+
+```yaml
+EssayAddOn:
+  essay_ready_paragraph_blocks:
+    mechanism:
+    process:
+    comparison:
+    evidence:
+    limitation:
+```
+
+Complete Example Essays are generated only when the user explicitly asks for essay preparation, model essays, full essay-style answers, or complete essay documents.
+
 ## MCQ Statement-Level Map
 
 For MCQ-heavy exams, predict discriminator axes and distractor families, not long model answers and not exact stems.

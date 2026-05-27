@@ -15,7 +15,7 @@ The setup wizard has these sections:
 | Section | Purpose |
 | --- | --- |
 | Project | Capture target label, code, exam year, and output folder. |
-| Source Inputs | List lecture slides, official notes, papers, practical material, answers, feedback, and readings. |
+| Source Inputs | List lecture slides, official notes, ordered course notes, papers, practical material, answers, feedback, and readings. |
 | Output Mode | Choose exactly one main preset and whether an audit package is requested. |
 | Evidence Policy | Decide whether academic search and extra-reading enrichment are allowed. |
 | QA Gates | Choose strictness for ontology, lineage, language, and blocking-flag checks. |
@@ -69,4 +69,4 @@ Ask at most one clarification question only when the missing input blocks the re
 
 ## Output Boundary
 
-Student-facing outputs may include the requested Lecture Knowledge Walkthrough DOCX, question-type DOCX add-on reports, Example Essay DOCX content, direct explanations, or concise reports. Internal QA artifacts may be generated under an internal folder, but they must not be mixed into the student-facing output unless the user explicitly asks for an audit package.
+Student-facing outputs may include Academic Exam-Ready Notes in `Lecture_Knowledge_Walkthrough.docx`, the explicit lecture-first walkthrough, question-type DOCX add-on reports, Example Essay DOCX content, direct explanations, or concise reports. Internal QA artifacts may be generated under an internal folder, but they must not be mixed into the student-facing output unless the user explicitly asks for an audit package.

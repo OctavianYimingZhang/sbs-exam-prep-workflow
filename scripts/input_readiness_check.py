@@ -14,7 +14,7 @@ from plan_workflow import PRESET_REQUIRED_CLASSES, available_source_classes, blo
 
 def build_report(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> dict[str, Any]:
     output_mode = config.get("output_mode", {})
-    selected_preset = normalize_preset(str(output_mode.get("preset") or "knowledge_walkthrough_docx"))
+    selected_preset = normalize_preset(str(output_mode.get("preset") or "exam_prep_notes_docx"))
     required = PRESET_REQUIRED_CLASSES[selected_preset]
     available = available_source_classes(config, source_scan)
     missing = missing_required_classes(required, available)

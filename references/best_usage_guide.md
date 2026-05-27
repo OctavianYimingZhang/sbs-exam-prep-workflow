@@ -6,7 +6,7 @@ This guide describes the source pack and run mode that give the Skill the strong
 
 For the strongest result, provide:
 
-- lecture slides or official notes;
+- lecture slides, official notes, lecturer-provided notes, or other readable ordered course notes;
 - formal past papers from the relevant exam regime;
 - answer keys, mark schemes, or official guidance when available;
 - practical, data, graph, protocol, case, or calculation materials when those question types are possible;
@@ -24,7 +24,8 @@ Start from the requested artifact and choose the minimum valid route. The author
 
 The exam strategy controls the output strategy:
 
-- lecture-review default: lecture-first Word walkthrough with conceptual modules;
+- general-revision default: exam-informed Academic Exam-Ready Notes in a Word walkthrough artifact;
+- explicit lecture-order walkthrough: lecture-first Word walkthrough with conceptual modules;
 - essay or problem-essay: module-level Example Essays, adaptation maps, paragraph banks, and source-boundary checks;
 - MCQ: student-facing Point Cards only by default, with traps folded into the card rather than exposed as separate audit tables;
 - short answer: module logic, highlighted keywords, and natural Example Answers rather than visible mark-schema tables;

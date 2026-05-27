@@ -36,6 +36,38 @@
       "description": "DOCX-first student-facing lecture walkthrough plan that preserves lecture order while rewriting each lecture into conceptual modules.",
       "required_properties": ["walkthrough_id", "target_group_key", "lecture_order", "lectures", "student_visible_structure", "forbidden_student_fields", "qa_status"]
     },
+    "CourseSection": {
+      "description": "Source-backed course-level section reconstructed from official materials before exam-ready notes are written.",
+      "required_properties": ["section_id", "target_group_key", "section_title", "section_function", "source_anchors", "student_visible"]
+    },
+    "LectureSession": {
+      "description": "Ordered lecture or source block mapped into a reconstructed course section.",
+      "required_properties": ["lecture_session_id", "section_id", "source_order", "title", "function_within_section", "source_anchors"]
+    },
+    "LectureConceptModule": {
+      "description": "Conceptual module inside a lecture session for Academic Exam-Ready Notes.",
+      "required_properties": ["concept_module_id", "lecture_session_id", "module_title", "core_exam_claim", "mechanism_or_process_logic", "source_anchors", "student_visible"]
+    },
+    "ExamEmphasisProfile": {
+      "description": "Internal profile that uses formal papers when available to control notes density, order, and visible priority labels without claiming exact future questions.",
+      "required_properties": ["profile_id", "target_group_key", "current_regime", "visible_question_types", "compatible_knowledge_points", "emphasis_level", "limitation_flags"]
+    },
+    "ExamPrepNotesPlan": {
+      "description": "Academic Exam-Ready Notes plan that combines source authority, reconstructed course sections, KnowledgePoints, question-type add-ons, and optional visual-aid specs.",
+      "required_properties": ["notes_plan_id", "target_group_key", "course_sections", "lecture_mapping", "knowledge_cards", "question_type_addons", "student_visible_structure", "forbidden_student_fields", "qa_status"]
+    },
+    "QuestionTypeAddOn": {
+      "description": "Student-facing question-type add-on attached after base Academic Exam-Ready Notes.",
+      "required_properties": ["addon_id", "kp_id", "addon_type", "student_visible_items", "qa_flags"]
+    },
+    "VisualAidSpec": {
+      "description": "Internal generation spec for an optional source-backed revision schematic.",
+      "required_properties": ["visual_aid_id", "kp_id", "aid_type", "source_backed_claims", "visual_elements", "caption", "alt_text", "generation_prompt", "forbidden_elements", "qa_flags"]
+    },
+    "GeneratedVisualAid": {
+      "description": "Generated revision schematic that may illustrate source-backed content but may not support factual claims.",
+      "required_properties": ["generated_visual_aid_id", "visual_aid_id", "caption", "alt_text", "student_visible", "qa_status"]
+    },
     "SourceDocument": {
       "description": "Every supplied or discovered file.",
       "required_properties": ["source_id", "path", "file_role", "trust_level", "analysis_context", "allowed_evidence_use", "extraction_status"]
@@ -139,9 +171,19 @@
     "ENRICHES_KP": {"from": "ReadingSource", "to": "KnowledgePoint"},
     "TESTS_KP": {"from": "PracticalOperation", "to": "KnowledgePoint"},
     "SUPPORTS_LECTURE_MODULE": {"from": "SourceFragment", "to": "LectureModule"},
+    "SUPPORTS_COURSE_SECTION": {"from": "SourceFragment", "to": "CourseSection"},
+    "MAPS_TO_LECTURE_SESSION": {"from": "CourseSection", "to": "LectureSession"},
+    "HAS_LECTURE_CONCEPT_MODULE": {"from": "LectureSession", "to": "LectureConceptModule"},
+    "SUPPORTS_LECTURE_CONCEPT_MODULE": {"from": "SourceFragment", "to": "LectureConceptModule"},
+    "MAPS_KP_TO_EXAM_EMPHASIS": {"from": "KnowledgePoint", "to": "ExamEmphasisProfile"},
+    "PLAN_USES_EXAM_EMPHASIS": {"from": "ExamPrepNotesPlan", "to": "ExamEmphasisProfile"},
+    "VISUAL_AID_FOR_KP": {"from": "VisualAidSpec", "to": "KnowledgePoint"},
+    "GENERATED_FROM_VISUAL_AID_SPEC": {"from": "GeneratedVisualAid", "to": "VisualAidSpec"},
     "GENERATED_FROM": {"from": "PrepArtifact", "to": "KnowledgePoint"},
     "GENERATED_FROM_KP": {"from": "PrepArtifact", "to": "KnowledgePoint"},
     "GENERATED_FROM_LECTURE_MODULE": {"from": "PrepArtifact", "to": "LectureModule"},
+    "GENERATED_FROM_EXAM_PREP_NOTES_PLAN": {"from": "PrepArtifact", "to": "ExamPrepNotesPlan"},
+    "VISUAL_AID_ATTACHED_TO": {"from": "PrepArtifact", "to": "GeneratedVisualAid"},
     "GENERATED_FROM_MCQ_POLICY": {"from": "PrepArtifact", "to": "MCQScoringPolicy"},
     "GENERATED_FROM_SHORT_ANSWER_VARIANT": {"from": "PrepArtifact", "to": "ShortAnswerVariant"},
     "GENERATED_FROM_ESSAY_COVERAGE_PLAN": {"from": "PrepArtifact", "to": "EssayCoveragePlan"},
@@ -171,6 +213,16 @@
       "id": "unreadable_source_no_factual_chain",
       "if_extraction_status": "unreadable",
       "forbid_link": "SUPPORTS_KP"
+    },
+    {
+      "id": "generated_visual_aid_no_claim_support",
+      "if_object_type": "GeneratedVisualAid",
+      "forbid_link": "SUPPORTS_CLAIM"
+    },
+    {
+      "id": "student_note_requires_verification_for_claim",
+      "if_source_trust_level": "student_or_unknown",
+      "forbid_link": "SUPPORTS_CLAIM_WITHOUT_VERIFICATION"
     }
   ],
   "action_types": {
@@ -184,6 +236,14 @@
     "BuildFragmentIndex": ["FragmentPartition"],
     "BuildLectureModules": ["LectureModule", "QAFlag"],
     "BuildKnowledgeWalkthroughPlan": ["KnowledgeWalkthroughPlan"],
+    "ReconstructCourseSections": ["CourseSection", "QAFlag"],
+    "MapLectureSessions": ["LectureSession"],
+    "BuildLectureConceptModules": ["LectureConceptModule", "QAFlag"],
+    "BuildExamEmphasisProfile": ["ExamEmphasisProfile", "QAFlag"],
+    "BuildExamPrepNotesPlan": ["ExamPrepNotesPlan", "QAFlag"],
+    "BuildQuestionTypeAddOns": ["QuestionTypeAddOn", "QAFlag"],
+    "PlanVisualAid": ["VisualAidSpec", "QAFlag"],
+    "GenerateVisualAid": ["GeneratedVisualAid", "QAFlag"],
     "NormalizeTargetGroup": ["SourceDocument"],
     "SplitExamRegime": ["AssessmentRegime", "ExamBlueprint"],
     "ExtractPastPaperQuestions": ["PastPaperQuestion"],
@@ -211,6 +271,10 @@
     "source_coverage_visible_before_generation",
     "workflow_plan_precedes_execution",
     "student_facing_output_filter_applied",
+    "exam_prep_notes_reconstruct_before_rewrite",
+    "student_or_unknown_note_requires_verification_for_factual_claim",
+    "question_type_addon_after_base_notes",
+    "generated_visual_aid_is_not_evidence",
     "knowledge_walkthrough_docx_is_lecture_first",
     "question_type_reports_hide_internal_reasoning",
     "blocking_gap_asks_one_question_or_marks_blocked",
@@ -233,6 +297,7 @@
     "output_view_selection": ["user_request", "source_coverage_map", "allowed_artifact_policy", "minimum_dependencies"],
     "workflow_plan_preview": ["request_scope", "selected_preset", "target_group_key", "actions", "skipped_modules", "blockers", "publish_gate"],
     "student_output_filter": ["internal_objects", "student_visible_structure", "forbidden_student_fields", "output_mode"],
+    "exam_prep_notes_docx": ["course_sections", "lecture_mapping", "knowledge_cards", "exam_emphasis_profile", "question_type_addons", "optional_visual_aids", "forbidden_student_fields"],
     "knowledge_walkthrough_docx": ["lecture_order", "lecture_overview", "module_map", "lecture_modules", "lecture_recap", "forbidden_student_fields"],
     "essay_exam_prep": ["current_regime", "essay_archetype", "compatible_kps", "lecture_scope", "module_example_essays", "adaptation_map", "qa_flags"],
     "mcq_exam_prep": ["mcq_archetype", "point_cards", "common_traps", "must_remember", "student_field_filter"],

@@ -8,6 +8,7 @@
     "contract_id": { "type": "string" },
     "output_mode": {
       "enum": [
+        "exam_prep_notes_docx",
         "knowledge_walkthrough_docx",
         "mcq_exam_prep",
         "short_answer_exam_prep",

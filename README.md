@@ -1,6 +1,6 @@
 # Everything Exam Preparation
 
-`everything-exam-preparation` is the Codex Skill in this repository. It turns a student's exam materials into Word-first, evidence-grounded revision artifacts: a lecture knowledge walkthrough plus question-type add-on reports for MCQ, Short Answer, Long Answer/Project/Scenario, and Essay exams.
+`everything-exam-preparation` is the Codex Skill in this repository. It turns a student's exam materials into Word-first, evidence-grounded revision artifacts: Academic Exam-Ready Notes plus question-type add-on reports for MCQ, Short Answer, Long Answer/Project/Scenario, and Essay exams.
 
 The Skill name follows the GitHub repository name in Codex-safe lowercase hyphen form. The workflow itself is course-agnostic: it must learn from uploaded materials and validated sources, not from hard-coded course, topic, or example names.
 
@@ -8,9 +8,9 @@ The project exists because exam preparation is not one task. The correct output 
 
 ## What This Skill Does
 
-The Skill reads the supplied materials, classifies their evidence role, detects the relevant exam format, and organises examinable knowledge first. The default route for general lecture review is a Word-first `Lecture Knowledge Walkthrough DOCX`: it follows lecture order, splits content into conceptual modules, and explains the knowledge in directly revisable prose.
+The Skill reads the supplied materials, classifies their evidence role, detects the relevant exam format, and organises examinable knowledge first. The default route for general revision is `exam_prep_notes_docx`: it accepts readable ordered course notes, ranks source authority, reconstructs course sections, uses formal past papers for emphasis when available, and writes Academic Exam-Ready Notes in the compatible public artifact `Lecture_Knowledge_Walkthrough.docx`.
 
-Question-type routes are add-ons to that knowledge walkthrough: MCQ Exam Analysis Report, Short Answer Exam Analysis Report, Long Answer/Project/Scenario Report, and Essay Module Example Essays. Past-paper analysis is used as a chat-only pre-generation brief to guide those outputs. Excel workbooks and public prediction workbooks are no longer student-facing output routes.
+Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report, Short Answer Exam Analysis Report, Long Answer/Project/Scenario Report, and Essay Module Example Essays. `knowledge_walkthrough_docx` remains a compatibility route for explicitly lecture-first walkthroughs. Past-paper analysis is used as a chat-only pre-generation brief to guide outputs. Excel workbooks and public prediction workbooks are no longer student-facing output routes.
 
 The invariant is that process helper files stay separate. Public outputs may include any requested student-facing artifact, but run manifests, source maps, QA JSON, lineage files, citation logs, rendered previews, and other internal validation files must not be mixed into the student-facing folder unless the user explicitly requests an audit package.
 
@@ -35,7 +35,7 @@ Example Essay outputs are revision exemplars. They are not submission-ready asse
 The Skill is designed around one first-principles chain:
 
 ```text
-inputs -> exam format -> question type -> examiner operation -> knowledge point -> preparation output
+inputs -> source authority -> exam format -> question type -> examiner operation -> course-section reconstruction -> knowledge point -> preparation output
 ```
 
 It is not a topic-hotness predictor. Frequency and recency are useful signals, but the main task is to infer how the examiner asks, what kind of reasoning the question rewards, and what preparation artefact best matches that strategy.
@@ -52,8 +52,8 @@ This makes the workflow configurable and auditable. The Skill first decides the 
 
 | Area | Behaviour |
 | --- | --- |
-| Default route | `knowledge_walkthrough_docx`, a Word-first lecture walkthrough. |
-| Question-type routes | MCQ, Short Answer, Long Answer/Project/Scenario, and Essay add-ons built on top of the walkthrough. |
+| Default route | `exam_prep_notes_docx`, Academic Exam-Ready Notes in `Lecture_Knowledge_Walkthrough.docx`. |
+| Question-type routes | MCQ, Short Answer, Long Answer/Project/Scenario, and Essay add-ons built on top of the base notes. |
 | Prediction route | Chat-only Exam Analysis Brief for module/point selection, not a public prediction file. |
 | Planning layer | `SkillConfig -> WorkflowPlan -> InputReadinessReport`. |
 | Evidence model | Each source has a role and a limit before it can support a claim. |
@@ -66,7 +66,7 @@ The package is intentionally layered:
 
 ```text
 SKILL.md -> route selection, hard boundaries, reference navigation
-references/ -> detailed protocols for evidence, routing, outputs, essays, QA, and release
+references/ -> protocol layer for evidence, Academic Exam-Ready Notes, routing, outputs, essays, visual aids, QA, and release
 schemas/ -> typed contracts for configs, plans, objects, claims, outputs, and lineage
 scripts/ -> deterministic planning, generation, linting, audit, and release checks
 benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour only
@@ -79,8 +79,8 @@ benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour onl
 1. Classify source files by role, trust level, extraction quality, and evidence limits.
 2. Diagnose the exam format and split incompatible exam regimes before comparing papers.
 3. Classify question types before choosing a preparation strategy.
-4. Convert source fragments into knowledge points and examiner operations.
-5. Select the walkthrough plus any question-type add-on that matches the evidence and requested artifact.
+4. Convert source fragments into reconstructed course sections, knowledge points, and examiner operations.
+5. Select Academic Exam-Ready Notes or the explicit lecture-first walkthrough plus any question-type add-on that matches the evidence and requested artifact.
 6. Rewrite internal reasoning into student-facing revision content.
 7. Run QA so unsupported claims and process helper files do not enter the final public output.
 
@@ -153,8 +153,8 @@ The Skill treats each non-trivial run as a small auditable data product. Interna
 ```text
 Bronze: source inventory, extraction status, source hashes
 Silver: source fragments, fragment partitions, past-paper question records
-Gold: knowledge points, examiner operations, archetypes, evidence claims, QA flags
-Serving: knowledge walkthrough DOCX, question-type report DOCX, direct answer, optional audit package
+Gold: course sections, knowledge points, examiner operations, archetypes, evidence claims, QA flags
+Serving: Academic Exam-Ready Notes DOCX, compatibility walkthrough DOCX, question-type report DOCX, direct answer, optional audit package
 ```
 
 The publish gate is:
@@ -171,18 +171,19 @@ This is implemented with a fragment metadata index, a runtime ontology validator
 
 ## Output Routes
 
-Choose one mode, or provide materials and ask for exam prep. General lecture-review requests use `full_workflow`, which resolves to the Word-first lecture walkthrough route. Question-type prep modes add a second DOCX report on top of the walkthrough unless the user explicitly opts out.
+Choose one mode, or provide materials and ask for exam prep. General revision requests use `full_workflow`, which resolves to `exam_prep_notes_docx`. Question-type prep modes add a second DOCX report on top of the base notes unless the user explicitly opts out.
 
 | Mode | Use when | Output |
 | --- | --- | --- |
-| `full_workflow` | You want the default lecture-review workflow. | Source coverage card plus Lecture Knowledge Walkthrough DOCX. |
+| `full_workflow` | You want the default revision workflow. | Source coverage card plus Academic Exam-Ready Notes in `Lecture_Knowledge_Walkthrough.docx`. |
 | `source_inventory` | You only want file roles and extraction status. | Source inventory and evidence-use limits. |
 | `exam_format_diagnosis` or `exam_analysis_brief` | You want exam/past-paper analysis before file generation. | Chat-only exam analysis brief; no prediction file. |
-| `knowledge_walkthrough_docx` | You want to go through lecture knowledge in order. | Lecture-first Word walkthrough with module overviews, knowledge walkthroughs, key logic, common confusions, and recap. |
-| `mcq_exam_prep` | You need MCQ-focused preparation. | Walkthrough plus MCQ Point Card report. |
-| `short_answer_exam_prep` | You need short-answer preparation. | Walkthrough plus module logic, point cards, highlighted keywords, and Example Answers. |
-| `long_answer_project_scenario_prep` | You need practical, data, project, scenario, method, case, or long-answer prep. | Walkthrough plus question analysis, answer order, reusable blocks, Example Answer, and adaptation notes. |
-| `essay_exam_prep` | You need essay preparation. | Walkthrough plus module-level big Example Essays with adaptation maps and paragraph banks. |
+| `exam_prep_notes_docx` | You want notes, revision, exam-prep notes, or to go through the material generally. | Exam-informed Academic Exam-Ready Notes in the compatible Word artifact. |
+| `knowledge_walkthrough_docx` | You explicitly want to go through lecture knowledge in source order. | Lecture-first Word walkthrough with module overviews, knowledge walkthroughs, key logic, common confusions, and recap. |
+| `mcq_exam_prep` | You need MCQ-focused preparation. | Base notes plus MCQ Point Card report. |
+| `short_answer_exam_prep` | You need short-answer preparation. | Base notes plus module logic, point cards, highlighted keywords, and Example Answers. |
+| `long_answer_project_scenario_prep` | You need practical, data, project, scenario, method, case, or long-answer prep. | Base notes plus question analysis, answer order, reusable blocks, Example Answer, and adaptation notes. |
+| `essay_exam_prep` | You need essay preparation. | Base notes plus module-level big Example Essays with adaptation maps and paragraph banks. |
 | `evidence_gap_audit` | You want to know what is missing. | Source coverage, blockers, unresolved conflicts, next-source checklist. |
 | `incremental_refresh` | You add new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects and artifacts are refreshed. |
 
@@ -208,11 +209,12 @@ The planning layer supports these presets:
 | --- | --- | --- |
 | `source_inventory_only` | any readable source | file classification and evidence limits |
 | `exam_format_diagnosis` | formal past papers | chat-only exam analysis brief |
-| `knowledge_walkthrough_docx` | lecture slides or official notes | default Word walkthrough |
-| `mcq_exam_prep` | lecture slides or official notes | walkthrough plus MCQ report |
-| `short_answer_exam_prep` | lecture slides or official notes | walkthrough plus Short Answer report |
-| `long_answer_project_scenario_prep` | lecture slides or official notes | walkthrough plus long-answer/project/scenario report |
-| `essay_exam_prep` | lecture slides or official notes | walkthrough plus module-level Example Essays |
+| `exam_prep_notes_docx` | readable course notes, with factual authority limits | default Academic Exam-Ready Notes |
+| `knowledge_walkthrough_docx` | lecture slides or official notes | compatibility lecture-first walkthrough |
+| `mcq_exam_prep` | lecture slides or official notes | base notes plus MCQ report |
+| `short_answer_exam_prep` | lecture slides or official notes | base notes plus Short Answer report |
+| `long_answer_project_scenario_prep` | lecture slides or official notes | base notes plus long-answer/project/scenario report |
+| `essay_exam_prep` | lecture slides or official notes | base notes plus module-level Example Essays |
 | `audit_lint_only` | none | requested checks only |
 | `github_ready_qa` | none | repository release gate |
 
@@ -222,14 +224,15 @@ The setup protocol is in [`references/interactive_setup_protocol.md`](references
 
 Student-facing outputs are Word-first. The selected route controls which DOCX artifacts are produced. The hard rule is that internal helper and QA files are not mixed into ordinary student-facing output.
 
-Default lecture-review output is a Word-first revision walkthrough. Complete Example Essays are generated only when explicitly requested.
+Default revision output is Academic Exam-Ready Notes in a Word artifact. Complete Example Essays are generated only when explicitly requested.
 
 Typical student-facing outputs:
 
 | Request type | Main output | Purpose |
 | --- | --- | --- |
 | Source inventory | JSON or concise report | Identify files, roles, extraction status, and evidence limits. |
-| Lecture knowledge walkthrough | `Lecture_Knowledge_Walkthrough.docx` | Go through lectures in order through AI-inferred conceptual modules. |
+| General revision / exam-prep notes | `Lecture_Knowledge_Walkthrough.docx` | Build Academic Exam-Ready Notes from source authority, course-section reconstruction, and optional exam emphasis. |
+| Explicit lecture-order walkthrough | `Lecture_Knowledge_Walkthrough.docx` | Go through lectures in order through AI-inferred conceptual modules. |
 | Exam analysis brief | Chat-only pre-generation note | Use paper patterns to choose modules and points without creating a prediction file. |
 | Essay/problem-essay prep | `Essay_Module_Example_Essays.docx` | Prepare module-level big Example Essays with adaptation maps and paragraph banks. |
 | MCQ prep | MCQ Point Cards and optional separate practice packs | Train recognition of close alternatives, common distractors, and expected-value answer strategy. |
@@ -249,14 +252,16 @@ flowchart TD
     E --> F[Exam-regime split]
     F --> G[Question-type classification]
     G --> H[Exam strategy diagnosis]
-    H --> I[Knowledge-point segmentation]
-    I --> J[Examiner-operation inference]
-    J --> K{Output route}
-    K --> L[Lecture Knowledge Walkthrough DOCX]
-    K --> M[MCQ Exam Analysis Report DOCX]
-    K --> N[Short Answer Exam Analysis Report DOCX]
-    K --> O[Long-answer / project / scenario report DOCX]
-    K --> Q[Essay Module Example Essays DOCX]
+    H --> I[Course-section reconstruction]
+    I --> J[Knowledge-point segmentation]
+    J --> K[Examiner-operation inference]
+    K --> R[Exam-ready notes plan]
+    R --> S{Output route}
+    S --> L[Lecture Knowledge Walkthrough DOCX]
+    S --> M[MCQ Exam Analysis Report DOCX]
+    S --> N[Short Answer Exam Analysis Report DOCX]
+    S --> O[Long-answer / project / scenario report DOCX]
+    S --> Q[Essay Module Example Essays DOCX]
     L --> P[Language, source, identity, and deliverable QA]
     M --> P
     N --> P
@@ -299,9 +304,11 @@ For Short Answer reports, each section starts with module logic, then point card
 
 The full policy is in [`references/student_facing_output_policy.md`](references/student_facing_output_policy.md).
 
-## Knowledge Walkthrough DOCX
+## Exam Prep Notes And Knowledge Walkthrough
 
-The `knowledge_walkthrough_docx` route is for going through lecture content. It does not predict papers, write essays, or create practice packs by default.
+The `exam_prep_notes_docx` route is the default for general revision. It accepts readable ordered course notes, verifies source authority, reconstructs course sections, maps lecture sessions, writes Academic Exam-Ready Notes, and may append question-type add-ons after the base notes. It does not create helper files in the student-facing folder.
+
+The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It does not predict papers, write essays, or create practice packs by default.
 
 Each lecture becomes:
 
@@ -324,7 +331,7 @@ Common Confusions
 Must Master
 ```
 
-The route is defined in [`references/knowledge_walkthrough_docx_protocol.md`](references/knowledge_walkthrough_docx_protocol.md).
+The default notes route is defined in [`references/exam_prep_notes_protocol.md`](references/exam_prep_notes_protocol.md). The compatibility lecture-first route is defined in [`references/knowledge_walkthrough_docx_protocol.md`](references/knowledge_walkthrough_docx_protocol.md).
 
 ## Exam Analysis Brief
 
@@ -477,7 +484,7 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | --- | --- |
 | `SKILL.md` | Top-level Codex Skill instructions and output contract. |
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
-| `references/` | Protocols for evidence handling, routing, planning, student-facing filters, language quality, Example Essays, legacy internal workbook compatibility, regression, and release. |
+| `references/` | Protocols for evidence handling, routing, Academic Exam-Ready Notes, visual aids, planning, student-facing filters, language quality, Example Essays, legacy internal workbook compatibility, regression, and release. |
 | `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, DOCX generation, student-output linting, language linting, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
 | `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, student output contracts, knowledge walkthrough plans, Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
@@ -489,10 +496,12 @@ Key public contracts:
 | Contract | File |
 | --- | --- |
 | Student-facing output filter | `references/student_facing_output_policy.md` |
-| Lecture walkthrough route | `references/knowledge_walkthrough_docx_protocol.md` |
+| Default Academic Exam-Ready Notes route | `references/exam_prep_notes_protocol.md` |
+| Compatibility lecture walkthrough route | `references/knowledge_walkthrough_docx_protocol.md` |
 | Setup and planning route | `references/interactive_setup_protocol.md` |
 | Exam-analysis brief route | `references/past_paper_prediction_protocol.md` |
 | Example Essay route | `references/essay_generation_protocol.md` and `references/example_essay_docx_output_protocol.md` |
+| Optional visual-aid route | `references/visual_aid_generation_protocol.md` |
 | Release gate | `references/github_release_protocol.md` |
 
 ## Install
@@ -519,7 +528,7 @@ The scripts are plain Python files. Extraction and DOCX quality depend on the in
 
 ## Command Catalog
 
-Generate a Lecture Knowledge Walkthrough DOCX:
+Generate a compatibility Lecture Knowledge Walkthrough DOCX:
 
 ```bash
 python scripts/generate_knowledge_walkthrough_docx.py \

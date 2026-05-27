@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 REQUIRED_FILES = [
     "references/student_facing_output_policy.md",
+    "references/exam_prep_notes_protocol.md",
     "references/knowledge_walkthrough_docx_protocol.md",
     "schemas/student_output_contract.schema.json",
     "schemas/knowledge_walkthrough_plan.schema.json",
@@ -20,7 +21,7 @@ REQUIRED_FILES = [
     "scripts/knowledge_walkthrough_linter.py",
 ]
 
-REQUIRED_PRESET = "knowledge_walkthrough_docx"
+REQUIRED_PRESETS = {"knowledge_walkthrough_docx", "exam_prep_notes_docx"}
 
 FORBIDDEN_VISIBLE_FIELDS = {
     "source_anchor",
@@ -57,17 +58,20 @@ def validate(root: Path) -> dict[str, Any]:
         enum = set(schema.get("properties", {}).get("output_mode", {}).get("properties", {}).get("preset", {}).get("enum", []))
         if schema_name == "workflow_plan":
             enum = set(schema.get("properties", {}).get("selected_preset", {}).get("enum", []))
-        if REQUIRED_PRESET not in enum:
-            failures.append({"type": "missing_knowledge_walkthrough_preset", "schema": schema_name})
+        for required_preset in sorted(REQUIRED_PRESETS):
+            if required_preset not in enum:
+                failures.append({"type": "missing_student_output_preset", "preset": required_preset, "schema": schema_name})
 
     plan_text = read(root / "scripts/plan_workflow.py")
-    if REQUIRED_PRESET not in plan_text:
-        failures.append({"type": "planner_missing_knowledge_walkthrough"})
+    for required_preset in sorted(REQUIRED_PRESETS):
+        if required_preset not in plan_text:
+            failures.append({"type": "planner_missing_student_output_preset", "preset": required_preset})
 
     policy = read(root / "references/student_facing_output_policy.md")
+    exam_prep_notes = read(root / "references/exam_prep_notes_protocol.md")
     walkthrough = read(root / "references/knowledge_walkthrough_docx_protocol.md")
-    combined = policy + "\n" + walkthrough
-    for term in ["MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap"]:
+    combined = policy + "\n" + exam_prep_notes + "\n" + walkthrough
+    for term in ["ExamPrepNotesStudentContract", "Academic Exam-Ready Notes", "MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap"]:
         if term not in combined:
             failures.append({"type": "student_policy_missing_term", "term": term})
     for field in sorted(FORBIDDEN_VISIBLE_FIELDS):

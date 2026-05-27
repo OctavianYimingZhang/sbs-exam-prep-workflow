@@ -8,12 +8,25 @@ prompt_cards:
       - "Do not infer hidden content from unreadable or unsupported files."
     hard_stops:
       - "No supplied or discoverable sources."
+  - card_id: "exam_prep_notes_docx"
+    preset: "exam_prep_notes_docx"
+    purpose: "Build exam-informed Academic Exam-Ready Notes for general revision."
+    minimum_inputs: ["readable_course_notes"]
+    output_contract:
+      - "Generate Lecture_Knowledge_Walkthrough.docx as the compatible public artifact."
+      - "Accept readable ordered course notes, but use only official or verified sources for factual claims."
+      - "Use past papers for emphasis only when supplied; do not invent exam frequency."
+      - "Append question-type add-ons only after the base notes."
+      - "Generated visual aids are optional revision schematics, not evidence."
+    hard_stops:
+      - "No lecture slides, official notes, or verified course notes."
+      - "Blocking evidence or student-output QA flag."
   - card_id: "mcq_exam_prep"
     preset: "mcq_exam_prep"
-    purpose: "Build the lecture walkthrough plus a student-facing MCQ point-card report."
+    purpose: "Build Academic Exam-Ready Notes plus a student-facing MCQ point-card report."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
-      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate Academic Exam-Ready Notes as the foundation."
       - "Generate MCQ Exam Analysis Report DOCX using point cards only."
       - "Do not expose source anchors, confidence, discriminator axes, answer keys, practice questions, or contrast tables."
     hard_stops:
@@ -21,7 +34,7 @@ prompt_cards:
       - "Blocking ontology or language QA flag."
   - card_id: "knowledge_walkthrough_docx"
     preset: "knowledge_walkthrough_docx"
-    purpose: "Build a lecture-first Word walkthrough for revising the lecture knowledge in order."
+    purpose: "Build a compatibility lecture-first Word walkthrough for revising lecture knowledge in source order."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
       - "Preserve lecture order."
@@ -32,20 +45,20 @@ prompt_cards:
       - "No lecture slides or official notes."
   - card_id: "short_answer_exam_prep"
     preset: "short_answer_exam_prep"
-    purpose: "Build the lecture walkthrough plus short-answer point cards and Example Answers."
+    purpose: "Build Academic Exam-Ready Notes plus short-answer point cards and Example Answers."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
-      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate Academic Exam-Ready Notes as the foundation."
       - "Generate module logic, point cards, highlighted keywords, and Example Answers."
       - "Do not expose mark-producing schema, source anchors, confidence, task verbs, or reference expansion."
     hard_stops:
       - "No lecture slides or official notes."
   - card_id: "long_answer_project_scenario_prep"
     preset: "long_answer_project_scenario_prep"
-    purpose: "Build the lecture walkthrough plus a long-answer/project/scenario report with analysis and Example Answer."
+    purpose: "Build Academic Exam-Ready Notes plus a long-answer/project/scenario report with analysis and Example Answer."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
-      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate Academic Exam-Ready Notes as the foundation."
       - "Generate question analysis, answer order, reusable answer blocks, Example Answer, and adaptation notes."
       - "Do not expose evidence rationale, confidence, recurrence, or source anchors."
     hard_stops:
@@ -55,7 +68,7 @@ prompt_cards:
     purpose: "Produce module-level Example Essays from verified source logic for essay exams."
     minimum_inputs: ["lecture_or_official_notes"]
     output_contract:
-      - "Generate Lecture Knowledge Walkthrough DOCX as the foundation."
+      - "Generate Academic Exam-Ready Notes as the foundation."
       - "Generate module-level big Example Essays with adaptation maps and paragraph banks."
       - "Verify citations or use an explicit classic-study fallback plan."
       - "Run DOCX formatting and language lint before delivery."

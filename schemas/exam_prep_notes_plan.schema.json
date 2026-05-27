@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/everything-exam-preparation/exam_prep_notes_plan.schema.json",
+  "title": "ExamPrepNotesPlan",
+  "type": "object",
+  "required": [
+    "notes_plan_id",
+    "target_group_key",
+    "course_sections",
+    "lecture_mapping",
+    "knowledge_cards",
+    "question_type_addons",
+    "student_visible_structure",
+    "forbidden_student_fields",
+    "qa_status"
+  ],
+  "properties": {
+    "notes_plan_id": { "type": "string" },
+    "target_group_key": { "type": "string" },
+    "course_sections": { "type": "array", "items": { "type": "string" } },
+    "lecture_mapping": { "type": "array", "items": { "type": "string" } },
+    "knowledge_cards": { "type": "array", "items": { "type": "object" } },
+    "question_type_addons": { "type": "array", "items": { "type": "object" } },
+    "optional_visual_aids": { "type": "array", "items": { "type": "string" } },
+    "student_visible_structure": { "type": "array", "items": { "type": "string" } },
+    "forbidden_student_fields": { "type": "array", "items": { "type": "string" } },
+    "qa_status": { "enum": ["pass", "warn", "block"] }
+  },
+  "additionalProperties": true
+}

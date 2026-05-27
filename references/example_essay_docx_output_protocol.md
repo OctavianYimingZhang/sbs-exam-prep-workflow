@@ -6,7 +6,7 @@ Use this protocol when Essay Exam Prep or Example Essay Mode is explicitly reque
 
 Do not trigger this DOCX protocol for MCQ, short-answer, long-answer/project/scenario, prediction-only, or ordinary lecture-walkthrough requests.
 
-The normal default lecture-review workflow is `knowledge_walkthrough_docx`. Essay prep is a DOCX add-on built on top of the lecture walkthrough unless the user explicitly opts out.
+The normal default revision workflow is `exam_prep_notes_docx`. Essay prep is a DOCX add-on built on top of the Academic Exam-Ready Notes artifact unless the user explicitly opts out. `knowledge_walkthrough_docx` remains available only when the user explicitly requests a lecture-first walkthrough.
 
 ## Primary Output
 

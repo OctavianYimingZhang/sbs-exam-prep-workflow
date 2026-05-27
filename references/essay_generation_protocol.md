@@ -51,6 +51,8 @@ ExampleEssayMode:
 
 The final user-facing answer should expose requested artefacts and keep internal helper files out, while the essay itself must visibly follow the internal plan.
 
+Optional visual aids may be planned only after the essay or notes text is source-backed. Generated schematics are revision aids, not evidence, citations, official figures, or replacements for written analysis. Follow `visual_aid_generation_protocol.md`; skip the visual-aid layer when generation is unavailable or when the concept does not benefit from a schematic.
+
 Do not:
 
 - write from memory;
@@ -704,6 +706,8 @@ claim -> mechanism/process/evidence -> consequence
 ```
 
 Write the answer paragraph itself, not instructions about writing. Do not narrate slides or pages. Do not preserve coverage by page-by-page summary.
+
+For `exam_prep_notes_docx`, use essay-ready paragraph blocks as an add-on layer only. Do not generate full Example Essays unless the user explicitly requests essay preparation, model essays, full essay-style answers, or complete essay documents.
 
 ## QA Flags
 

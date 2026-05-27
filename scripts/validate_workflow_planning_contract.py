@@ -20,6 +20,10 @@ REQUIRED_FILES = [
     "schemas/workflow_plan.schema.json",
     "schemas/input_readiness_report.schema.json",
     "schemas/knowledge_walkthrough_plan.schema.json",
+    "schemas/exam_prep_notes_plan.schema.json",
+    "schemas/exam_emphasis_profile.schema.json",
+    "schemas/question_type_addon.schema.json",
+    "schemas/visual_aid_spec.schema.json",
     "schemas/run_status.schema.json",
     "schemas/student_output_contract.schema.json",
     "schemas/prompt_card.schema.json",
@@ -33,12 +37,15 @@ REQUIRED_FILES = [
     "references/interactive_setup_protocol.md",
     "references/best_usage_guide.md",
     "references/student_facing_output_policy.md",
+    "references/exam_prep_notes_protocol.md",
+    "references/visual_aid_generation_protocol.md",
     "references/knowledge_walkthrough_docx_protocol.md",
 ]
 
 REQUIRED_PRESETS = {
     "source_inventory_only",
     "exam_format_diagnosis",
+    "exam_prep_notes_docx",
     "knowledge_walkthrough_docx",
     "mcq_exam_prep",
     "short_answer_exam_prep",
