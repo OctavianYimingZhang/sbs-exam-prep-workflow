@@ -23,7 +23,7 @@ User request -> SkillConfig -> WorkflowPlan -> InputReadinessReport -> OutputVie
 
 ## Mode Selector
 
-Classify the request into one mode before deep analysis:
+Classify the request into one mode before deep analysis. This table is the authoritative route selector for `SKILL.md`, `interactive_setup_protocol.md`, and `best_usage_guide.md`.
 
 | Mode | Use when | Main output |
 | --- | --- | --- |

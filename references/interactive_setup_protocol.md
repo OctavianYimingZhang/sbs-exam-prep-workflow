@@ -40,18 +40,7 @@ Use `schemas/skill_config.schema.json` as the shape contract. If a field is unkn
 
 ## Preset Selection
 
-Use the narrowest preset that can answer the user's request:
-
-| User need | Preset |
-| --- | --- |
-| File roles and evidence limits only | `source_inventory_only` |
-| Exam sections, question types, and answer rules | `exam_format_diagnosis` |
-| Default lecture knowledge review | `knowledge_walkthrough_docx` |
-| MCQ strategy and content drills | `mcq_exam_prep` |
-| Short-answer variants and Example Answers | `short_answer_exam_prep` |
-| Practical, graph, data, case, protocol, calculation, scenario, project, or long-answer prep | `long_answer_project_scenario_prep` |
-| Essay preparation or complete Example Essays | `essay_exam_prep` |
-| Checks only | `audit_lint_only` or `github_ready_qa` |
+Use the mode selector and mode-to-preset mapping in `references/user_interaction_protocol.md` as the source of truth. This setup protocol should only instantiate the selected preset into `SkillConfig`, `WorkflowPlan`, and `InputReadinessReport`.
 
 Do not generate a DOCX report when a narrower audit, inventory, or format diagnosis is sufficient. Do not use legacy Excel workbook paths as public output routes.
 

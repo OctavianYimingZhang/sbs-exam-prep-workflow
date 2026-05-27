@@ -60,6 +60,20 @@ This makes the workflow configurable and auditable. The Skill first decides the 
 | Public boundary | Student-facing artifacts are separated from internal helper and QA files. |
 | Release gate | Local validation, identity-trigger linting, public-output linting, and repository QA. |
 
+## Skill Package Architecture
+
+The package is intentionally layered:
+
+```text
+SKILL.md -> route selection, hard boundaries, reference navigation
+references/ -> detailed protocols for evidence, routing, outputs, essays, QA, and release
+schemas/ -> typed contracts for configs, plans, objects, claims, outputs, and lineage
+scripts/ -> deterministic planning, generation, linting, audit, and release checks
+benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour only
+```
+
+`SKILL.md` is the router, not the full manual. It should decide the narrowest valid route, enforce source and output boundaries, and load only the relevant reference files. Detailed rules for Example Essays, DOCX formatting, question-type reports, and release checks live in `references/` so trigger logic stays readable and harder to misapply.
+
 ## Core Workflow
 
 1. Classify source files by role, trust level, extraction quality, and evidence limits.
