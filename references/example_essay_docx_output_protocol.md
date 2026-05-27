@@ -180,6 +180,35 @@ Fail or flag the essay if:
 - the insertion pushes Extra Reading above the allowed ratio.
 - the insertion is true but not needed for the question.
 
+## Compression Budget Source Map
+
+When an Example Essay is compressed after citation and Extra Reading integration, the source map should preserve the internal compression budget so QA can distinguish safe concision from content loss.
+
+```yaml
+compression_budget:
+  current_word_count:
+  requested_reduction:
+    type: percent | words | unspecified
+    value:
+  protected_source_skeleton:
+    - source-grounded claim, mechanism, evidence, limitation, comparison, or synthesis item
+  protected_academic_details:
+    - citation-supported named detail or examiner-relevant distinction
+  removable_redundancy:
+    - repeated framing
+    - duplicated restatement
+    - overlong transition
+    - low-value background
+  safe_reduction_range:
+    min:
+    max:
+  unsafe_threshold:
+  decision: compress_within_safe_range | partial_compression_only | reject_requested_reduction
+  reason:
+```
+
+Fail or flag the essay if a requested compression target is followed after the budget says it is unsafe, a protected source-skeleton item disappears, or final visible prose leaks process language such as percentage-compression decisions.
+
 ## Extra Reading Ratio
 
 If relevant Extra Reading Books are uploaded:

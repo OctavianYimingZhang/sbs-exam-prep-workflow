@@ -57,6 +57,15 @@ HOW_TO_WRITE = [
             re.I,
         ),
     ),
+    (
+        "mechanical_compression_trace",
+        re.compile(
+            r"\b(?:compressed|compress(?:ion|ing)?|reduce(?:d)?|cut)\s+(?:by|about|around|approximately)?\s*\d{1,3}%\b|"
+            r"\b(?:target|safe|lossless)\s+word[-\s]?count\b|"
+            r"\b(?:safe|lossless)\s+compression\s+(?:range|budget|limit)\b",
+            re.I,
+        ),
+    ),
 ]
 
 WEAK_OPENERS = re.compile(r"^\s*(background|introduction|firstly|secondly|thirdly|to begin with)\b[:,]?", re.I)

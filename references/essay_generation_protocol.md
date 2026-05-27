@@ -34,6 +34,7 @@ ExampleEssayMode:
   paragraph_plan:
   first_draft:
   citation_and_extra_reading_integration:
+  compression_budget_estimate:
   expression_efficiency_compression_pass:
   accuracy_preservation_pass:
   analytic_argument_pass:
@@ -278,6 +279,39 @@ Run citation and Extra Reading integration before final compression. If the essa
 
 Compression is not a word-count operation. It is an exam-preparation efficiency operation: maximise useful examinable knowledge per word while preserving mechanism accuracy.
 
+Before compressing, estimate the safe compression budget. Do not apply a requested percentage mechanically. A 30% reduction is valid only if the removable material is genuinely redundant after the source skeleton, evidence, citation-supported details, and analytic limitations are protected.
+
+Use a `CompressionBudgetEstimate` internally:
+
+```yaml
+CompressionBudgetEstimate:
+  current_word_count:
+  requested_reduction:
+    type: percent | words | unspecified
+    value:
+  protected_source_skeleton:
+    - core source claim, mechanism, evidence, comparison, limitation, or synthesis item that cannot be deleted
+  protected_academic_details:
+    - named evidence, citation-supported mechanism detail, or examiner-relevant distinction that should be kept or compressed but not removed
+  removable_redundancy:
+    - repeated framing
+    - duplicated source/evidence restatement
+    - overlong transition
+    - low-value background
+    - repeated synthesis list
+  safe_reduction_range:
+    min:
+    max:
+  unsafe_threshold:
+  decision:
+    - compress_within_safe_range
+    - partial_compression_only
+    - reject_requested_reduction
+  reason:
+```
+
+Compression targets must be content-derived. If a requested reduction would remove a protected item, use the largest safe reduction instead and record that the requested target exceeds the safe compression budget.
+
 A sentence should stay only if it performs at least one of these functions:
 
 - states the paragraph claim;
@@ -316,6 +350,8 @@ Keep:
 
 Do not compress by simply shortening every sentence. Compress by deciding what function each sentence performs.
 
+Protected material may still be made more concise, but it must remain present. For example, a named interneuron set, citation-supported cell identity, experiment condition, or timing result can be compressed into a tighter clause when it is examiner-relevant; it must not be deleted merely to hit a percentage target.
+
 ## Accuracy-Preserving Compression
 
 After compression, run an accuracy preservation pass. The compressed essay must preserve:
@@ -327,6 +363,8 @@ After compression, run an accuracy preservation pass. The compressed essay must 
 5. Evidence interpretation: experiments, examples, and figures must retain what they show and what they do not show.
 
 Reject compressed wording when it changes the claim scope, removes a required qualifier, or turns a support/modulation claim into a generation/proof claim.
+
+Also reject compressed drafts when the final answer has lost one of the protected source-skeleton items identified in the compression budget. Shorter wording is not acceptable if it reduces mechanism density, removes necessary evidence, or converts a discussion paragraph into a descriptive summary.
 
 ## Analytic Argument Pass
 
@@ -488,6 +526,9 @@ unnecessary_receptor_catalogue
 descriptive_list_without_analysis
 compression_changed_claim_scope
 compression_removed_required_qualifier
+compression_target_exceeds_safe_budget
+protected_source_skeleton_removed
+mechanical_compression_trace
 highlight_span_too_broad
 source_type_colour_mismatch
 lecture_logic_replaced_by_extra_reading
@@ -701,6 +742,9 @@ Add QA flags when needed:
 - `descriptive_list_without_analysis`;
 - `compression_changed_claim_scope`;
 - `compression_removed_required_qualifier`;
+- `compression_target_exceeds_safe_budget`;
+- `protected_source_skeleton_removed`;
+- `mechanical_compression_trace`;
 - `extra_reading_inserted_before_ppt_logic`;
 - `extra_reading_replaces_lecture_logic`;
 - `citation_added_without_paragraph_function`;
@@ -720,6 +764,7 @@ ExampleEssayOutput:
   paragraph_plan:
   detail_admission_matrix:
   citation_and_extra_reading_integration:
+  compression_budget_estimate:
   expression_efficiency_compression_pass:
   accuracy_preservation_pass:
   analytic_argument_pass:
@@ -735,7 +780,9 @@ ExampleEssayOutput:
     - no_true_but_unneeded_detail:
     - no_review_article_drift:
     - analytical_sentences_present:
+    - protected_source_skeleton_preserved:
     - compression_preserves_claim_scope:
+    - compression_inside_safe_budget:
     - compression_improves_expression_efficiency:
     - examples_used_as_evidence:
     - evidence_interpreted_not_listed:

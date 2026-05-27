@@ -322,6 +322,8 @@ class EssayTextRun:
     micro_detail_insert: bool = False
     original_phrase: str | None = None
     inserted_phrase: str | None = None
+    parent_ppt_or_source_slot: str | None = None
+    question_function: str | None = None
     claim_delta: str | None = None
     qa_status: str | None = None
 
@@ -346,6 +348,8 @@ class EssayTextRun:
         if self.micro_detail_insert:
             if self.source_type not in {"extra_reading_book", "citation_original_source", "classic_experiment_source"}:
                 errors.append("micro_detail_requires_verified_extra_source")
+            if not self.parent_ppt_or_source_slot:
+                errors.append("micro_detail_parent_slot_missing")
             if not self.source_anchor:
                 errors.append("micro_detail_insert_missing_source_anchor")
             if not self.inserted_phrase:

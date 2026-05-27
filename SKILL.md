@@ -316,6 +316,7 @@ knowledge inventory
 paragraph plan
 first draft
 citation and Extra Reading integration
+compression budget estimate
 expression-efficiency compression pass
 accuracy-preservation pass
 analytic argument pass
@@ -353,6 +354,8 @@ Example Essays must be PPT/source-anchored and study-efficient. Do not treat hig
 Before adding molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail, identify the parent lecture/PPT/source mechanism slot. If the source does not contain the parent slot, reject the detail unless the question explicitly requires that deeper level.
 
 Final compression must run after citation and Extra Reading integration. Compression is function filtering, not mechanical shortening. Preserve causal strength, scope qualifiers, model boundaries, and experimental interpretation. Reject compressed wording if it changes `adjusts`, `gates`, `entrains`, `stabilises`, `modulates`, `supports`, or `implicates` into `generates` or `proves` without source support.
+
+Before compressing, estimate the safe compression budget from the essay itself. Identify the protected source skeleton, protected evidence, and protected named academic details, then compress only expression redundancy and duplicated framing. Do not chase a requested percentage if it would remove the PPT/source skeleton, necessary examples, citation-supported details, or analytic limitations. If the user asks to compress further, make only the reductions still inside the safe budget and stop when the remaining savings would reduce answer quality.
 
 After the draft is coherent, run the sentence-level Extra Reading micro-detail pass before highlight planning. This pass does not rewrite the essay. It scans unhighlighted mechanism, evidence, and interpretation sentences whose parent mechanism is explicitly present in the PPT/source logic. Insert only a short verified named detail when it sharpens that source-derived slot without changing the claim level, scope, or exam function.
 

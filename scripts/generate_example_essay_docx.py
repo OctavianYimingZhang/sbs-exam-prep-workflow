@@ -43,6 +43,17 @@ def word_count(text: str) -> int:
     return len(re.findall(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?", text))
 
 
+def as_float(value: Any) -> float | None:
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        try:
+            return float(value.strip().rstrip("%"))
+        except ValueError:
+            return None
+    return None
+
+
 def paragraph_kind(paragraph: dict[str, Any]) -> str:
     if paragraph.get("is_title"):
         return "title"
@@ -106,6 +117,20 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     if not essay.get("lecture_anchors"):
         errors.append("essay_requires_lecture_anchors")
+    compression_budget = essay.get("compression_budget")
+    if isinstance(compression_budget, dict):
+        protected_source_skeleton = compression_budget.get("protected_source_skeleton") or []
+        if not protected_source_skeleton:
+            errors.append("compression_budget_missing_protected_source_skeleton")
+        requested = compression_budget.get("requested_reduction") or {}
+        requested_type = requested.get("type") if isinstance(requested, dict) else None
+        requested_value = as_float(requested.get("value")) if isinstance(requested, dict) else None
+        safe_range = compression_budget.get("safe_reduction_range") or {}
+        safe_max = as_float(safe_range.get("max")) if isinstance(safe_range, dict) else None
+        decision = compression_budget.get("decision")
+        if requested_type == "percent" and requested_value is not None and safe_max is not None and requested_value > safe_max:
+            if decision != "reject_requested_reduction":
+                errors.append("compression_target_exceeds_safe_budget")
     body_paragraphs = [p for p in essay.get("paragraphs", []) if paragraph_kind(p) == "body"]
     if not body_paragraphs:
         errors.append("essay_requires_body_paragraphs")
@@ -167,6 +192,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
         "target_group_key": essay.get("target_group_key"),
         "lecture_anchors": essay.get("lecture_anchors", []),
         "extra_reading_status": essay.get("extra_reading_status", "not_supplied"),
+        "compression_budget": essay.get("compression_budget"),
         "paragraphs": [],
         "qa_flags": qa_flags,
     }

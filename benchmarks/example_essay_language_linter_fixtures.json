@@ -57,6 +57,12 @@
       "text": "Because spinal networks can generate rhythmic motor output in reduced preparations, sensory feedback is unnecessary for locomotion. This compression removes the distinction between basic rhythm generation and feedback-dependent adjustment to load, speed and phase."
     },
     {
+      "id": "mechanical_compression_trace_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "This version has been compressed by 30% while preserving the main points. The target word count is lower, so the paragraph removes some evidence and keeps only the broad conclusion about spinal rhythm generation."
+    },
+    {
       "id": "claim_mechanism_good",
       "expected": "pass",
       "has_lecture_anchor": true,

@@ -62,6 +62,14 @@ Reject or rewrite paragraphs that:
 
 Compression is not sentence shortening. It is function filtering.
 
+Compression must be budgeted from the content, not from an arbitrary percentage. Before shortening a complete answer, identify:
+
+- the protected source skeleton: core claims, mechanisms, evidence, comparisons, limitations, and synthesis items required by the question;
+- protected academic details: named evidence, citation-supported mechanism detail, and examiner-relevant distinctions;
+- removable redundancy: repeated framing, duplicated restatement, overlong transitions, and low-value background.
+
+Compress only the removable redundancy first. Protected material may be tightened, but it must not disappear unless the question, source scope, or user request changes.
+
 For each sentence, ask:
 
 ```text
@@ -76,6 +84,8 @@ Does it link back to the question?
 Delete or merge sentences that do none of these.
 
 Compression must preserve causal strength, scope qualifiers, negative distinctions, model boundaries, and evidence interpretation. Do not rewrite `not necessary for generating the core rhythm` as `not necessary for locomotion`, or `supports a mechanism` as `proves the mechanism`, unless the source warrants the stronger claim.
+
+If the user asks for a percentage reduction that would delete protected source skeleton or citation-supported detail, reject that target and use the largest safe reduction. The final answer should not mention internal compression targets or word-count budgeting.
 
 ## Detail-Level Discipline
 

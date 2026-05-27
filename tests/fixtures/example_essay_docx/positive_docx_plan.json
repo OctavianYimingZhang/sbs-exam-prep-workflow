@@ -15,6 +15,33 @@
           "claim_supported": "lecture-defined signal-response mechanism"
         }
       ],
+      "compression_budget": {
+        "current_word_count": 240,
+        "requested_reduction": {
+          "type": "percent",
+          "value": 8
+        },
+        "protected_source_skeleton": [
+          "signal detection to intracellular change",
+          "receptor-level decision step",
+          "blocking evidence supporting causal interpretation",
+          "threshold logic linking weak and strong stimulation to outcomes"
+        ],
+        "protected_academic_details": [
+          "receptor phosphorylation site",
+          "Author et al. 2026 blocking experiment"
+        ],
+        "removable_redundancy": [
+          "repeated transition language"
+        ],
+        "safe_reduction_range": {
+          "min": 5,
+          "max": 10
+        },
+        "unsafe_threshold": 15,
+        "decision": "compress_within_safe_range",
+        "reason": "The requested reduction removes only repeated phrasing while preserving the lecture skeleton and verified micro-detail."
+      },
       "extra_reading_status": "supplied_found",
       "paragraphs": [
         {

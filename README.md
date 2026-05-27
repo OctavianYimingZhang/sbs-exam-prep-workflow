@@ -404,6 +404,7 @@ knowledge inventory
 paragraph plan
 first draft
 citation and Extra Reading integration
+compression budget estimate
 expression-efficiency compression pass
 accuracy-preservation pass
 analytic argument pass
@@ -425,6 +426,7 @@ Essay language is controlled by the shared language contract:
 - use lecture/PPT/source logic as the skeleton and Extra Reading only as a precision layer;
 - add named molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent PPT/source mechanism slot;
 - reject true-but-unneeded catalogues, review-style drift, and details that need a new explanatory sentence before they are useful;
+- estimate a safe compression budget before shortening, protecting the source skeleton, essential evidence, citation-supported named details, and analytic limitations;
 - run final compression after citation and Extra Reading integration, preserving causal strength, scope qualifiers, model boundaries, and evidence interpretation;
 - remove lecture-route narration and exam-guidance phrasing;
 - calibrate citation strength, using cautious verbs unless a source directly proves causality;

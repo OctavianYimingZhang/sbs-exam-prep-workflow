@@ -17,6 +17,21 @@
           "subtitle": { "type": ["string", "null"] },
           "target_group_key": { "type": ["string", "null"] },
           "lecture_anchors": { "type": "array" },
+          "compression_budget": {
+            "type": ["object", "null"],
+            "properties": {
+              "current_word_count": { "type": ["integer", "number", "null"] },
+              "requested_reduction": { "type": ["object", "null"] },
+              "protected_source_skeleton": { "type": "array" },
+              "protected_academic_details": { "type": "array" },
+              "removable_redundancy": { "type": "array" },
+              "safe_reduction_range": { "type": ["object", "null"] },
+              "unsafe_threshold": { "type": ["integer", "number", "null"] },
+              "decision": { "type": ["string", "null"] },
+              "reason": { "type": ["string", "null"] }
+            },
+            "additionalProperties": true
+          },
           "paragraphs": {
             "type": "array",
             "items": {
