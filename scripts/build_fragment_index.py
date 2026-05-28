@@ -125,6 +125,9 @@ def source_document(row: dict[str, Any], index: int, digest: str) -> dict[str, A
         "source_hash": digest,
         "text_path": row.get("text_path"),
         "target_group_key": row.get("target_code") or row.get("target_name"),
+        "visual_content_types": row.get("visual_content_types") or [],
+        "visual_inspection_status": row.get("visual_inspection_status") or "not_required",
+        "visual_inspection_required": bool(row.get("visual_inspection_required", False)),
     }
 
 
@@ -147,6 +150,9 @@ def source_partition(row: dict[str, Any], source_id: str, index: int, digest: st
         "command_verbs": [],
         "input_format": None,
         "image_count": row.get("image_count"),
+        "visual_content_types": row.get("visual_content_types") or [],
+        "visual_inspection_status": row.get("visual_inspection_status") or "not_required",
+        "visual_inspection_required": bool(row.get("visual_inspection_required", False)),
         "extraction_confidence": confidence_from_status(str(row.get("status") or "")),
         "allowed_evidence_use": allowed_evidence_use(row),
         "source_hash": digest,
@@ -185,6 +191,9 @@ def question_partitions(path: Path, start_index: int) -> list[dict[str, Any]]:
                 "command_verbs": question.get("command_verbs") or [],
                 "input_format": question.get("input_format"),
                 "image_count": None,
+                "visual_content_types": [],
+                "visual_inspection_status": "not_required",
+                "visual_inspection_required": False,
                 "extraction_confidence": question.get("extracted_confidence") or "Medium",
                 "allowed_evidence_use": ["current_prediction_evidence"],
                 "source_hash": stable_hash(json.dumps(question, sort_keys=True)),

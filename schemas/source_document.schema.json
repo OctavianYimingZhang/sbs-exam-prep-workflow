@@ -13,7 +13,10 @@
     "analysis_context": { "type": "string" },
     "allowed_evidence_use": { "type": "array", "items": { "type": "string" } },
     "extraction_status": { "type": "string" },
-    "source_hash": { "type": ["string", "null"] }
+    "source_hash": { "type": ["string", "null"] },
+    "visual_content_types": { "type": "array", "items": { "type": "string" } },
+    "visual_inspection_status": { "type": "string" },
+    "visual_inspection_required": { "type": "boolean" }
   },
   "additionalProperties": true
 }

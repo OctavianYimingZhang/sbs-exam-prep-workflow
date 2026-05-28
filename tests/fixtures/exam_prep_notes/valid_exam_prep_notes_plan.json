@@ -1,0 +1,64 @@
+{
+  "object_type": "ExamPrepNotesPlan",
+  "notes_plan_id": "notes_plan_fixture_001",
+  "target_group_key": "generic_current",
+  "course_sections": [
+    {
+      "section_id": "section_001",
+      "section_title": "Generic Mechanism",
+      "section_function": "Explains how a source-backed mechanism produces a measurable output.",
+      "source_anchors": ["fake_lecture.txt:1"]
+    }
+  ],
+  "lecture_mapping": [
+    {
+      "lecture_session_id": "lecture_001",
+      "section_id": "section_001",
+      "source_order": 1,
+      "title": "Generic Lecture",
+      "source_anchors": ["fake_lecture.txt:1"]
+    }
+  ],
+  "knowledge_cards": [
+    {
+      "card_id": "card_001",
+      "kp_id": "kp_001",
+      "section_id": "section_001",
+      "priority_label": "必备",
+      "exam_function": "Use the mechanism chain to explain an observed output.",
+      "core_exam_claim": "A source-backed mechanism links input, process, output, and limitation.",
+      "exam_ready_synthesis": "The examinable point is the causal link between mechanism and output, with the limitation stated explicitly.",
+      "mechanism_or_process_logic": "Input changes the mechanism; the mechanism changes the readout; the limitation defines scope.",
+      "source_anchors": ["fake_lecture.txt:1"],
+      "coverage_status": "tested",
+      "student_visible": true
+    }
+  ],
+  "official_definition_records": [
+    {
+      "term": "generic mechanism",
+      "definition_text": "A source-backed causal explanation from input to output.",
+      "verification_status": "official",
+      "source_anchors": ["fake_lecture.txt:1"]
+    }
+  ],
+  "exam_emphasis_binding": {
+    "formal_papers_used": true,
+    "compatible_question_types": ["mcq", "short_answer"],
+    "limitations": ["Past papers control emphasis only, not factual truth or exact future wording."]
+  },
+  "question_type_addons": [],
+  "optional_visual_aids": [],
+  "content_coverage_checks": [
+    {
+      "check_id": "coverage_001",
+      "status": "pass",
+      "scope": "student_visible_knowledge_cards",
+      "message": "Every visible card has source support, priority, exam function, and coverage status."
+    }
+  ],
+  "student_visible_structure": ["Course-Level Exam Map", "Course Section", "Module", "Core Exam Claim"],
+  "forbidden_student_fields": ["source_anchor", "confidence", "examiner_operation"],
+  "qa_flags": [],
+  "qa_status": "pass"
+}

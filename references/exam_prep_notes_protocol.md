@@ -45,7 +45,7 @@ Run the route in this order:
 
 1. Classify source authority and extraction quality.
 2. Build a source coverage map and identify unreadable or weak sources.
-3. If formal past papers are supplied, extract current-regime question records and build an `ExamEmphasisProfile`.
+3. If formal past papers are supplied, insert optional `exam_regime`, `past_paper_questions`, `question_archetypes`, and `examiner_operations` actions; use them for format, emphasis, and answer-operation evidence only.
 4. Reconstruct course-level sections from the official source logic.
 5. Map lecture sessions or ordered source blocks into the reconstructed course sections.
 6. Extract lecture-level conceptual modules and KnowledgePoints.
@@ -56,6 +56,10 @@ Run the route in this order:
 11. Run student-output, evidence, language, DOCX, and helper-file boundary QA.
 
 If no formal past papers are supplied, generate notes from source centrality, conceptual dependency, and official course emphasis only. Do not invent exam frequency or future-question probability.
+
+Cross-target examples, exemplar answers, and feedback sources may add an internal style-analysis action. That action may control paragraph density, answer ordering, and transferable workflow rules only; it must not support target factual claims, prediction claims, official answers, or priority labels.
+
+Visual-heavy PDFs, presentations, figures, tables, image exemplars, and image-only files must carry visual-inspection metadata in source inventory and fragment partitions. If a requested output depends on the visual content, inspect it before making the claim or keep the relevant conclusion limited.
 
 ## ExamEmphasisProfile
 
@@ -123,6 +127,8 @@ Optional Visual Aid
 ```
 
 Omit headings that add no value for a specific source set. Do not expose internal evidence fields.
+
+The internal `ExamPrepNotesPlan` must use structured course sections, lecture mapping, source-backed knowledge cards, official definition records, exam-emphasis binding, question-type add-ons, content-coverage checks, QA flags, and a visible-output field filter. Every student-visible knowledge card must have source support, one visible priority label, an exam function, and a coverage status.
 
 ## Academic Exam-Ready Notes Language
 

@@ -29,6 +29,7 @@ REQUIRED_FILES = [
     "schemas/prompt_card.schema.json",
     "scripts/plan_workflow.py",
     "scripts/input_readiness_check.py",
+    "scripts/validate_exam_prep_notes_plan.py",
     "scripts/generate_knowledge_walkthrough_docx.py",
     "scripts/knowledge_walkthrough_linter.py",
     "scripts/render_workflow_plan.py",
@@ -97,6 +98,8 @@ def validate(root: Path) -> dict[str, Any]:
         failures.append({"type": "missing_workflow_plan_object"})
     if "PlanWorkflow" not in action_types:
         failures.append({"type": "missing_plan_workflow_action"})
+    if "AnalyzeStyleExamples" not in action_types:
+        failures.append({"type": "missing_style_analysis_action"})
     for link in sorted(REQUIRED_LINKS - link_types):
         failures.append({"type": "missing_typed_generated_from_link", "link_type": link})
     for object_name, id_field in REQUIRED_ID_FIELDS.items():
@@ -137,6 +140,11 @@ def validate(root: Path) -> dict[str, Any]:
     for preset in sorted(REQUIRED_PRESETS):
         if preset not in preset_text:
             failures.append({"type": "preset_missing_from_agents_file", "preset": preset})
+
+    plan_text = read(root / "scripts/plan_workflow.py")
+    for optional_module in ["past_paper_questions", "question_archetypes", "examiner_operations", "style_analysis"]:
+        if optional_module not in plan_text:
+            failures.append({"type": "planner_missing_optional_module", "module": optional_module})
 
     combined_docs = "\n".join(
         read(root / path)

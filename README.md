@@ -78,12 +78,14 @@ benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour onl
 ## Core Workflow
 
 1. Classify source files by role, trust level, extraction quality, and evidence limits.
-2. Diagnose the exam format and split incompatible exam regimes before comparing papers.
-3. Classify question types before choosing a preparation strategy.
-4. Convert source fragments into reconstructed course sections, knowledge points, and examiner operations.
-5. Select Academic Exam-Ready Notes or the explicit lecture-first walkthrough plus any question-type add-on that matches the evidence and requested artifact.
-6. Rewrite internal reasoning into student-facing revision content.
-7. Run QA so unsupported claims and process helper files do not enter the final public output.
+2. Record visual-inspection status for diagrams, tables, figures, presentations, image exemplars, and image-only sources.
+3. Diagnose the exam format and split incompatible exam regimes before comparing papers.
+4. When formal papers are present, extract question records and archetypes as optional evidence modules for emphasis and answer operations.
+5. Convert source fragments into reconstructed course sections, knowledge points, and examiner operations.
+6. Select Academic Exam-Ready Notes or the explicit lecture-first walkthrough plus any question-type add-on that matches the evidence and requested artifact.
+7. Use examples and feedback only for internal style/density rules unless their factual claims are independently verified.
+8. Rewrite internal reasoning into student-facing revision content.
+9. Run QA so unsupported claims and process helper files do not enter the final public output.
 
 ## Quick Start
 
@@ -192,7 +194,7 @@ No lineage -> no reproducible publish.
 No QA pass -> no publish.
 ```
 
-This is implemented with a fragment metadata index, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
+This is implemented with a fragment metadata index, optional past-paper evidence modules, style-only example analysis, visual-inspection metadata, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
 
 ## Output Routes
 

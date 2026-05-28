@@ -9,21 +9,123 @@
     "course_sections",
     "lecture_mapping",
     "knowledge_cards",
+    "official_definition_records",
+    "exam_emphasis_binding",
     "question_type_addons",
+    "content_coverage_checks",
     "student_visible_structure",
     "forbidden_student_fields",
+    "qa_flags",
     "qa_status"
   ],
   "properties": {
-    "notes_plan_id": { "type": "string" },
-    "target_group_key": { "type": "string" },
-    "course_sections": { "type": "array", "items": { "type": "string" } },
-    "lecture_mapping": { "type": "array", "items": { "type": "string" } },
-    "knowledge_cards": { "type": "array", "items": { "type": "object" } },
+    "object_type": { "const": "ExamPrepNotesPlan" },
+    "notes_plan_id": { "type": "string", "minLength": 1 },
+    "target_group_key": { "type": "string", "minLength": 1 },
+    "course_sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "section_title", "section_function", "source_anchors"],
+        "properties": {
+          "section_id": { "type": "string" },
+          "section_title": { "type": "string" },
+          "section_function": { "type": "string" },
+          "source_anchors": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "lecture_mapping": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["lecture_session_id", "section_id", "source_order", "title", "source_anchors"],
+        "properties": {
+          "lecture_session_id": { "type": "string" },
+          "section_id": { "type": "string" },
+          "source_order": { "type": ["integer", "string"] },
+          "title": { "type": "string" },
+          "source_anchors": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        },
+        "additionalProperties": true
+      }
+    },
+    "knowledge_cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "card_id",
+          "kp_id",
+          "section_id",
+          "priority_label",
+          "exam_function",
+          "core_exam_claim",
+          "exam_ready_synthesis",
+          "source_anchors",
+          "coverage_status",
+          "student_visible"
+        ],
+        "properties": {
+          "card_id": { "type": "string" },
+          "kp_id": { "type": "string" },
+          "section_id": { "type": "string" },
+          "priority_label": { "enum": ["必备", "重点", "补充"] },
+          "exam_function": { "type": "string", "minLength": 1 },
+          "core_exam_claim": { "type": "string", "minLength": 1 },
+          "exam_ready_synthesis": { "type": "string", "minLength": 1 },
+          "mechanism_or_process_logic": { "type": "string" },
+          "source_anchors": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "coverage_status": { "enum": ["tested", "partially_tested", "fresh", "saturated", "unknown"] },
+          "student_visible": { "type": "boolean" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "official_definition_records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["term", "definition_text", "verification_status", "source_anchors"],
+        "properties": {
+          "term": { "type": "string" },
+          "definition_text": { "type": "string" },
+          "verification_status": { "enum": ["official", "verified_external", "requires_verification"] },
+          "source_anchors": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "exam_emphasis_binding": {
+      "type": "object",
+      "required": ["formal_papers_used", "compatible_question_types", "limitations"],
+      "properties": {
+        "formal_papers_used": { "type": "boolean" },
+        "compatible_question_types": { "type": "array", "items": { "type": "string" } },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
     "question_type_addons": { "type": "array", "items": { "type": "object" } },
     "optional_visual_aids": { "type": "array", "items": { "type": "string" } },
+    "content_coverage_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check_id", "status", "scope"],
+        "properties": {
+          "check_id": { "type": "string" },
+          "status": { "enum": ["pass", "warn", "block"] },
+          "scope": { "type": "string" },
+          "message": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
     "student_visible_structure": { "type": "array", "items": { "type": "string" } },
     "forbidden_student_fields": { "type": "array", "items": { "type": "string" } },
+    "qa_flags": { "type": "array", "items": { "type": "string" } },
     "qa_status": { "enum": ["pass", "warn", "block"] }
   },
   "additionalProperties": true

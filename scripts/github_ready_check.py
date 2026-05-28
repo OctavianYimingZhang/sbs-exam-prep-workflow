@@ -97,7 +97,11 @@ def main() -> int:
         fragment_index_dir = tmp_dir / "fragment_index"
         planner_dir = tmp_dir / "planner"
         workflow_plan_path = planner_dir / "workflow_plan.json"
+        default_no_paper_plan_path = planner_dir / "default_no_paper_plan.json"
+        default_with_paper_plan_path = planner_dir / "default_with_paper_plan.json"
+        style_plan_path = planner_dir / "style_plan.json"
         input_readiness_path = planner_dir / "input_readiness.json"
+        visual_readiness_path = planner_dir / "visual_input_readiness.json"
         workflow_plan_preview_path = planner_dir / "workflow_plan.md"
         run_status_path = planner_dir / "run_status.json"
         lineage_report_path = planner_dir / "lineage_report.json"
@@ -128,6 +132,61 @@ def main() -> int:
                     ],
                 ),
                 run_command(
+                    "workflow_plan_default_without_past_papers_keeps_prediction_modules_off",
+                    [
+                        py,
+                        "scripts/plan_workflow.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_exam_prep_no_past_papers.json",
+                        "--output",
+                        str(default_no_paper_plan_path),
+                        "--forbid-module",
+                        "exam_regime",
+                        "--forbid-module",
+                        "past_paper_questions",
+                        "--forbid-module",
+                        "question_archetypes",
+                        "--forbid-module",
+                        "examiner_operations",
+                    ],
+                ),
+                run_command(
+                    "workflow_plan_default_with_past_papers_enables_exam_evidence_modules",
+                    [
+                        py,
+                        "scripts/plan_workflow.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_exam_prep_with_past_papers.json",
+                        "--source-scan",
+                        "tests/fixtures/control_plane/source_scan.json",
+                        "--output",
+                        str(default_with_paper_plan_path),
+                        "--require-module",
+                        "exam_regime",
+                        "--require-module",
+                        "past_paper_questions",
+                        "--require-module",
+                        "question_archetypes",
+                        "--require-module",
+                        "examiner_operations",
+                    ],
+                ),
+                run_command(
+                    "workflow_plan_style_examples_enable_style_analysis",
+                    [
+                        py,
+                        "scripts/plan_workflow.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_exam_prep_no_past_papers.json",
+                        "--source-scan",
+                        "tests/fixtures/control_plane/source_scan_style_example.json",
+                        "--output",
+                        str(style_plan_path),
+                        "--require-module",
+                        "style_analysis",
+                    ],
+                ),
+                run_command(
                     "workflow_plan_knowledge_walkthrough_fixture",
                     [
                         py,
@@ -150,6 +209,38 @@ def main() -> int:
                         "--output",
                         str(input_readiness_path),
                     ],
+                ),
+                run_command(
+                    "input_readiness_visual_warning_fixture",
+                    [
+                        py,
+                        "scripts/input_readiness_check.py",
+                        "--config",
+                        "tests/fixtures/planner/skill_config_exam_prep_no_past_papers.json",
+                        "--source-scan",
+                        "tests/fixtures/control_plane/source_scan_visual_warning.json",
+                        "--output",
+                        str(visual_readiness_path),
+                        "--require-warning-id",
+                        "warn_visual_inspection_needed",
+                    ],
+                ),
+                run_command(
+                    "exam_prep_notes_plan_contract_fixture",
+                    [
+                        py,
+                        "scripts/validate_exam_prep_notes_plan.py",
+                        "tests/fixtures/exam_prep_notes/valid_exam_prep_notes_plan.json",
+                    ],
+                ),
+                run_command(
+                    "exam_prep_notes_plan_rejects_invalid_visible_card",
+                    [
+                        py,
+                        "scripts/validate_exam_prep_notes_plan.py",
+                        "tests/fixtures/exam_prep_notes/invalid_knowledge_card_plan.json",
+                    ],
+                    expect_failure=True,
                 ),
                 run_command(
                     "workflow_plan_render_fixture",

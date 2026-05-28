@@ -234,6 +234,7 @@
     "CreateSourceInventory": ["SourceDocument"],
     "ExtractFragments": ["SourceFragment", "QAFlag"],
     "BuildFragmentIndex": ["FragmentPartition"],
+    "AnalyzeStyleExamples": ["QAFlag"],
     "BuildLectureModules": ["LectureModule", "QAFlag"],
     "BuildKnowledgeWalkthroughPlan": ["KnowledgeWalkthroughPlan"],
     "ReconstructCourseSections": ["CourseSection", "QAFlag"],
@@ -288,6 +289,7 @@
     "old_regime_evidence_cannot_raise_current_confidence_above_medium",
     "lecturer_style_cannot_raise_confidence_above_medium_without_repeated_current_regime_support",
     "fragment_partition_pruning_precedes_deep_reasoning",
+    "style_examples_do_not_support_factual_or_prediction_claims",
     "lineage_required_for_publish",
     "blocking_qa_flag_blocks_publish",
     "student_output_excludes_internal_helper_artifacts"

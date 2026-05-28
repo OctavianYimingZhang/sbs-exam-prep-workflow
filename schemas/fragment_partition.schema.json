@@ -19,6 +19,9 @@
     "command_verbs": { "type": "array", "items": { "type": "string" } },
     "input_format": { "type": ["string", "object", "null"] },
     "image_count": { "type": ["integer", "null"] },
+    "visual_content_types": { "type": "array", "items": { "type": "string" } },
+    "visual_inspection_status": { "type": "string" },
+    "visual_inspection_required": { "type": "boolean" },
     "extraction_confidence": { "enum": ["High", "Medium", "Low"] },
     "allowed_evidence_use": { "type": "array", "items": { "type": "string" } },
     "source_hash": { "type": "string" }

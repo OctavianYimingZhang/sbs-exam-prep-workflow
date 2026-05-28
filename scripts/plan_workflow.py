@@ -160,6 +160,24 @@ PRESET_MODULES = {
     "github_ready_qa": ["repository_qa"],
 }
 
+PAST_PAPER_AWARE_PRESETS = {
+    "exam_prep_notes_docx",
+    "mcq_exam_prep",
+    "short_answer_exam_prep",
+    "long_answer_project_scenario_prep",
+    "essay_exam_prep",
+}
+
+STYLE_AWARE_PRESETS = {
+    "exam_prep_notes_docx",
+    "mcq_exam_prep",
+    "short_answer_exam_prep",
+    "long_answer_project_scenario_prep",
+    "essay_exam_prep",
+}
+
+PAST_PAPER_EVIDENCE_MODULES = ["exam_regime", "past_paper_questions", "question_archetypes"]
+
 MODULE_DEFS = {
     "source_inventory": {
         "action_type": "CreateSourceInventory",
@@ -172,6 +190,12 @@ MODULE_DEFS = {
         "minimum_inputs": ["source_inventory"],
         "expected_outputs": ["FragmentPartition"],
         "qa_checks": ["partition metadata", "source hash"],
+    },
+    "style_analysis": {
+        "action_type": "AnalyzeStyleExamples",
+        "minimum_inputs": ["style_or_example_evidence"],
+        "expected_outputs": ["QAFlag"],
+        "qa_checks": ["style-only transfer", "non-transferable content blocked", "no factual or prediction support"],
     },
     "lecture_module_extraction": {
         "action_type": "BuildLectureModules",
@@ -249,7 +273,7 @@ MODULE_DEFS = {
         "action_type": "BuildExamPrepNotesPlan",
         "minimum_inputs": ["CourseSection", "LectureSession", "LectureConceptModule", "KnowledgePoint", "ExamEmphasisProfile"],
         "expected_outputs": ["ExamPrepNotesPlan"],
-        "qa_checks": ["Academic Exam-Ready Notes structure", "definition policy", "student note verification"],
+        "qa_checks": ["Academic Exam-Ready Notes structure", "definition policy", "student note verification", "knowledge-card coverage"],
     },
     "question_type_addon_generation": {
         "action_type": "BuildQuestionTypeAddOns",
@@ -441,6 +465,30 @@ def class_for_scan_role(role: str) -> str | None:
     return None
 
 
+def scan_has_style_evidence(source_scan: dict[str, Any] | None) -> bool:
+    if not source_scan:
+        return False
+    for item in source_scan.get("files", []):
+        if not isinstance(item, dict):
+            continue
+        role = str(item.get("role", "")).lower()
+        analysis_context = str(item.get("analysis_context", "")).lower()
+        if item.get("allowed_style_use") or item.get("allowed_transferable_example_use"):
+            return True
+        if analysis_context in {"style_exemplar", "cross_target_example"}:
+            return True
+        if role in {"exemplar_answer", "exemplar_image", "essay_guidance"}:
+            return True
+    return False
+
+
+def style_evidence_available(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> bool:
+    source_inputs = config.get("source_inputs", {})
+    if list_items(source_inputs.get("exemplars_or_feedback")):
+        return True
+    return scan_has_style_evidence(source_scan)
+
+
 def available_source_classes(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> set[str]:
     available: set[str] = set()
     source_inputs = config.get("source_inputs", {})
@@ -458,6 +506,8 @@ def available_source_classes(config: dict[str, Any], source_scan: dict[str, Any]
                 available.add(source_class)
     if "lecture_or_official_notes" in available:
         available.add("readable_course_notes")
+    if style_evidence_available(config, source_scan):
+        available.add("style_or_example_evidence")
     if available:
         available.add("any_source")
     return available
@@ -467,7 +517,7 @@ def missing_required_classes(required: list[str], available: set[str]) -> list[s
     return [item for item in required if item not in available]
 
 
-def blocker_for_missing(index: int, missing_input: str, selected_preset: str) -> dict[str, Any]:
+def blocker_for_missing(index: int, missing_input: str, selected_preset: str, blocked_modules: list[str] | None = None) -> dict[str, Any]:
     labels = {
         "any_source": "at least one readable source",
         "lecture_or_official_notes": "lecture slides or official notes",
@@ -481,7 +531,7 @@ def blocker_for_missing(index: int, missing_input: str, selected_preset: str) ->
         "severity": "blocking",
         "missing_input": missing_input,
         "resolution_prompt": f"Provide {label}, or choose a narrower preset that does not require it.",
-        "blocked_modules": PRESET_MODULES[selected_preset],
+        "blocked_modules": blocked_modules or PRESET_MODULES[selected_preset],
     }
 
 
@@ -505,6 +555,29 @@ def action_for_module(index: int, module: str, modules: list[str], reuse_existin
     }
 
 
+def insert_after_once(modules: list[str], anchor: str, additions: list[str]) -> None:
+    index = modules.index(anchor) + 1 if anchor in modules else len(modules)
+    for addition in additions:
+        if addition not in modules:
+            modules.insert(index, addition)
+            index += 1
+
+
+def modules_for_preset(
+    selected_preset: str,
+    available: set[str],
+    config: dict[str, Any],
+    source_scan: dict[str, Any] | None = None,
+) -> list[str]:
+    modules = list(PRESET_MODULES[selected_preset])
+    if selected_preset in PAST_PAPER_AWARE_PRESETS and "formal_past_papers" in available:
+        insert_after_once(modules, "fragment_index", PAST_PAPER_EVIDENCE_MODULES)
+        insert_after_once(modules, "knowledge_points", ["examiner_operations"])
+    if selected_preset in STYLE_AWARE_PRESETS and style_evidence_available(config, source_scan):
+        insert_after_once(modules, "fragment_index", ["style_analysis"])
+    return modules
+
+
 def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> dict[str, Any]:
     output_mode = config.get("output_mode", {})
     raw_mode = output_mode.get("preset") or output_mode.get("mode") or "exam_prep_notes_docx"
@@ -512,8 +585,8 @@ def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None
     required = PRESET_REQUIRED_CLASSES[selected_preset]
     available = available_source_classes(config, source_scan)
     missing = missing_required_classes(required, available)
-    blockers = [blocker_for_missing(index, item, selected_preset) for index, item in enumerate(missing, start=1)]
-    modules = PRESET_MODULES[selected_preset]
+    modules = modules_for_preset(selected_preset, available, config, source_scan)
+    blockers = [blocker_for_missing(index, item, selected_preset, modules) for index, item in enumerate(missing, start=1)]
     advanced = config.get("advanced", {})
     reuse_existing = bool(advanced.get("reuse_existing_intermediates", True))
 
@@ -538,6 +611,11 @@ def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None
         "requested_artifacts": list(output_mode.get("requested_artifacts", [])) if isinstance(output_mode.get("requested_artifacts", []), list) else [],
         "available_source_classes": sorted(available),
         "required_source_classes": required,
+        "optional_modules_enabled": [
+            module
+            for module in modules
+            if module in {"exam_regime", "past_paper_questions", "question_archetypes", "examiner_operations", "style_analysis"}
+        ],
     }
     target_group_key = str(project.get("target_group_key") or "unspecified_target")
     plan_seed = {
@@ -593,6 +671,8 @@ def main() -> int:
     parser.add_argument("--source-scan", type=Path, help="Optional extract_sources.py source_scan.json.")
     parser.add_argument("--output", type=Path, help="Where to write the WorkflowPlan JSON.")
     parser.add_argument("--fail-on-blockers", action="store_true")
+    parser.add_argument("--require-module", action="append", default=[], help="Fail unless the generated plan includes this module.")
+    parser.add_argument("--forbid-module", action="append", default=[], help="Fail if the generated plan includes this module.")
     args = parser.parse_args()
 
     try:
@@ -612,6 +692,17 @@ def main() -> int:
         args.output.write_text(text + "\n", encoding="utf-8")
     else:
         print(text)
+    modules = {action.get("module") for action in plan.get("actions", [])}
+    assertion_failures = []
+    for module in args.require_module:
+        if module not in modules:
+            assertion_failures.append(f"required module missing: {module}")
+    for module in args.forbid_module:
+        if module in modules:
+            assertion_failures.append(f"forbidden module present: {module}")
+    if assertion_failures:
+        print(json.dumps({"status": "fail", "failures": assertion_failures}, indent=2), file=sys.stderr)
+        return 1
     if args.fail_on_blockers and plan["blockers"]:
         return 2
     return 0

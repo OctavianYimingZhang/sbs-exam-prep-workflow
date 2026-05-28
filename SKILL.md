@@ -29,6 +29,9 @@ Default behaviour:
 - If the user asks only for past-paper analysis, exam format, or likely emphasis before generation, produce a chat-only `exam_analysis_brief`; do not create a public prediction file.
 - For essay/problem-essay prediction language, use `Predicted essay theme` as the default label, not predicted question wording.
 - If the user asks only for inventory, linting, QA, or release checks, run the narrow audit route and do not generate study artifacts.
+- When formal past papers are supplied with ordinary notes generation, route them through optional exam-regime, question-record, archetype, and examiner-operation planning actions. These actions may shape emphasis and add-ons but must not become factual authority or exact future-question claims.
+- When style examples, feedback, or cross-target examples are supplied, run style analysis only as an internal transferable-rule layer; do not use example content as target factual or prediction evidence.
+- When sources contain diagrams, tables, figures, presentations, or image-only content, preserve visual-inspection metadata and warn internally before relying on visual content.
 
 Hard boundaries:
 

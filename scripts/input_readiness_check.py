@@ -9,7 +9,32 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from plan_workflow import PRESET_REQUIRED_CLASSES, available_source_classes, blocker_for_missing, load_json, missing_required_classes, normalize_preset
+from plan_workflow import PRESET_REQUIRED_CLASSES, available_source_classes, blocker_for_missing, load_json, missing_required_classes, modules_for_preset, normalize_preset
+
+
+VISUAL_AFFECTED_PRESETS = {
+    "exam_prep_notes_docx",
+    "knowledge_walkthrough_docx",
+    "mcq_exam_prep",
+    "short_answer_exam_prep",
+    "long_answer_project_scenario_prep",
+    "essay_exam_prep",
+}
+
+
+def visual_warning_sources(source_scan: dict[str, Any] | None) -> list[str]:
+    if not source_scan:
+        return []
+    sources = []
+    for item in source_scan.get("files", []):
+        if not isinstance(item, dict):
+            continue
+        limitations = item.get("limitations") if isinstance(item.get("limitations"), list) else []
+        visual_required = bool(item.get("visual_inspection_required")) or "visual_inspection_required" in limitations
+        visual_status = str(item.get("visual_inspection_status") or "")
+        if visual_required or visual_status.startswith(("required", "recommended")):
+            sources.append(str(item.get("name") or item.get("path") or "unknown_source"))
+    return sources
 
 
 def build_report(config: dict[str, Any], source_scan: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -18,7 +43,8 @@ def build_report(config: dict[str, Any], source_scan: dict[str, Any] | None = No
     required = PRESET_REQUIRED_CLASSES[selected_preset]
     available = available_source_classes(config, source_scan)
     missing = missing_required_classes(required, available)
-    blockers = [blocker_for_missing(index, item, selected_preset) for index, item in enumerate(missing, start=1)]
+    modules = modules_for_preset(selected_preset, available, config, source_scan)
+    blockers = [blocker_for_missing(index, item, selected_preset, modules) for index, item in enumerate(missing, start=1)]
     warnings: list[dict[str, Any]] = []
 
     source_inputs = config.get("source_inputs", {})
@@ -37,6 +63,16 @@ def build_report(config: dict[str, Any], source_scan: dict[str, Any] | None = No
                 "warning_id": "warn_example_policy",
                 "severity": "warning",
                 "message": "Examples or feedback should be style/workflow evidence only unless independently verified from target sources.",
+            }
+        )
+    visual_sources = visual_warning_sources(source_scan)
+    if selected_preset in VISUAL_AFFECTED_PRESETS and visual_sources:
+        warnings.append(
+            {
+                "warning_id": "warn_visual_inspection_needed",
+                "severity": "warning",
+                "message": "Some sources contain image, diagram, table, figure, or presentation content that may need visual inspection before claims are made.",
+                "sources": visual_sources,
             }
         )
 
@@ -60,6 +96,7 @@ def main() -> int:
     parser.add_argument("--source-scan", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--fail-on-blockers", action="store_true")
+    parser.add_argument("--require-warning-id", action="append", default=[])
     args = parser.parse_args()
 
     try:
@@ -76,6 +113,11 @@ def main() -> int:
         args.output.write_text(text + "\n", encoding="utf-8")
     else:
         print(text)
+    warning_ids = {warning.get("warning_id") for warning in report.get("warnings", [])}
+    missing_warnings = [warning_id for warning_id in args.require_warning_id if warning_id not in warning_ids]
+    if missing_warnings:
+        print(json.dumps({"status": "fail", "missing_warning_ids": missing_warnings}, indent=2), file=sys.stderr)
+        return 1
     if args.fail_on_blockers and report["blockers"]:
         return 2
     return 0

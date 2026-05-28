@@ -67,6 +67,9 @@ class ExtractedFile:
     slide_count: int | None = None
     image_count: int | None = None
     limitations: list[str] = field(default_factory=list)
+    visual_content_types: list[str] = field(default_factory=list)
+    visual_inspection_status: str = "not_required"
+    visual_inspection_required: bool = False
     preview: str = ""
 
 
@@ -412,6 +415,37 @@ def allowed_use_flags(analysis_context: str, role: str) -> dict[str, bool]:
     }
 
 
+def visual_metadata(path: Path, text: str, extra: dict[str, Any], limitations: list[str]) -> tuple[list[str], str, bool]:
+    suffix = path.suffix.lower()
+    lower_text = (path.name + "\n" + text[:8000]).lower()
+    visual_types: list[str] = []
+    if suffix in IMAGE_EXTS:
+        visual_types.append("standalone_image")
+    if extra.get("image_count"):
+        visual_types.append("embedded_image")
+    if suffix in {".pptx", ".pptm", ".ppsx", ".ppt"}:
+        visual_types.append("presentation_visuals_possible")
+    if any(term in lower_text for term in ("diagram", "schematic", "pathway figure", "figure")):
+        visual_types.append("figure_or_diagram")
+    if any(term in lower_text for term in ("table", "tabulated")):
+        visual_types.append("table")
+    if any(term in lower_text for term in ("graph", "chart", "plot", "axis", "axes")):
+        visual_types.append("graph_or_chart")
+    if "visual_inspection_required" in limitations:
+        visual_types.append("style_or_image_exemplar")
+
+    visual_types = sorted(set(visual_types))
+    if suffix in IMAGE_EXTS:
+        return visual_types, "required_image_only_source", True
+    if extra.get("image_count"):
+        return visual_types, "required_embedded_images_present", True
+    if suffix in {".pptx", ".pptm", ".ppsx", ".ppt"}:
+        return visual_types, "required_presentation_visuals_possible", True
+    if any(item in visual_types for item in ("figure_or_diagram", "table", "graph_or_chart")):
+        return visual_types, "recommended_visual_elements_named", True
+    return visual_types, "not_required", False
+
+
 def extract_pdf(path: Path) -> tuple[str, str, int | None, int | None, list[str]]:
     if fitz is not None:
         doc = fitz.open(path)
@@ -607,6 +641,7 @@ def scan(
             limitations.append(
                 "Image exemplar may be used for essay style, paragraph logic, and density only; factual claims require verification from lecture or reliable sources."
             )
+        visual_content_types, visual_inspection_status, visual_inspection_required = visual_metadata(path, text, extra, limitations)
         year = detect_year(path, text, role)
         rows.append(
             ExtractedFile(
@@ -634,6 +669,9 @@ def scan(
                 slide_count=extra.get("slide_count"),
                 image_count=extra.get("image_count"),
                 limitations=limitations,
+                visual_content_types=visual_content_types,
+                visual_inspection_status=visual_inspection_status,
+                visual_inspection_required=visual_inspection_required,
                 preview=normalise(text[:500]),
             )
         )
