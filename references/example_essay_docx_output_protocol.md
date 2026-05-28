@@ -30,6 +30,8 @@ Also produce:
 
 Do not place a complete essay into one Excel cell. Do not create an Excel workbook as the ordinary essay-prep output. Excel paragraph-row output is allowed only as an internal or explicitly requested audit artefact.
 
+Do not create the complete DOCX essay before the detailed essay plan is approved unless the user explicitly requests direct generation or has already requested execution of the planned essay package.
+
 Final user-facing output may include the requested final artefacts, such as `Essay_Module_Example_Essays.docx`, separate Example Essay DOCX files, or another explicitly requested final format. Do not return or package helper JSON, source maps, manifests, source-audit files, render previews, or citation-resolution logs unless the user explicitly asks for an audit package.
 
 ## Word Document Formatting
@@ -273,6 +275,8 @@ Essay content must be built in this order:
 
 Extra Reading and citation-source content must enrich the lecture answer, not replace it.
 
+Candidate sources identified during plan-stage DeepResearch are not reference-list sources until their metadata and claim relevance are verified.
+
 ## Lecture Grounding
 
 No Example Essay may be drafted before the relevant lecture slides have been read, mapped, and converted into a lecture-logic plan.
@@ -310,6 +314,8 @@ Fail DOCX generation or mark the essay as non-compliant if:
 - the essay contains true-but-not-needed detail, review-style drift, or a channel/receptor/gene/pathway catalogue without analytic use;
 - compression changes claim scope, causal strength, model boundaries, or experimental interpretation;
 - a citation printed on a slide is copied into the essay without resolving and reading the original source;
+- a candidate source appears as a verified citation without metadata and claim verification;
+- a reused published figure, table image, chart, or adapted visual lacks licence or permission;
 - an uploaded formatting PDF or style exemplar is used as biological content.
 
 ## User-Facing Output Contract

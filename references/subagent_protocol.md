@@ -18,6 +18,16 @@ Use subagents when available for large multi-source exam-analysis jobs. Keep tas
 - `RegressionAgent`: runs benchmark fixtures separately and reports both fixture pass/fail and generic contribution pass/fail against `cross_subject_regression_protocol.md`. It must explain what reusable workflow rule each benchmark validates.
 - `docx-verifier agent`: reviews generated DOCX reports for formatting, readability, missing anchors, and unsupported claims.
 
+Essay-specific roles when `essay_exam_prep` or complete essay drafting is active:
+
+- `question-and-rubric agent`: extracts command verb, required scope, excluded scope, examiner expectation, and off-topic risks.
+- `literature-retrieval agent`: finds required readings, seminal papers, recent papers, reviews, and candidate sources with DOI/PMID/URL status.
+- `mechanism-theory agent`: maps mechanisms, models, source support, evidence strength, and limitations to essay sections.
+- `evidence-appraisal agent`: calibrates claim strength and allowed verbs for each major source-backed claim.
+- `citation agent`: verifies metadata, citation placement, source-to-claim fit, in-text citations, and reference-list entries.
+- `figure-table-data agent`: checks figure reuse permission, generated schematic scope, academic table value, and data-analysis requirements.
+- `critical-thinking agent`: checks analytic/descriptive balance, discussion quality, limitation use, and model comparison.
+
 ## Delegation Rules
 
 - Do not give the same source group to multiple agents unless independent validation is needed.
@@ -53,3 +63,4 @@ Before accepting subagent output:
 - check that benchmark content has not been used as target factual or prediction evidence;
 - check that a benchmark lesson is applied only after structural trigger evidence is found in target sources;
 - check that subagent outputs distinguish fixture pass/fail from generic contribution pass/fail.
+- for essay roles, check that candidate sources are not treated as verified citations until metadata and claim relevance are confirmed.

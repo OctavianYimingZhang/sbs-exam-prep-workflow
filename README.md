@@ -10,7 +10,7 @@ The project exists because exam preparation is not one task. The correct output 
 
 The Skill reads the supplied materials, classifies their evidence role, and organises examinable knowledge first. The default route for general revision is `exam_prep_notes_docx`: it accepts readable ordered course notes, ranks source authority, reconstructs course sections, decomposes sources into an atomic knowledge ledger, locks a source-first baseline, then uses formal past papers for emphasis only after baseline coverage passes. It writes Academic Exam-Ready Notes in the compatible public artifact `Lecture_Knowledge_Walkthrough.docx`.
 
-Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report, Short Answer Exam Analysis Report, Long Answer/Project/Scenario Report, and Essay Module Example Essays. `knowledge_walkthrough_docx` remains a compatibility route for explicitly lecture-first walkthroughs. Past-paper analysis is used as a chat-only pre-generation brief to guide outputs. Excel workbooks and public prediction workbooks are no longer student-facing output routes.
+Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report, Short Answer Exam Analysis Report, Long Answer/Project/Scenario Report, and Essay Module Example Essays. Essay work now has an explicit tutor-style layer for intake, DeepResearch, subtitle-level planning, plan approval, citation strategy, figure/table/data gates, and final QA before complete drafting unless the user explicitly requests direct generation. `knowledge_walkthrough_docx` remains a compatibility route for explicitly lecture-first walkthroughs. Past-paper analysis is used as a chat-only pre-generation brief to guide outputs. Excel workbooks and public prediction workbooks are no longer student-facing output routes.
 
 The invariant is that process helper files stay separate. Public outputs may include any requested student-facing artifact, but run manifests, source maps, QA JSON, lineage files, citation logs, rendered previews, and other internal validation files must not be mixed into the student-facing folder unless the user explicitly requests an audit package.
 
@@ -54,6 +54,7 @@ This makes the workflow configurable and auditable. The Skill first decides the 
 | --- | --- |
 | Default route | `exam_prep_notes_docx`, Academic Exam-Ready Notes in `Lecture_Knowledge_Walkthrough.docx`. |
 | Question-type routes | MCQ, Short Answer, Long Answer/Project/Scenario, and Essay add-ons built on top of the base notes. |
+| Essay tutor layer | Essay-specific intake, DeepResearch, detailed plan approval, candidate-source labelling, citation strategy, and figure/table/data QA. |
 | Prediction route | Chat-only Exam Analysis Brief for module/point selection, not a public prediction file. |
 | Planning layer | `SkillConfig -> WorkflowPlan -> InputReadinessReport`. |
 | Evidence model | Each source has a role and a limit before it can support a claim. |
@@ -213,6 +214,7 @@ Choose one mode, or provide materials and ask for exam prep. General revision re
 | `short_answer_exam_prep` | You need short-answer preparation. | Base notes plus module logic, point cards, highlighted keywords, and Example Answers. |
 | `long_answer_project_scenario_prep` | You need practical, data, project, scenario, method, case, or long-answer prep. | Base notes plus question analysis, answer order, reusable blocks, Example Answer, and adaptation notes. |
 | `essay_exam_prep` | You need essay preparation. | Base notes plus module-level big Example Essays with adaptation maps and paragraph banks. |
+| `essay_planning_only` | You need a thesis, outline, DeepResearch plan, or plan approval stage before drafting. | Chat-only detailed essay plan with subtitle-level body logic, citation strategy, visual/data strategy, assumptions, and blockers. |
 | `evidence_gap_audit` | You want to know what is missing. | Source coverage, blockers, unresolved conflicts, next-source checklist. |
 | `incremental_refresh` | You add new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects and artifacts are refreshed. |
 

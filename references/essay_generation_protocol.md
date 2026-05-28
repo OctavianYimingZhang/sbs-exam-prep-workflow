@@ -6,6 +6,8 @@ The protocol applies across biological and non-biological science-style essays. 
 
 Use `language_quality_contract.md` as the source of truth for prose quality. This file defines Example Essay orchestration, source grounding, and planning.
 
+Use `essay_tutor_workflow_protocol.md` when the user asks for complete essay planning, assessed-style drafting, citation-controlled essay writing, or figure/table/data support. That protocol controls essay-specific intake, DeepResearch, subtitle-level planning, plan approval, candidate-source labelling, and visual/data gates before this file controls drafting and DOCX generation.
+
 ## Core Principle
 
 An Example Essay is not a longer summary of lecture slides. It is a controlled answer to a question:
@@ -22,10 +24,15 @@ Run this orchestration sequence for complete Example Essay generation:
 
 ```yaml
 ExampleEssayMode:
+  essay_specific_intake:
+  input_readiness_report:
   question_analysis:
   source_scope_detection:
   lecture_or_material_reading:
   ppt_or_source_logic_reconstruction:
+  deep_research:
+  detailed_essay_plan:
+  plan_approval_gate:
   citation_detection:
   citation_original_source_resolution_and_reading:
   classic_experiment_fallback_if_slide_citations_absent:
@@ -59,6 +66,7 @@ Optional visual aids may be planned only after the essay or notes text is source
 Do not:
 
 - write from memory;
+- draft a complete final essay before a detailed plan is approved unless the user explicitly asks to skip the approval loop or directly requests generation;
 - write from a predicted theme or practice variant alone without verifying the supplied lecture/source scope;
 - write from a past-paper stem without reading the relevant lecture/source material;
 - copy citations printed in slides without resolving and reading the original source when source-derived content is used;
@@ -83,6 +91,12 @@ Source priority:
 7. Other peer-reviewed papers, textbooks, DOI/PubMed/publisher pages, or Google Scholar results when no official reading is supplied or citation resolution requires it.
 
 If relevant lecture/source material cannot be identified or read, do not generate a polished essay. Emit a QA flag and ask for the missing material.
+
+Plan-stage citation rule:
+
+- Treat unverified external sources as `candidate_source` during planning.
+- Use exact author-year, DOI, PMID, article title, journal, or "recent review" claims only after verification.
+- Candidate sources may shape the search plan, but they must not enter the final draft, reference list, highlight map, or DOCX until metadata and claim relevance are verified.
 
 ## Example And Exemplar Use
 
@@ -252,6 +266,8 @@ question-relevant core claims > source objectives/summaries > repeated mechanism
 ## Paragraph Plan
 
 Every complete Example Essay must be planned paragraph-by-paragraph.
+
+For standalone essay planning, the plan must also specify main-body subtitles and the specific content, key claim, evidence need, and analytic angle for each subtitle. A plan that contains only `Introduction`, `Main Body`, `Discussion`, and `Conclusion` is insufficient.
 
 ```yaml
 EssayParagraphPlan:

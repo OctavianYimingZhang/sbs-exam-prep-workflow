@@ -37,6 +37,7 @@ Classify the request into one mode before deep analysis. This table is the autho
 | `short_answer_exam_prep` | User asks for short-answer practice. | Lecture walkthrough plus module logic, point cards, highlighted keywords, and Example Answers. |
 | `long_answer_project_scenario_prep` | User asks for practical, data, graph, protocol, calculation, case, project, scenario, or long-answer prep. | Lecture walkthrough plus question analysis, reusable mechanism/method/readout/interpretation/control/limitation blocks, Example Answer, and adaptation notes. |
 | `essay_exam_prep` | User asks for essay preparation or complete Example Essays. | Lecture walkthrough plus module-level Example Essays, adaptation maps, and paragraph banks. |
+| `essay_planning_only` | User asks for a plan, outline, thesis, essay structure, or pre-draft DeepResearch plan. | Chat-only detailed essay plan with subtitle-level body logic, citation strategy, visual/data strategy, assumptions, and blockers. |
 | `evidence_gap_audit` | User asks what is missing or why output is blocked. | Source coverage map, blocking gaps, stale evidence, and next-source checklist. |
 | `incremental_refresh` | User supplies new slides, papers, readings, answers, or feedback after a prior run. | Only affected objects, sections, artifacts, and QA results are refreshed. |
 
@@ -56,6 +57,7 @@ Map interaction modes to execution presets before planning:
 | `short_answer_exam_prep` | `short_answer_exam_prep` |
 | `long_answer_project_scenario_prep` | `long_answer_project_scenario_prep` |
 | `essay_exam_prep` | `essay_exam_prep` |
+| `essay_planning_only` | `essay_exam_prep` with draft generation disabled |
 | `evidence_gap_audit` | `audit_lint_only` |
 | `incremental_refresh` | narrowest affected preset |
 
@@ -72,6 +74,7 @@ Blocking examples:
 - source files are unreadable and the requested artifact depends on their hidden content;
 - exact citation, answer key, mark scheme, or official answer is requested but the relevant source is absent;
 - live-exam or active-assessment risk cannot be ruled out.
+- complete essay drafting is requested, but the user has not approved the detailed plan and did not request direct generation.
 
 Non-blocking examples:
 
@@ -79,6 +82,7 @@ Non-blocking examples:
 - extra reading is missing: perform academic search if the mode needs it and record what was verified;
 - old-format papers are present: use them for coverage only and label current prediction confidence conservatively;
 - no answer key exists: produce lecture-supported answer logic and do not claim official answers.
+- citation style is missing during planning: mark it as pending and resolve before final draft or DOCX.
 
 ## Source Coverage Card
 

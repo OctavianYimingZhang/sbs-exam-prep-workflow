@@ -423,11 +423,15 @@ For answer-one essay sections with several options, add an `EssayCoveragePlan`. 
 
 When Essay Exam Prep or Example Essay Mode is triggered, follow `essay_generation_protocol.md` and package the student-facing result as `Essay_Module_Example_Essays.docx` unless the user explicitly asks for separate essay files.
 
+For complete essay planning, assessed-style essay drafting, or a user-supplied essay topic not already constrained by a lecture source pack, first apply `essay_tutor_workflow_protocol.md`. The plan must collect essay constraints, run DeepResearch, produce a subtitle-level plan, and pass the plan-approval gate unless the user explicitly requests direct generation.
+
 If the exam-format gate classifies the target as `long_answer_project`, follow `long_answer_example_protocol.md` instead of the essay-generation protocol.
 
 For every essay output, require:
 
 - Question deconstruction;
+- Essay intake constraints where relevant;
+- Detailed essay plan with subtitle-level main-body content;
 - Lecture anchors;
 - Knowledge inventory;
 - Lecturer-intent analysis;

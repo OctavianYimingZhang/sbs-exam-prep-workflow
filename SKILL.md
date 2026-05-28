@@ -109,6 +109,7 @@ Public output contract:
 Example Essay hard gates:
 
 - Trigger complete Example Essay mode only when the user asks for essay preparation, model essays, full essay-style answers, or complete essay documents.
+- For complete essay planning or assessed-style drafting, follow `references/essay_tutor_workflow_protocol.md` before drafting: collect essay constraints, run DeepResearch, produce a subtitle-level plan, and use the plan-approval gate unless the user explicitly asks for direct generation.
 - Follow `references/essay_generation_protocol.md` and `references/example_essay_docx_output_protocol.md`.
 - Use lecture/PPT/source logic as the skeleton; Extra Reading is a precision layer, not a replacement.
 - Add molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent source mechanism slot and preserves claim level, scope, and exam function.
@@ -146,6 +147,7 @@ Student-facing outputs:
 
 Example Essays and prose:
 
+- `references/essay_tutor_workflow_protocol.md`: essay-specific intake, DeepResearch, detailed plan schema, approval loop, subagent roles, citation modes, figure/table/data rules, and final essay QA.
 - `references/essay_generation_protocol.md`: Example Essay planning, source logic, Extra Reading integration, compression budget, and examiner-fit checks.
 - `references/example_essay_docx_output_protocol.md`: DOCX-first Example Essay formatting, highlighting, source mapping, and source audit.
 - `references/language_quality_contract.md`: shared prose-quality rules for KP synthesis, Example Essays, and long-answer prose.

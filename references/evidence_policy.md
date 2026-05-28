@@ -55,6 +55,7 @@ If the user supplies no citations for an Example Essay, actively mine lecture sl
 If relevant lecture slides contain no usable citations, find several verified classic experiments or landmark primary studies through academic search. Use them only when they directly support the lecture-grounded paragraph claim.
 If Extra Reading Books are uploaded, locate the relevant chapter/section before using them. Do not cite or highlight a whole book vaguely.
 Formatting reference PDFs are layout/style evidence only and must not supply biological claims.
+During essay planning, unverified external sources are candidate sources only. Do not place them in the final draft, reference list, DOCX, or highlight map until metadata and claim relevance are verified.
 ```
 
 ## Example Evidence Use
@@ -148,6 +149,8 @@ Do not:
 - write a benchmark-specific instruction outside an explicit regression context;
 - apply an example lesson without a matching target evidence condition;
 - insert unverified citations;
+- present candidate sources as verified essay evidence;
+- reuse academic paper figures, tables, or images without licence, permission, user-provided rights, or a clearly allowed private-study boundary;
 - skip slide-citation mining when the user does not supply citations for Example Essay generation;
 - use classic experiments before checking whether lecture slides contain usable citations;
 - use famous experiments that are not directly relevant to the exact paragraph claim;
@@ -191,6 +194,8 @@ Use these flags when applicable:
 - `regime_example_applied_without_format_match`
 - `question_type_example_applied_without_question_type_match`
 - `citation_detected_on_slide`
+- `candidate_source_needs_verification`
+- `candidate_source_used_as_verified`
 - `citation_original_resolved`
 - `citation_original_unreadable`
 - `citation_original_used_without_reading`
@@ -210,3 +215,5 @@ Use these flags when applicable:
 - `essay_paragraph_missing_lecture_anchor`
 - `essay_not_tightly_lecture_grounded`
 - `docx_format_lint_failed`
+- `figure_reuse_permission_missing`
+- `generated_figure_contains_unsupported_claim`

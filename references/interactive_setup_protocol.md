@@ -17,6 +17,7 @@ The setup wizard has these sections:
 | Project | Capture target label, code, exam year, and output folder. |
 | Source Inputs | List lecture slides, official notes, ordered course notes, papers, practical material, answers, feedback, and readings. |
 | Output Mode | Choose exactly one main preset and whether an audit package is requested. |
+| Essay Constraints | For complete essay work, capture topic, exact question, word limit, format, citation style, rubric, source base, figure/table/data needs, and AI-use policy where available. |
 | Evidence Policy | Decide whether academic search and extra-reading enrichment are allowed. |
 | QA Gates | Choose strictness for ontology, lineage, language, and blocking-flag checks. |
 | Plan Preview | Show actions, skipped modules, blockers, and publish gates. |
@@ -54,6 +55,15 @@ Before execution, create or conceptually present the `WorkflowPlan`:
 - modules skipped and why;
 - blockers;
 - publish gate.
+
+For complete essay planning or assessed-style drafting, add:
+
+- detailed essay-plan version;
+- approval status;
+- candidate sources still requiring verification;
+- figure/table/data gates if requested.
+
+Do not generate the complete final essay before the plan is approved unless the user explicitly requests direct generation.
 
 Use `scripts/plan_workflow.py` when a config file is available. Use `scripts/render_workflow_plan.py` when a markdown preview is useful.
 

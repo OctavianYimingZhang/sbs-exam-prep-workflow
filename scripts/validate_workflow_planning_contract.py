@@ -44,6 +44,7 @@ REQUIRED_FILES = [
     "references/best_usage_guide.md",
     "references/student_facing_output_policy.md",
     "references/exam_prep_notes_protocol.md",
+    "references/essay_tutor_workflow_protocol.md",
     "references/visual_aid_generation_protocol.md",
     "references/knowledge_walkthrough_docx_protocol.md",
 ]
