@@ -42,10 +42,28 @@
         ]
       }
     },
+    "exam_prep_knowledge_card": {
+      "type": "object",
+      "properties": {
+        "priority": { "enum": ["★★★", "★★", "★"] },
+        "module_title": { "type": "string" },
+        "exam_specificity": { "type": "string" },
+        "core_exam_claim": { "type": "string" },
+        "key_definitions": { "type": "array", "items": { "type": "string" } },
+        "exam_ready_knowledge_synthesis": { "type": "string" },
+        "criteria_components_steps": { "type": "array", "items": { "type": "string" } },
+        "mechanism_or_process_logic": { "type": "string" },
+        "canonical_example": { "type": "string" },
+        "exam_use": { "type": "string" },
+        "common_error_or_trap": { "type": "string" },
+        "must_master": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
     "mcq_student_point_card": {
       "type": "object",
       "properties": {
-        "priority": { "enum": ["必备", "重点", "补充"] },
+        "priority": { "enum": ["★★★", "★★", "★"] },
         "point": { "type": "string" },
         "knowledge_explanation": { "type": "string" },
         "how_exam_tests_it": { "type": "string" },
@@ -57,7 +75,7 @@
     "short_answer_point_card": {
       "type": "object",
       "properties": {
-        "priority": { "enum": ["必备", "重点", "补充"] },
+        "priority": { "enum": ["★★★", "★★", "★"] },
         "point": { "type": "string" },
         "common_question_form": { "type": "string" },
         "exam_explanation_with_highlighted_keywords": { "type": "string" },

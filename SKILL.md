@@ -10,7 +10,7 @@ Use this Skill to turn a student's supplied exam materials into evidence-grounde
 The first-principles chain is:
 
 ```text
-inputs -> source authority -> exam format -> question type -> examiner operation -> course-section reconstruction -> knowledge point -> preparation output
+inputs -> source authority -> course reconstruction -> source-first baseline notes -> coverage QA -> exam overlay -> preparation output
 ```
 
 ## Purpose And Trigger Boundary
@@ -23,13 +23,13 @@ Trigger this Skill for:
 
 Default behaviour:
 
-- If the user provides materials and asks to revise, make notes, go through the material, or prepare generally without naming a narrower artifact, select `exam_prep_notes_docx`. This route emits the compatible `Lecture_Knowledge_Walkthrough.docx` public artifact while using exam-informed Academic Exam-Ready Notes logic.
+- If the user provides materials and asks to revise, make notes, go through the material, or prepare generally without naming a narrower artifact, select `exam_prep_notes_docx`. This route emits the compatible `Lecture_Knowledge_Walkthrough.docx` public artifact by building source-first baseline notes, running protected coverage QA, then applying an exam overlay.
 - Keep `knowledge_walkthrough_docx` as a compatibility route when the user explicitly asks for a lecture-first walkthrough in source order.
 - If the user asks for MCQ, Short Answer, Long Answer/Project/Scenario, Practical/Data, or Essay preparation, generate the Academic Exam-Ready Notes foundation unless the user explicitly opts out, then add the matching DOCX report.
 - If the user asks only for past-paper analysis, exam format, or likely emphasis before generation, produce a chat-only `exam_analysis_brief`; do not create a public prediction file.
 - For essay/problem-essay prediction language, use `Predicted essay theme` as the default label, not predicted question wording.
 - If the user asks only for inventory, linting, QA, or release checks, run the narrow audit route and do not generate study artifacts.
-- When formal past papers are supplied with ordinary notes generation, route them through optional exam-regime, question-record, archetype, and examiner-operation planning actions. These actions may shape emphasis and add-ons but must not become factual authority or exact future-question claims.
+- When formal past papers are supplied with ordinary notes generation, route them through optional exam-regime, question-record, archetype, and examiner-operation planning actions. These actions may shape overlay emphasis and add-ons but must not become factual authority, exact future-question claims, or reasons to delete source-backed baseline modules.
 - When style examples, feedback, or cross-target examples are supplied, run style analysis only as an internal transferable-rule layer; do not use example content as target factual or prediction evidence.
 - When sources contain diagrams, tables, figures, presentations, or image-only content, preserve visual-inspection metadata and warn internally before relying on visual content.
 
@@ -93,7 +93,7 @@ Student-facing output filter:
 
 - Public prose must be directly usable revision content, not an audit trace.
 - Do not expose source anchors, confidence bands, recurrence counts, lecture centrality, examiner-operation labels, task verbs, discriminator axes, reference expansion, evidence limits, internal priority scores, source maps, QA JSON, run manifests, lineage files, citation logs, or rendered previews unless the user explicitly asks for an audit package.
-- Visible priority labels are only `必备`, `重点`, and `补充`.
+- Visible priority labels are only `★★★`, `★★`, and `★`.
 - Internal helper artifacts may be generated for validation, but they must stay outside ordinary student-facing output folders.
 
 Public output contract:

@@ -99,7 +99,7 @@ Step 2: Module extraction. Split by conceptual function, not by slide number:
 - disease/application module;
 - method/data module.
 
-Step 3: Knowledge compression. Merge repeated content. Convert pathways into mechanism chains. Demote low-value details into common confusions or omit them.
+Step 3: Knowledge compression. Merge repeated content and convert pathways into mechanism chains only after checking protected KnowledgePoints. Official definitions, contrast pairs, criteria/features/stages lists, named examples, `Why X?` blocks, diagrams, tables, equations, calculations, workflows, and past-paper terms must remain visible as named module content. Demote or omit only genuinely unsupported or repetitive detail, not protected source-backed items.
 
 Step 4: Student-facing rewrite. Use direct explanatory prose, mixed English terms where useful, and bold required terms. Do not write `slides say`, `according to page`, or source-tracing narration.
 

@@ -16,7 +16,9 @@ REQUIRED_TOP_LEVEL = {
     "lecture_mapping",
     "knowledge_cards",
     "official_definition_records",
+    "source_baseline_binding",
     "exam_emphasis_binding",
+    "exam_overlay_binding",
     "question_type_addons",
     "content_coverage_checks",
     "student_visible_structure",
@@ -29,18 +31,40 @@ REQUIRED_CARD_FIELDS = {
     "card_id",
     "kp_id",
     "section_id",
-    "priority_label",
-    "exam_function",
+    "module_id",
+    "module_title",
+    "source_baseline_card_id",
+    "priority",
+    "exam_specificity",
     "core_exam_claim",
-    "exam_ready_synthesis",
+    "exam_ready_knowledge_synthesis",
+    "must_master",
+    "protected_source_items_covered",
     "source_anchors",
     "coverage_status",
     "student_visible",
 }
 
-ALLOWED_PRIORITY = {"必备", "重点", "补充"}
+ALLOWED_PRIORITY = {"★★★", "★★", "★"}
 ALLOWED_COVERAGE = {"tested", "partially_tested", "fresh", "saturated", "unknown"}
 ALLOWED_QA_STATUS = {"pass", "warn", "block"}
+ALLOWED_EXAM_SPECIFICITY = {
+    "definition",
+    "mechanism",
+    "criteria list",
+    "comparison",
+    "calculation",
+    "graph interpretation",
+    "method workflow",
+    "case justification",
+    "background",
+}
+FORBIDDEN_CARD_FIELDS = {
+    "priority_label",
+    "exam_function",
+    "exam_ready_synthesis",
+    "evidence_or_example_function",
+}
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -87,15 +111,34 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             continue
         for field in sorted(REQUIRED_CARD_FIELDS - set(card)):
             failures.append({"type": "knowledge_card_missing_field", "card_id": card.get("card_id"), "field": field})
+        for field in sorted(FORBIDDEN_CARD_FIELDS & set(card)):
+            failures.append({"type": "knowledge_card_forbidden_legacy_field", "card_id": card.get("card_id"), "field": field})
         if card.get("student_visible") is True:
-            if card.get("priority_label") not in ALLOWED_PRIORITY:
-                failures.append({"type": "student_visible_card_invalid_priority", "card_id": card.get("card_id"), "priority_label": card.get("priority_label")})
-            if not str(card.get("exam_function") or "").strip():
-                failures.append({"type": "student_visible_card_missing_exam_function", "card_id": card.get("card_id")})
+            if card.get("priority") not in ALLOWED_PRIORITY:
+                failures.append({"type": "student_visible_card_invalid_priority", "card_id": card.get("card_id"), "priority": card.get("priority")})
+            if card.get("exam_specificity") not in ALLOWED_EXAM_SPECIFICITY:
+                failures.append({"type": "student_visible_card_invalid_exam_specificity", "card_id": card.get("card_id"), "exam_specificity": card.get("exam_specificity")})
+            if not str(card.get("module_title") or "").strip():
+                failures.append({"type": "student_visible_card_missing_module_title", "card_id": card.get("card_id")})
+            if not str(card.get("source_baseline_card_id") or "").strip():
+                failures.append({"type": "student_visible_card_missing_source_baseline_card_id", "card_id": card.get("card_id")})
             if not non_empty_list(card.get("source_anchors")):
                 failures.append({"type": "student_visible_card_missing_source_anchors", "card_id": card.get("card_id")})
+            if not non_empty_list(card.get("must_master")):
+                failures.append({"type": "student_visible_card_missing_must_master", "card_id": card.get("card_id")})
+            if not non_empty_list(card.get("protected_source_items_covered")):
+                failures.append({"type": "student_visible_card_missing_protected_source_items", "card_id": card.get("card_id")})
             if card.get("coverage_status") not in ALLOWED_COVERAGE:
                 failures.append({"type": "student_visible_card_invalid_coverage_status", "card_id": card.get("card_id"), "coverage_status": card.get("coverage_status")})
+
+    baseline = plan.get("source_baseline_binding", {})
+    if not isinstance(baseline, dict):
+        failures.append({"type": "source_baseline_binding_not_object"})
+    else:
+        if not str(baseline.get("baseline_plan_id") or "").strip():
+            failures.append({"type": "source_baseline_binding_missing_baseline_plan_id"})
+        if baseline.get("coverage_floor_status") not in ALLOWED_QA_STATUS:
+            failures.append({"type": "source_baseline_binding_invalid_coverage_floor_status", "coverage_floor_status": baseline.get("coverage_floor_status")})
 
     emphasis = plan.get("exam_emphasis_binding", {})
     if not isinstance(emphasis, dict):
@@ -107,6 +150,17 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             failures.append({"type": "exam_emphasis_binding_question_types_not_list"})
         if not isinstance(emphasis.get("limitations", []), list):
             failures.append({"type": "exam_emphasis_binding_limitations_not_list"})
+
+    overlay = plan.get("exam_overlay_binding", {})
+    if not isinstance(overlay, dict):
+        failures.append({"type": "exam_overlay_binding_not_object"})
+    else:
+        if not str(overlay.get("overlay_id") or "").strip():
+            failures.append({"type": "exam_overlay_binding_missing_overlay_id"})
+        if overlay.get("overlay_status") not in ALLOWED_QA_STATUS:
+            failures.append({"type": "exam_overlay_binding_invalid_overlay_status", "overlay_status": overlay.get("overlay_status")})
+        if overlay.get("protected_items_preserved") is not True:
+            failures.append({"type": "exam_overlay_binding_protected_items_not_preserved"})
 
     checks = plan.get("content_coverage_checks", [])
     if not isinstance(checks, list) or not checks:

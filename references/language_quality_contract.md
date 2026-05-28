@@ -11,9 +11,12 @@ For `exam_prep_notes_docx`, write notes as exam-ready academic synthesis, not as
 Prefer section functions such as:
 
 - `Core Exam Claim`;
+- `Key Definitions`;
 - `Exam-Ready Knowledge Synthesis`;
+- `Criteria / Components / Steps`;
 - `Mechanism / Process Logic`;
-- `Evidence / Example Function`;
+- `Canonical Example`;
+- `Exam Use`;
 - `Common Error / Trap`;
 - `Must Master`.
 
@@ -28,10 +31,10 @@ Avoid:
 The paragraph shape is:
 
 ```text
-examinable claim or problem -> mechanism/process -> evidence/example function -> scope or limitation -> exam use
+examinable claim or problem -> mechanism/process -> canonical example where source-backed -> scope or limitation -> exam use
 ```
 
-Do not preserve the original notes' order when that order is weaker than the exam logic. Use the original order only to infer prerequisites, source intent, and causal development.
+Do not preserve the original notes' order when that order is weaker than the exam logic, but do preserve the source-first baseline coverage of protected definitions, contrast pairs, criteria lists, named examples, diagrams, tables, equations, calculations, and workflow items before applying exam overlay.
 
 ## Core Paragraph Shape
 

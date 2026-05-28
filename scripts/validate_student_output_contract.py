@@ -71,7 +71,7 @@ def validate(root: Path) -> dict[str, Any]:
     exam_prep_notes = read(root / "references/exam_prep_notes_protocol.md")
     walkthrough = read(root / "references/knowledge_walkthrough_docx_protocol.md")
     combined = policy + "\n" + exam_prep_notes + "\n" + walkthrough
-    for term in ["ExamPrepNotesStudentContract", "Academic Exam-Ready Notes", "MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap"]:
+    for term in ["ExamPrepNotesStudentContract", "Academic Exam-Ready Notes", "MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap", "Canonical Example", "Exam Use", "★★★"]:
         if term not in combined:
             failures.append({"type": "student_policy_missing_term", "term": term})
     for field in sorted(FORBIDDEN_VISIBLE_FIELDS):
@@ -79,7 +79,10 @@ def validate(root: Path) -> dict[str, Any]:
             failures.append({"type": "student_policy_missing_forbidden_field", "field": field})
 
     contract = load_json(root / "schemas/student_output_contract.schema.json")
-    contract_text = json.dumps(contract)
+    contract_text = json.dumps(contract, ensure_ascii=False)
+    for legacy in ["必备", "重点", "补充"]:
+        if legacy in policy + exam_prep_notes + contract_text:
+            failures.append({"type": "legacy_priority_label_still_visible", "label": legacy})
     for field in sorted(FORBIDDEN_VISIBLE_FIELDS):
         if field not in contract_text:
             failures.append({"type": "student_output_schema_missing_forbidden_field", "field": field})

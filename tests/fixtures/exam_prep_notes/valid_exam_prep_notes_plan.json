@@ -24,11 +24,21 @@
       "card_id": "card_001",
       "kp_id": "kp_001",
       "section_id": "section_001",
-      "priority_label": "必备",
-      "exam_function": "Use the mechanism chain to explain an observed output.",
+      "module_id": "module_001",
+      "module_title": "Generic mechanism as a source-backed causal module",
+      "source_baseline_card_id": "baseline_card_001",
+      "priority": "★★★",
+      "exam_specificity": "mechanism",
       "core_exam_claim": "A source-backed mechanism links input, process, output, and limitation.",
-      "exam_ready_synthesis": "The examinable point is the causal link between mechanism and output, with the limitation stated explicitly.",
+      "key_definitions": ["A mechanism is a source-backed causal explanation from input to output."],
+      "exam_ready_knowledge_synthesis": "The examinable point is the causal link between mechanism and output, with the limitation stated explicitly.",
+      "criteria_components_steps": ["Identify input.", "Explain process.", "State output.", "State limitation."],
       "mechanism_or_process_logic": "Input changes the mechanism; the mechanism changes the readout; the limitation defines scope.",
+      "canonical_example": "A source-backed example demonstrates the same causal chain without adding unsupported detail.",
+      "exam_use": "Use this module to answer a short-answer or case prompt asking why the output changes.",
+      "common_error_or_trap": "Do not state the output without the causal process.",
+      "must_master": ["Define the mechanism.", "Link input to output.", "State the limitation."],
+      "protected_source_items_covered": ["official definition", "mechanism chain", "summary point"],
       "source_anchors": ["fake_lecture.txt:1"],
       "coverage_status": "tested",
       "student_visible": true
@@ -42,10 +52,22 @@
       "source_anchors": ["fake_lecture.txt:1"]
     }
   ],
+  "source_baseline_binding": {
+    "baseline_plan_id": "baseline_plan_fixture_001",
+    "coverage_floor_status": "pass",
+    "protected_source_items_total": 3,
+    "limitations": []
+  },
   "exam_emphasis_binding": {
     "formal_papers_used": true,
     "compatible_question_types": ["mcq", "short_answer"],
     "limitations": ["Past papers control emphasis only, not factual truth or exact future wording."]
+  },
+  "exam_overlay_binding": {
+    "overlay_id": "overlay_fixture_001",
+    "overlay_status": "pass",
+    "protected_items_preserved": true,
+    "limitations": []
   },
   "question_type_addons": [],
   "optional_visual_aids": [],
@@ -54,10 +76,10 @@
       "check_id": "coverage_001",
       "status": "pass",
       "scope": "student_visible_knowledge_cards",
-      "message": "Every visible card has source support, priority, exam function, and coverage status."
+      "message": "Every visible card has source support, star priority, exam specificity, protected coverage, and coverage status."
     }
   ],
-  "student_visible_structure": ["Course-Level Exam Map", "Course Section", "Module", "Core Exam Claim"],
+  "student_visible_structure": ["Course-Level Exam Map", "Course Section", "Module", "Core Exam Claim", "Canonical Example", "Exam Use"],
   "forbidden_student_fields": ["source_anchor", "confidence", "examiner_operation"],
   "qa_flags": [],
   "qa_status": "pass"

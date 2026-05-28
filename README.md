@@ -258,7 +258,7 @@ Typical student-facing outputs:
 | Request type | Main output | Purpose |
 | --- | --- | --- |
 | Source inventory | JSON or concise report | Identify files, roles, extraction status, and evidence limits. |
-| General revision / exam-prep notes | `Lecture_Knowledge_Walkthrough.docx` | Build Academic Exam-Ready Notes from source authority, course-section reconstruction, and optional exam emphasis. |
+| General revision / exam-prep notes | `Lecture_Knowledge_Walkthrough.docx` | Build source-first baseline notes, protect source coverage, then apply optional exam overlay. |
 | Explicit lecture-order walkthrough | `Lecture_Knowledge_Walkthrough.docx` | Go through lectures in order through AI-inferred conceptual modules. |
 | Exam analysis brief | Chat-only pre-generation note | Use paper patterns to choose modules and points without creating a prediction file. |
 | Essay/problem-essay prep | `Essay_Module_Example_Essays.docx` | Prepare module-level big Example Essays with adaptation maps and paragraph banks. |
@@ -276,13 +276,14 @@ flowchart TD
     B --> C[WorkflowPlan]
     C --> D[InputReadinessReport]
     D --> E[Source inventory]
-    E --> F[Exam-regime split]
-    F --> G[Question-type classification]
-    G --> H[Exam strategy diagnosis]
-    H --> I[Course-section reconstruction]
+    E --> I[Course-section reconstruction]
     I --> J[Knowledge-point segmentation]
-    J --> K[Examiner-operation inference]
-    K --> R[Exam-ready notes plan]
+    J --> K[Source-first baseline notes]
+    K --> U[Baseline coverage floor QA]
+    U --> F[Optional exam-regime and question analysis]
+    F --> V[Exam overlay pass]
+    V --> W[Overlay coverage QA]
+    W --> R[Exam-ready notes plan]
     R --> S{Output route}
     S --> L[Lecture Knowledge Walkthrough DOCX]
     S --> M[MCQ Exam Analysis Report DOCX]
@@ -296,7 +297,7 @@ flowchart TD
     Q --> P
 ```
 
-The Skill first classifies the evidence, then chooses the preparation strategy. It avoids applying essay logic to MCQ, short-answer, data/problem, or practical questions.
+The Skill first classifies the evidence, reconstructs source-backed course structure, and protects a baseline note set before applying exam emphasis. It avoids applying essay logic to MCQ, short-answer, data/problem, or practical questions.
 
 ## Student-Facing Output Filter
 
@@ -305,7 +306,7 @@ Internal reasoning can use source anchors, confidence, recurrence, lecture centr
 Visible output should be rewritten as:
 
 ```text
-priority -> point/module -> explanation -> exam-use answer or walkthrough
+star priority -> module -> source-backed explanation -> canonical example -> exam use
 ```
 
 Forbidden in ordinary student-facing reports:
@@ -333,7 +334,7 @@ The full policy is in [`references/student_facing_output_policy.md`](references/
 
 ## Exam Prep Notes And Knowledge Walkthrough
 
-The `exam_prep_notes_docx` route is the default for general revision. It accepts readable ordered course notes, verifies source authority, reconstructs course sections, maps lecture sessions, writes Academic Exam-Ready Notes, and may append question-type add-ons after the base notes. It does not create helper files in the student-facing folder.
+The `exam_prep_notes_docx` route is the default for general revision. It accepts readable ordered course notes, verifies source authority, reconstructs course sections, maps lecture sessions, creates a source-first baseline plan, runs protected coverage QA, applies any exam overlay, writes Academic Exam-Ready Notes, and may append question-type add-ons after the base notes. It does not create helper files in the student-facing folder.
 
 The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It does not predict papers, write essays, or create practice packs by default.
 

@@ -25,17 +25,31 @@
       "kp_id": "kp_bad",
       "section_id": "section_001",
       "priority_label": "High",
+      "priority": "High",
       "core_exam_claim": "Unsupported visible card.",
       "exam_ready_synthesis": "This card intentionally lacks required public support fields.",
+      "exam_ready_knowledge_synthesis": "This card intentionally lacks required public support fields.",
       "source_anchors": [],
       "coverage_status": "untracked",
       "student_visible": true
     }
   ],
   "official_definition_records": [],
+  "source_baseline_binding": {
+    "baseline_plan_id": "",
+    "coverage_floor_status": "warn",
+    "protected_source_items_total": 1,
+    "limitations": []
+  },
   "exam_emphasis_binding": {
     "formal_papers_used": false,
     "compatible_question_types": [],
+    "limitations": []
+  },
+  "exam_overlay_binding": {
+    "overlay_id": "overlay_bad",
+    "overlay_status": "warn",
+    "protected_items_preserved": false,
     "limitations": []
   },
   "question_type_addons": [],

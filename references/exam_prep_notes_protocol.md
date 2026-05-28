@@ -9,10 +9,10 @@ This route is not a slide paraphrase, a chatty tutor explanation, a prediction f
 Accept any readable, ordered course-note source, but do not give every source the same authority.
 
 ```text
-CourseContentSource -> OrderedContentItem -> SourceFragment -> KnowledgePoint -> PrepArtifact
+CourseContentSource -> OrderedContentItem -> SourceFragment -> KnowledgePoint -> SourceBaselineNotesPlan -> ExamOverlayPass -> PrepArtifact
 ```
 
-The route reconstructs the course knowledge architecture before writing. Source order is used to infer prerequisites, teaching intent, and causal development, not to force the final notes to preserve the original note sequence when a better exam logic exists.
+The route reconstructs the course knowledge architecture and writes a protected source-first baseline before any exam overlay is allowed to affect density, order, priority, or add-ons. Source order is used to infer prerequisites, teaching intent, and causal development, not to force the final notes to preserve the original note sequence when a better exam logic exists.
 
 ## Source Authority
 
@@ -49,11 +49,17 @@ Run the route in this order:
 4. Reconstruct course-level sections from the official source logic.
 5. Map lecture sessions or ordered source blocks into the reconstructed course sections.
 6. Extract lecture-level conceptual modules and KnowledgePoints.
-7. Apply exam-emphasis mapping to density, ordering, and priority labels.
-8. Generate Academic Exam-Ready Notes.
-9. Append a question-type add-on layer only when useful or requested.
-10. Add optional visual aids only after the text is source-backed.
-11. Run student-output, evidence, language, DOCX, and helper-file boundary QA.
+7. Generate `SourceBaselineNotesPlan` from official source structure before exam pruning.
+8. Run `BaselineCoverageFloorQA`.
+9. Build `ExamEmphasisProfile` from formal past-paper question records when available.
+10. Apply `ExamOverlayPass` to priority, density, ordering, examples, traps, and question-type add-ons.
+11. Run `OverlayDidNotDamageCoverageQA`.
+12. Generate integrated Academic Exam-Ready Notes.
+13. Append a question-type add-on layer only when useful or requested.
+14. Add optional visual aids only after the text is source-backed.
+15. Run `exam_prep_notes_linter` plus student-output, evidence, language, DOCX, and helper-file boundary QA.
+
+Exam evidence may add, split, reorder, prioritise, densify, and enrich. Exam evidence must not delete, hide, or over-compress protected source-backed modules.
 
 If no formal past papers are supplied, generate notes from source centrality, conceptual dependency, and official course emphasis only. Do not invent exam frequency or future-question probability.
 
@@ -82,7 +88,7 @@ Allowed uses:
 - increase depth for source-backed KnowledgePoints that match visible question families;
 - order notes so high-transfer concepts appear before lower-transfer details;
 - decide whether MCQ, short-answer, long-answer, practical/data, or essay add-ons are useful;
-- mark content as `必备`, `重点`, or `补充` without exposing scoring logic.
+- mark content as `★★★`, `★★`, or `★` without exposing scoring logic.
 
 Forbidden uses:
 
@@ -100,6 +106,23 @@ If a definition appears only in student notes or unknown-provenance notes, treat
 
 If no support is found, use a conservative definition, avoid extra specificity, and attach an internal QA flag. Do not invent mechanism, scope, exception, or terminology.
 
+## Protected KnowledgePoint Rule
+
+A source-backed item is protected when it is:
+
+- an intended learning outcome;
+- a slide/page heading or major notes heading;
+- an official definition;
+- a contrast pair;
+- a criteria, features, stages, classes, or components list;
+- a named example used to teach a concept;
+- a source section of the form `Why X?`;
+- a labelled diagram, table, graph, equation, calculation, or workflow;
+- a summary or take-home point;
+- a term, operation, or concept appearing in formal past papers.
+
+Protected items must appear in the source baseline plan. They may not disappear, be hidden only in `Common Error / Trap`, or be reduced to one checklist phrase. If a protected item is genuinely low value, keep it brief and label it `★`; do not remove it unless a QA flag records why it cannot be supported.
+
 ## Student-Facing Structure
 
 Use a Word-first structure that reads as revision notes, not an audit:
@@ -115,11 +138,15 @@ Lecture [Number or Name]
 Lecture Function Within Section
 Lecture-Level Module Map
 Module: [Title]
-Priority: 必备 | 重点 | 补充
+Priority: ★★★ | ★★ | ★
+Exam Specificity
 Core Exam Claim
+Key Definitions
 Exam-Ready Knowledge Synthesis
+Criteria / Components / Steps
 Mechanism / Process Logic
-Evidence / Example Function
+Canonical Example
+Exam Use
 Common Error / Trap
 Must Master
 Question-Type Add-On Layer
@@ -128,16 +155,25 @@ Optional Visual Aid
 
 Omit headings that add no value for a specific source set. Do not expose internal evidence fields.
 
-The internal `ExamPrepNotesPlan` must use structured course sections, lecture mapping, source-backed knowledge cards, official definition records, exam-emphasis binding, question-type add-ons, content-coverage checks, QA flags, and a visible-output field filter. Every student-visible knowledge card must have source support, one visible priority label, an exam function, and a coverage status.
+The internal `ExamPrepNotesPlan` must use structured course sections, lecture mapping, source-backed knowledge cards, official definition records, source-baseline binding, exam-emphasis binding, exam-overlay binding, question-type add-ons, content-coverage checks, QA flags, and a visible-output field filter. Every student-visible knowledge card must have source support, one visible star priority label, exam specificity, source-baseline card binding, protected-source coverage, must-master points, and a coverage status.
+
+Priority meanings:
+
+- `★★★` = answer-producing exam core: standalone definition, mechanism, calculation, graph/data operation, criteria list, method workflow, named source example, or case-study decision point.
+- `★★` = supporting examinable knowledge: useful for explanation, comparison, justification, or transfer.
+- `★` = background/context: useful framing only; keep brief unless directly tested.
 
 ## Academic Exam-Ready Notes Language
 
 Prefer:
 
 - `Core Exam Claim`;
+- `Key Definitions`;
 - `Exam-Ready Knowledge Synthesis`;
+- `Criteria / Components / Steps`;
 - `Mechanism / Process Logic`;
-- `Evidence / Example Function`;
+- `Canonical Example`;
+- `Exam Use`;
 - `Common Error / Trap`;
 - `Must Master`.
 

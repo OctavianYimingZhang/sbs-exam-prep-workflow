@@ -129,7 +129,7 @@ The default student-facing MCQ report is a Point Card report only. Convert the i
 
 ```yaml
 MCQStudentPointCard:
-  priority: 必备 | 重点 | 补充
+  priority: ★★★ | ★★ | ★
   point: string
   knowledge_explanation: string
   how_exam_tests_it: string
@@ -264,7 +264,7 @@ ShortAnswerModuleSection:
   point_cards: list[ShortAnswerPointCard]
 
 ShortAnswerPointCard:
-  priority: 必备 | 重点 | 补充
+  priority: ★★★ | ★★ | ★
   point: string
   common_question_form: string
   exam_explanation_with_highlighted_keywords: string

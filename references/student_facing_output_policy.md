@@ -51,11 +51,17 @@ These may appear only in internal QA or an explicit audit package requested by t
 
 Use only these visible priority labels when priority is useful:
 
-- `必备`;
-- `重点`;
-- `补充`.
+- `★★★`;
+- `★★`;
+- `★`.
 
-Do not explain why a point is `必备` by exposing recurrence, confidence, or source-scoring logic. Convert the reason into useful content: what to know, how it is tested, and what trap to avoid.
+Meanings:
+
+- `★★★` = answer-producing exam core: standalone definition, mechanism, calculation, graph/data operation, criteria list, method workflow, named source example, or case-study decision point.
+- `★★` = supporting examinable knowledge: useful for explanation, comparison, justification, or transfer.
+- `★` = background/context: useful framing only; keep brief unless directly tested.
+
+Do not explain why a point is `★★★` by exposing recurrence, confidence, or source-scoring logic. Convert the reason into useful content: what to know, how it is tested, and what trap to avoid.
 
 ## Exam Prep Notes Student Contract
 
@@ -77,11 +83,16 @@ Visible knowledge card:
 
 ```yaml
 ExamPrepKnowledgeCard:
-  priority: 必备 | 重点 | 补充
+  priority: ★★★ | ★★ | ★
+  module_title: string
+  exam_specificity: string
   core_exam_claim: string
+  key_definitions: list[string]
   exam_ready_knowledge_synthesis: string
+  criteria_components_steps: list[string]
   mechanism_or_process_logic: string
-  evidence_or_example_function: string
+  canonical_example: string
+  exam_use: string
   common_error_or_trap: string
   must_master: list[string]
 ```
@@ -109,7 +120,7 @@ Visible MCQ Point Card:
 
 ```yaml
 MCQStudentPointCard:
-  priority: 必备 | 重点 | 补充
+  priority: ★★★ | ★★ | ★
   point: string
   knowledge_explanation: string
   how_exam_tests_it: string
@@ -152,7 +163,7 @@ Visible point card:
 
 ```yaml
 ShortAnswerPointCard:
-  priority: 必备 | 重点 | 补充
+  priority: ★★★ | ★★ | ★
   point: string
   common_question_form: string
   exam_explanation_with_highlighted_keywords: string

@@ -196,13 +196,14 @@ If a section presents several essay options and the student answers one, prepare
 When formal past papers are supplied with a general notes or revision request, past-paper analysis feeds `exam_prep_notes_docx` before notes are generated:
 
 ```text
-formal papers -> current regime split -> PastPaperQuestion records -> question families -> KP compatibility -> ExamEmphasisProfile -> Academic Exam-Ready Notes
+formal papers -> current regime split -> PastPaperQuestion records -> question families -> KP compatibility -> ExamEmphasisProfile -> ExamOverlayPass -> Academic Exam-Ready Notes
 ```
 
-The `ExamEmphasisProfile` may control density, ordering, and visible priority labels for source-backed KnowledgePoints. It may also decide whether MCQ, short-answer, long-answer, practical/data, or essay add-ons are useful after the base notes.
+The `ExamEmphasisProfile` feeds the `ExamOverlayPass`, which may control density, ordering, and visible star priority labels for source-backed KnowledgePoints after the `SourceBaselineNotesPlan` has passed coverage QA. It may also decide whether MCQ, short-answer, long-answer, practical/data, or essay add-ons are useful after the base notes.
 
-The `ExamEmphasisProfile` must not control:
+The `ExamEmphasisProfile` and `ExamOverlayPass` must not control:
 
+- deletion, hiding, or over-compression of protected source-backed baseline modules;
 - exact future wording;
 - unsupported official answers;
 - fake numerical prediction;

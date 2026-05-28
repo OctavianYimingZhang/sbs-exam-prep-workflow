@@ -335,6 +335,21 @@ KnowledgePoint:
 
 Do not split by every slide. Split by examinable causal block. A valid KP should work as an MCQ concept, a short-answer mark cluster, an essay paragraph, or one component of an essay plan.
 
+Protected source-backed items override ordinary compression. Treat each of the following as a protected KnowledgePoint or protected sub-item in the source baseline:
+
+- intended learning outcome;
+- slide/page heading or major notes heading;
+- official definition;
+- contrast pair;
+- criteria, features, stages, classes, components, or steps list;
+- named example used to teach a concept;
+- `Why X?` source section;
+- labelled diagram, table, graph, equation, calculation, or workflow;
+- summary or take-home point;
+- term, operation, or concept appearing in formal past papers.
+
+Protected items may be grouped only when the final baseline still names and explains each item. They may not be hidden only in traps, omitted as low-value detail, or reduced to one checklist phrase.
+
 For essay-capable KPs, do not treat all slide facts equally. Prioritise the facts that can form a causal paragraph:
 
 ```text

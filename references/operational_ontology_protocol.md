@@ -53,7 +53,7 @@ Core objects:
 
 - `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, `WorkflowPlan`, and `OutputView`: interaction-layer objects that select mode, plan actions, expose source coverage, and prevent hidden blockers.
 - `LectureModule` and `KnowledgeWalkthroughPlan`: compatibility lecture-review objects that preserve lecture order while converting slides or notes into conceptual modules.
-- `CourseSection`, `LectureSession`, `LectureConceptModule`, `ExamEmphasisProfile`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure before writing.
+- `CourseSection`, `LectureSession`, `LectureConceptModule`, `SourceBaselineNotesPlan`, `ExamEmphasisProfile`, `ExamOverlayPass`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure, protect source-first baseline coverage, then apply exam overlay before writing.
 - `QuestionTypeAddOn`, `VisualAidSpec`, and `GeneratedVisualAid`: final-layer add-on objects that may extend notes without becoming factual authority.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
@@ -122,6 +122,10 @@ SourceFragment SUPPORTS_LECTURE_MODULE LectureModule
 SourceFragment SUPPORTS_COURSE_SECTION CourseSection
 LectureSession HAS_LECTURE_CONCEPT_MODULE LectureConceptModule
 KnowledgePoint MAPS_KP_TO_EXAM_EMPHASIS ExamEmphasisProfile
+SourceBaselineNotesPlan BASELINE_COVERS_KP KnowledgePoint
+ExamOverlayPass OVERLAY_USES_BASELINE SourceBaselineNotesPlan
+ExamPrepNotesPlan PLAN_USES_SOURCE_BASELINE SourceBaselineNotesPlan
+ExamPrepNotesPlan PLAN_USES_EXAM_OVERLAY ExamOverlayPass
 KnowledgePoint SUPPORTS_CLAIM EvidenceClaim
 PastPaperQuestion INSTANTIATES QuestionArchetype
 QuestionArchetype USES_OPERATION ExaminerOperation
@@ -169,7 +173,11 @@ BuildKnowledgeWalkthroughPlan
 ReconstructCourseSections
 MapLectureSessions
 BuildLectureConceptModules
+BuildSourceBaselineNotesPlan
+RunBaselineCoverageFloorQA
 BuildExamEmphasisProfile
+ApplyExamOverlayPass
+RunOverlayCoverageQA
 BuildExamPrepNotesPlan
 BuildQuestionTypeAddOns
 PlanVisualAid
@@ -188,6 +196,7 @@ BuildEssayCoveragePlan
 MapKPToArchetype
 VerifyReadingSource
 GeneratePrepArtifact
+LintExamPrepNotes
 CreateWorkflowRun
 ValidateOntologyRuntime
 WriteRunManifest
