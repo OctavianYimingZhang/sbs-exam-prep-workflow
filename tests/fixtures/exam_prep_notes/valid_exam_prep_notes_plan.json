@@ -52,6 +52,13 @@
       "source_anchors": ["fake_lecture.txt:1"]
     }
   ],
+  "atomic_knowledge_ledger_binding": {
+    "ledger_id": "atomic_ledger_fixture_001",
+    "knowledge_units_total": 3,
+    "student_visible_units_bound": 3,
+    "administrative_units_excluded": 0,
+    "missing_units": []
+  },
   "source_baseline_binding": {
     "baseline_plan_id": "baseline_plan_fixture_001",
     "coverage_floor_status": "pass",
@@ -69,6 +76,12 @@
     "protected_items_preserved": true,
     "limitations": []
   },
+  "knowledge_only_student_view_binding": {
+    "view_id": "knowledge_only_view_fixture_001",
+    "course_knowledge_map_used": true,
+    "administrative_exam_text_removed": true,
+    "forbidden_public_phrases": []
+  },
   "question_type_addons": [],
   "optional_visual_aids": [],
   "content_coverage_checks": [
@@ -79,7 +92,7 @@
       "message": "Every visible card has source support, star priority, exam specificity, protected coverage, and coverage status."
     }
   ],
-  "student_visible_structure": ["Course-Level Exam Map", "Course Section", "Module", "Core Exam Claim", "Canonical Example", "Exam Use"],
+  "student_visible_structure": ["Course Knowledge Map", "Knowledge Section", "Module", "Core Exam Claim", "Canonical Example", "Exam Use"],
   "forbidden_student_fields": ["source_anchor", "confidence", "examiner_operation"],
   "qa_flags": [],
   "qa_status": "pass"

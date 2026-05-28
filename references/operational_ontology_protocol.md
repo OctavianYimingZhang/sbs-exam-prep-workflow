@@ -3,7 +3,7 @@
 The Skill uses an operational ontology to control workflow, evidence permissions, and output generation. The ontology is not a topic taxonomy and not an embedding index. It is an object-link-action model:
 
 ```text
-SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> CourseSection -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
+SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> AtomicKnowledgeLedger -> CourseSection -> KnowledgePoint -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> ExamOverlayPass -> PrepArtifact -> QAFlag
 ```
 
 ## Purpose
@@ -32,7 +32,8 @@ SourceFragment, FragmentPartition, PastPaperQuestion, AssessmentRegime, ExamBlue
 Gold layer
 Validated semantic objects:
 CourseSection, LectureSession, LectureConceptModule, KnowledgePoint,
-ExamEmphasisProfile, ExaminerOperation, QuestionArchetype, SlotGrammar,
+AtomicKnowledgeLedger, SourceBaselineNotesPlan, KnowledgeOnlyStudentView,
+ExamEmphasisProfile, ExamOverlayPass, ExaminerOperation, QuestionArchetype, SlotGrammar,
 EvidenceClaim, ReadingSource, MethodBlock, QuestionTypeAddOn, VisualAidSpec,
 GeneratedVisualAid, QAFlag.
 
@@ -53,7 +54,7 @@ Core objects:
 
 - `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, `WorkflowPlan`, and `OutputView`: interaction-layer objects that select mode, plan actions, expose source coverage, and prevent hidden blockers.
 - `LectureModule` and `KnowledgeWalkthroughPlan`: compatibility lecture-review objects that preserve lecture order while converting slides or notes into conceptual modules.
-- `CourseSection`, `LectureSession`, `LectureConceptModule`, `SourceBaselineNotesPlan`, `ExamEmphasisProfile`, `ExamOverlayPass`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure, protect source-first baseline coverage, then apply exam overlay before writing.
+- `CourseSection`, `LectureSession`, `LectureConceptModule`, `AtomicKnowledgeLedger`, `SourceBaselineNotesPlan`, `KnowledgeOnlyStudentView`, `ExamEmphasisProfile`, `ExamOverlayPass`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure, decompose source blocks into atomic units, protect source-first baseline coverage, filter public output to knowledge-only content, then apply exam overlay before writing.
 - `QuestionTypeAddOn`, `VisualAidSpec`, and `GeneratedVisualAid`: final-layer add-on objects that may extend notes without becoming factual authority.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
@@ -122,8 +123,13 @@ SourceFragment SUPPORTS_LECTURE_MODULE LectureModule
 SourceFragment SUPPORTS_COURSE_SECTION CourseSection
 LectureSession HAS_LECTURE_CONCEPT_MODULE LectureConceptModule
 KnowledgePoint MAPS_KP_TO_EXAM_EMPHASIS ExamEmphasisProfile
+AtomicKnowledgeLedger LEDGER_DECOMPOSES_FRAGMENT SourceFragment
+AtomicKnowledgeLedger LEDGER_BINDS_KP KnowledgePoint
+SourceBaselineNotesPlan BASELINE_USES_ATOMIC_LEDGER AtomicKnowledgeLedger
 SourceBaselineNotesPlan BASELINE_COVERS_KP KnowledgePoint
 ExamOverlayPass OVERLAY_USES_BASELINE SourceBaselineNotesPlan
+KnowledgeOnlyStudentView VIEW_FILTERS_BASELINE SourceBaselineNotesPlan
+KnowledgeOnlyStudentView VIEW_APPLIES_OVERLAY ExamOverlayPass
 ExamPrepNotesPlan PLAN_USES_SOURCE_BASELINE SourceBaselineNotesPlan
 ExamPrepNotesPlan PLAN_USES_EXAM_OVERLAY ExamOverlayPass
 KnowledgePoint SUPPORTS_CLAIM EvidenceClaim
@@ -173,11 +179,13 @@ BuildKnowledgeWalkthroughPlan
 ReconstructCourseSections
 MapLectureSessions
 BuildLectureConceptModules
+BuildAtomicKnowledgeLedger
 BuildSourceBaselineNotesPlan
 RunBaselineCoverageFloorQA
 BuildExamEmphasisProfile
 ApplyExamOverlayPass
 RunOverlayCoverageQA
+BuildKnowledgeOnlyStudentView
 BuildExamPrepNotesPlan
 BuildQuestionTypeAddOns
 PlanVisualAid
@@ -196,7 +204,9 @@ BuildEssayCoveragePlan
 MapKPToArchetype
 VerifyReadingSource
 GeneratePrepArtifact
+GenerateExamPrepNotesDocx
 LintExamPrepNotes
+LintExamPrepDocxStyle
 CreateWorkflowRun
 ValidateOntologyRuntime
 WriteRunManifest
@@ -226,6 +236,12 @@ Student output filter query:
 
 ```text
 internal objects + selected output mode + allowed visible fields + forbidden visible fields
+```
+
+Academic Exam-Ready Notes query:
+
+```text
+course knowledge map + knowledge sections + lecture mapping + atomic ledger + source baseline + knowledge-only student view + exam overlay + knowledge cards + question-type add-ons + optional visual aids + forbidden student fields
 ```
 
 Academic Exam-Ready Notes query:

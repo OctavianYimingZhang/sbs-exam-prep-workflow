@@ -10,9 +10,11 @@
     "lecture_mapping",
     "knowledge_cards",
     "official_definition_records",
+    "atomic_knowledge_ledger_binding",
     "source_baseline_binding",
     "exam_emphasis_binding",
     "exam_overlay_binding",
+    "knowledge_only_student_view_binding",
     "question_type_addons",
     "content_coverage_checks",
     "student_visible_structure",
@@ -137,6 +139,18 @@
       },
       "additionalProperties": true
     },
+    "atomic_knowledge_ledger_binding": {
+      "type": "object",
+      "required": ["ledger_id", "knowledge_units_total", "student_visible_units_bound", "administrative_units_excluded", "missing_units"],
+      "properties": {
+        "ledger_id": { "type": "string" },
+        "knowledge_units_total": { "type": "integer", "minimum": 0 },
+        "student_visible_units_bound": { "type": "integer", "minimum": 0 },
+        "administrative_units_excluded": { "type": "integer", "minimum": 0 },
+        "missing_units": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
     "source_baseline_binding": {
       "type": "object",
       "required": ["baseline_plan_id", "coverage_floor_status", "protected_source_items_total", "limitations"],
@@ -145,6 +159,17 @@
         "coverage_floor_status": { "enum": ["pass", "warn", "block"] },
         "protected_source_items_total": { "type": "integer", "minimum": 0 },
         "limitations": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "knowledge_only_student_view_binding": {
+      "type": "object",
+      "required": ["view_id", "course_knowledge_map_used", "administrative_exam_text_removed", "forbidden_public_phrases"],
+      "properties": {
+        "view_id": { "type": "string" },
+        "course_knowledge_map_used": { "type": "boolean" },
+        "administrative_exam_text_removed": { "type": "boolean" },
+        "forbidden_public_phrases": { "type": "array", "items": { "type": "string" } }
       },
       "additionalProperties": true
     },

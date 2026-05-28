@@ -10,12 +10,14 @@ prompt_cards:
       - "No supplied or discoverable sources."
   - card_id: "exam_prep_notes_docx"
     preset: "exam_prep_notes_docx"
-    purpose: "Build exam-informed Academic Exam-Ready Notes for general revision."
+    purpose: "Build source-first Academic Exam-Ready Notes for general revision."
     minimum_inputs: ["readable_course_notes"]
     output_contract:
       - "Generate Lecture_Knowledge_Walkthrough.docx as the compatible public artifact."
       - "Accept readable ordered course notes, but use only official or verified sources for factual claims."
-      - "Use past papers for emphasis only when supplied; do not invent exam frequency."
+      - "Build an atomic knowledge ledger and baseline coverage floor before using past papers."
+      - "Use past papers for overlay emphasis only when supplied; do not invent exam frequency."
+      - "Keep the public DOCX knowledge-only: use Course Knowledge Map, not exam-format audit text."
       - "Append question-type add-ons only after the base notes."
       - "Generated visual aids are optional revision schematics, not evidence."
     hard_stops:

@@ -56,7 +56,7 @@ The Skill accepts any readable course-note source: slides, official notes, lectu
 Ordered course-note processing uses:
 
 ```text
-CourseContentSource -> OrderedContentItem -> SourceFragment -> KnowledgePoint -> PrepArtifact
+CourseContentSource -> OrderedContentItem -> SourceFragment -> AtomicKnowledgeLedger -> KnowledgePoint -> PrepArtifact
 ```
 
 Student handwritten annotations, typed notes, flashcards, and unknown-provenance summaries may be used as interpretation hints, definition candidates, and gap cues, but must not be treated as authoritative course facts unless supported by slide text, official notes, official course material, verified textbooks, or verified academic sources. AI-generated notes have no factual authority and may only help with structure after independent verification.
@@ -226,6 +226,24 @@ Old-regime papers may support concept coverage and possible slot fillers, but th
 - A reading list, course handbook, programme/advisement document, or suggestions file may identify reading recommendations or administrative constraints; it must not replace lecture content.
 - Essay style examples must be classified as `style_exemplar` or `exemplar_answer` and used only for paragraph structure, density, and tone unless factual claims are independently verified from target materials.
 - Unsupported files: never infer hidden content.
+
+## Atomic Source Decomposition
+
+For `exam_prep_notes_docx`, extraction does not stop at broad KnowledgePoints. Before baseline notes are written, every readable slide/page/source block must be decomposed into `AtomicKnowledgeUnit` records inside an internal `AtomicKnowledgeLedger`.
+
+Protected atomic units include:
+
+- intended learning outcomes;
+- slide/page headings and major note headings;
+- definition-style text;
+- contrast pairs;
+- criteria, feature, stage, class, or component lists;
+- named mechanisms, methods, drugs, diseases, examples, cases, and target classes;
+- `Why X?` source blocks;
+- labelled diagrams, tables, equations, graphs, calculations, and workflows;
+- limitations, misconceptions, and take-home points.
+
+Administrative units, exam timing, mark splits, reading-list logistics, course-admin pages, and repeated duplicates may be excluded from the student view, but the ledger must record the exclusion reason. Knowledge units must be bound to final modules or named submodules before public generation.
 
 ### Extra Reading Book Extraction
 

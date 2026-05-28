@@ -71,16 +71,19 @@ PRESET_MODULES = {
         "lecture_session_mapping",
         "lecture_concept_module_extraction",
         "knowledge_points",
+        "atomic_knowledge_ledger",
         "source_baseline_notes_plan",
         "baseline_coverage_floor_qa",
         "exam_emphasis_profile",
         "exam_overlay_pass",
         "overlay_did_not_damage_coverage_qa",
+        "knowledge_only_student_view_filter",
         "exam_prep_notes_plan",
         "question_type_addon_generation",
         "visual_aid_planning",
         "visual_aid_generation_optional",
         "exam_prep_notes_docx_generation",
+        "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
         "deliverable_qa",
     ],
@@ -99,16 +102,19 @@ PRESET_MODULES = {
         "lecture_session_mapping",
         "lecture_concept_module_extraction",
         "knowledge_points",
+        "atomic_knowledge_ledger",
         "source_baseline_notes_plan",
         "baseline_coverage_floor_qa",
         "exam_emphasis_profile",
         "exam_overlay_pass",
         "overlay_did_not_damage_coverage_qa",
+        "knowledge_only_student_view_filter",
         "exam_prep_notes_plan",
         "question_type_addon_generation",
         "visual_aid_planning",
         "visual_aid_generation_optional",
         "exam_prep_notes_docx_generation",
+        "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
         "mcq_policy",
         "mcq_exam_report_docx",
@@ -121,16 +127,19 @@ PRESET_MODULES = {
         "lecture_session_mapping",
         "lecture_concept_module_extraction",
         "knowledge_points",
+        "atomic_knowledge_ledger",
         "source_baseline_notes_plan",
         "baseline_coverage_floor_qa",
         "exam_emphasis_profile",
         "exam_overlay_pass",
         "overlay_did_not_damage_coverage_qa",
+        "knowledge_only_student_view_filter",
         "exam_prep_notes_plan",
         "question_type_addon_generation",
         "visual_aid_planning",
         "visual_aid_generation_optional",
         "exam_prep_notes_docx_generation",
+        "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
         "short_answer_variants",
         "short_answer_exam_report_docx",
@@ -143,16 +152,19 @@ PRESET_MODULES = {
         "lecture_session_mapping",
         "lecture_concept_module_extraction",
         "knowledge_points",
+        "atomic_knowledge_ledger",
         "source_baseline_notes_plan",
         "baseline_coverage_floor_qa",
         "exam_emphasis_profile",
         "exam_overlay_pass",
         "overlay_did_not_damage_coverage_qa",
+        "knowledge_only_student_view_filter",
         "exam_prep_notes_plan",
         "question_type_addon_generation",
         "visual_aid_planning",
         "visual_aid_generation_optional",
         "exam_prep_notes_docx_generation",
+        "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
         "method_blocks",
         "long_answer_project_report_docx",
@@ -165,16 +177,19 @@ PRESET_MODULES = {
         "lecture_session_mapping",
         "lecture_concept_module_extraction",
         "knowledge_points",
+        "atomic_knowledge_ledger",
         "source_baseline_notes_plan",
         "baseline_coverage_floor_qa",
         "exam_emphasis_profile",
         "exam_overlay_pass",
         "overlay_did_not_damage_coverage_qa",
+        "knowledge_only_student_view_filter",
         "exam_prep_notes_plan",
         "question_type_addon_generation",
         "visual_aid_planning",
         "visual_aid_generation_optional",
         "exam_prep_notes_docx_generation",
+        "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
         "essay_coverage_plan",
         "citation_resolution",
@@ -201,7 +216,7 @@ STYLE_AWARE_PRESETS = {
     "essay_exam_prep",
 }
 
-PAST_PAPER_EVIDENCE_MODULES = ["exam_regime", "past_paper_questions", "question_archetypes"]
+PAST_PAPER_EVIDENCE_MODULES = ["exam_regime", "past_paper_questions", "question_archetypes", "examiner_operations"]
 
 MODULE_DEFS = {
     "source_inventory": {
@@ -288,11 +303,22 @@ MODULE_DEFS = {
         "expected_outputs": ["KnowledgePoint", "EvidenceClaim"],
         "qa_checks": ["source anchors", "claim strength"],
     },
+    "atomic_knowledge_ledger": {
+        "action_type": "BuildAtomicKnowledgeLedger",
+        "minimum_inputs": ["SourceFragment", "KnowledgePoint"],
+        "expected_outputs": ["AtomicKnowledgeLedger"],
+        "qa_checks": [
+            "every source block decomposed",
+            "administrative units excluded from student view",
+            "knowledge units bound to modules",
+            "visual and unreadable units flagged",
+        ],
+    },
     "source_baseline_notes_plan": {
         "action_type": "BuildSourceBaselineNotesPlan",
-        "minimum_inputs": ["CourseSection", "LectureSession", "LectureConceptModule", "KnowledgePoint"],
+        "minimum_inputs": ["CourseSection", "LectureSession", "LectureConceptModule", "KnowledgePoint", "AtomicKnowledgeLedger"],
         "expected_outputs": ["SourceBaselineNotesPlan"],
-        "qa_checks": ["source-first module coverage", "protected knowledge points", "no exam pruning"],
+        "qa_checks": ["source-first module coverage", "protected knowledge points", "atomic knowledge coverage", "no exam pruning"],
     },
     "baseline_coverage_floor_qa": {
         "action_type": "RunBaselineCoverageFloorQA",
@@ -320,9 +346,20 @@ MODULE_DEFS = {
     },
     "exam_prep_notes_plan": {
         "action_type": "BuildExamPrepNotesPlan",
-        "minimum_inputs": ["SourceBaselineNotesPlan", "ExamOverlayPass", "CourseSection", "LectureSession", "LectureConceptModule", "KnowledgePoint", "ExamEmphasisProfile"],
+        "minimum_inputs": ["KnowledgeOnlyStudentView", "SourceBaselineNotesPlan", "ExamOverlayPass", "CourseSection", "LectureSession", "LectureConceptModule", "KnowledgePoint", "ExamEmphasisProfile"],
         "expected_outputs": ["ExamPrepNotesPlan"],
         "qa_checks": ["Academic Exam-Ready Notes structure", "protected coverage", "definition policy", "student note verification", "knowledge-card coverage"],
+    },
+    "knowledge_only_student_view_filter": {
+        "action_type": "BuildKnowledgeOnlyStudentView",
+        "minimum_inputs": ["AtomicKnowledgeLedger", "SourceBaselineNotesPlan", "ExamOverlayPass"],
+        "expected_outputs": ["KnowledgeOnlyStudentView", "QAFlag"],
+        "qa_checks": [
+            "assessment and audit text filtered",
+            "course knowledge map only",
+            "exam use restricted to module-level application",
+            "protected knowledge units still visible",
+        ],
     },
     "question_type_addon_generation": {
         "action_type": "BuildQuestionTypeAddOns",
@@ -343,10 +380,16 @@ MODULE_DEFS = {
         "qa_checks": ["not evidence", "caption boundary", "skip if unavailable"],
     },
     "exam_prep_notes_docx_generation": {
-        "action_type": "GeneratePrepArtifact",
+        "action_type": "GenerateExamPrepNotesDocx",
         "minimum_inputs": ["ExamPrepNotesPlan"],
         "expected_outputs": ["PrepArtifact"],
-        "qa_checks": ["DOCX format", "Academic Exam-Ready Notes language", "public output boundary"],
+        "qa_checks": ["DOCX format", "ClinicalDrugPlainStyle", "Academic Exam-Ready Notes language", "public output boundary"],
+    },
+    "exam_prep_docx_style_linter": {
+        "action_type": "LintExamPrepDocxStyle",
+        "minimum_inputs": ["PrepArtifact"],
+        "expected_outputs": ["QAFlag"],
+        "qa_checks": ["black text", "Arial", "2.5 cm margins", "stable line spacing", "no blue headings"],
     },
     "exam_prep_notes_linter": {
         "action_type": "LintExamPrepNotes",
@@ -626,8 +669,7 @@ def modules_for_preset(
 ) -> list[str]:
     modules = list(PRESET_MODULES[selected_preset])
     if selected_preset in PAST_PAPER_AWARE_PRESETS and "formal_past_papers" in available:
-        insert_after_once(modules, "fragment_index", PAST_PAPER_EVIDENCE_MODULES)
-        insert_after_once(modules, "knowledge_points", ["examiner_operations"])
+        insert_after_once(modules, "baseline_coverage_floor_qa", PAST_PAPER_EVIDENCE_MODULES)
     if selected_preset in STYLE_AWARE_PRESETS and style_evidence_available(config, source_scan):
         insert_after_once(modules, "fragment_index", ["style_analysis"])
     return modules

@@ -10,7 +10,7 @@ Use this Skill to turn a student's supplied exam materials into evidence-grounde
 The first-principles chain is:
 
 ```text
-inputs -> source authority -> course reconstruction -> source-first baseline notes -> coverage QA -> exam overlay -> preparation output
+inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> exam overlay -> preparation output
 ```
 
 ## Purpose And Trigger Boundary
@@ -92,8 +92,10 @@ Use the operational ontology in `ontology/ontology.json` and `references/operati
 Student-facing output filter:
 
 - Public prose must be directly usable revision content, not an audit trace.
+- Ordinary Academic Exam-Ready Notes are knowledge documents, not exam-format audits. Do not expose assessment percentages, exam timing, mark splits, Section A/Section B administrative rules, historical-paper comparability notes, no-mark-scheme notes, coverage notes, source-quality caveats, ELM-check warnings, provenance text, or extraction-quality warnings in the public DOCX.
 - Do not expose source anchors, confidence bands, recurrence counts, lecture centrality, examiner-operation labels, task verbs, discriminator axes, reference expansion, evidence limits, internal priority scores, source maps, QA JSON, run manifests, lineage files, citation logs, or rendered previews unless the user explicitly asks for an audit package.
 - Visible priority labels are only `★★★`, `★★`, and `★`.
+- Use `Course Knowledge Map` as the public top matter for ordinary notes. Do not use `Course-Level Exam Map` in public notes.
 - Internal helper artifacts may be generated for validation, but they must stay outside ordinary student-facing output folders.
 
 Public output contract:

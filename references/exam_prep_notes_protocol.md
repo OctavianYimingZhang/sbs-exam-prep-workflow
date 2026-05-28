@@ -9,7 +9,7 @@ This route is not a slide paraphrase, a chatty tutor explanation, a prediction f
 Accept any readable, ordered course-note source, but do not give every source the same authority.
 
 ```text
-CourseContentSource -> OrderedContentItem -> SourceFragment -> KnowledgePoint -> SourceBaselineNotesPlan -> ExamOverlayPass -> PrepArtifact
+CourseContentSource -> OrderedContentItem -> SourceFragment -> AtomicKnowledgeLedger -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> ExamOverlayPass -> PrepArtifact
 ```
 
 The route reconstructs the course knowledge architecture and writes a protected source-first baseline before any exam overlay is allowed to affect density, order, priority, or add-ons. Source order is used to infer prerequisites, teaching intent, and causal development, not to force the final notes to preserve the original note sequence when a better exam logic exists.
@@ -45,27 +45,90 @@ Run the route in this order:
 
 1. Classify source authority and extraction quality.
 2. Build a source coverage map and identify unreadable or weak sources.
-3. If formal past papers are supplied, insert optional `exam_regime`, `past_paper_questions`, `question_archetypes`, and `examiner_operations` actions; use them for format, emphasis, and answer-operation evidence only.
-4. Reconstruct course-level sections from the official source logic.
-5. Map lecture sessions or ordered source blocks into the reconstructed course sections.
-6. Extract lecture-level conceptual modules and KnowledgePoints.
+3. Reconstruct course-level sections from the official source logic.
+4. Map lecture sessions or ordered source blocks into the reconstructed course sections.
+5. Extract lecture-level conceptual modules and KnowledgePoints.
+6. Build the internal `AtomicKnowledgeLedger`.
 7. Generate `SourceBaselineNotesPlan` from official source structure before exam pruning.
 8. Run `BaselineCoverageFloorQA`.
-9. Build `ExamEmphasisProfile` from formal past-paper question records when available.
-10. Apply `ExamOverlayPass` to priority, density, ordering, examples, traps, and question-type add-ons.
-11. Run `OverlayDidNotDamageCoverageQA`.
-12. Generate integrated Academic Exam-Ready Notes.
-13. Append a question-type add-on layer only when useful or requested.
-14. Add optional visual aids only after the text is source-backed.
-15. Run `exam_prep_notes_linter` plus student-output, evidence, language, DOCX, and helper-file boundary QA.
+9. If formal past papers are supplied, insert optional `exam_regime`, `past_paper_questions`, `question_archetypes`, and `examiner_operations` actions; use them for format, emphasis, and answer-operation evidence only.
+10. Build `ExamEmphasisProfile` from formal past-paper question records when available.
+11. Apply `ExamOverlayPass` to priority, density, ordering, examples, traps, and question-type add-ons.
+12. Run `OverlayDidNotDamageCoverageQA`.
+13. Build the `KnowledgeOnlyStudentView` filter.
+14. Generate integrated Academic Exam-Ready Notes.
+15. Append a question-type add-on layer only when useful or requested.
+16. Add optional visual aids only after the text is source-backed.
+17. Run `exam_prep_docx_style_linter`, `exam_prep_notes_linter`, plus student-output, evidence, language, DOCX, and helper-file boundary QA.
 
 Exam evidence may add, split, reorder, prioritise, densify, and enrich. Exam evidence must not delete, hide, or over-compress protected source-backed modules.
+
+Past-paper objects must not be visible to module segmentation, atomic-item extraction, or baseline coverage construction. Formal exam evidence may be loaded only after `AtomicKnowledgeLedger`, `SourceBaselineNotesPlan`, and `BaselineCoverageFloorQA` are complete. This prevents exam patterns from defining the factual boundary of the notes.
 
 If no formal past papers are supplied, generate notes from source centrality, conceptual dependency, and official course emphasis only. Do not invent exam frequency or future-question probability.
 
 Cross-target examples, exemplar answers, and feedback sources may add an internal style-analysis action. That action may control paragraph density, answer ordering, and transferable workflow rules only; it must not support target factual claims, prediction claims, official answers, or priority labels.
 
 Visual-heavy PDFs, presentations, figures, tables, image exemplars, and image-only files must carry visual-inspection metadata in source inventory and fragment partitions. If a requested output depends on the visual content, inspect it before making the claim or keep the relevant conclusion limited.
+
+## AtomicKnowledgeLedger
+
+Before building baseline notes, create an internal `AtomicKnowledgeLedger`.
+
+Every slide, page, table, figure, diagram, or source block must be decomposed into atomic units:
+
+```yaml
+AtomicKnowledgeUnit:
+  unit_id: string
+  source_id: string
+  lecture_id: string
+  slide_or_page_range: string
+  raw_heading: string
+  raw_text_summary: string
+  unit_type:
+    - definition
+    - term
+    - contrast_pair
+    - criteria_item
+    - mechanism_step
+    - method_step
+    - equation
+    - calculation_rule
+    - graph_readout
+    - diagram_label
+    - table_entry
+    - named_example
+    - disease_case
+    - drug_case
+    - limitation
+    - misconception
+    - administrative
+    - decorative
+    - duplicate
+    - unreadable_visual
+  student_visibility:
+    - include_in_notes
+    - internal_audit_only
+    - exclude_admin
+    - duplicate_covered_elsewhere
+    - requires_visual_inspection
+  bound_module_id: string | null
+  coverage_status:
+    - covered
+    - grouped_but_named
+    - audit_only
+    - excluded_with_reason
+    - missing
+```
+
+Rules:
+
+- Every slide/page heading becomes at least one atomic item unless it is purely administrative.
+- Every bullet containing a term, process, definition, method, equation, graph, example, limitation, or contrast becomes an atomic item.
+- Every table row or diagram label that teaches knowledge becomes an atomic item.
+- Administrative units are excluded from student output.
+- Knowledge units must be bound to final modules or named submodules.
+- Grouping is allowed only when each grouped item is still named and explained inside the module.
 
 ## ExamEmphasisProfile
 
@@ -123,16 +186,97 @@ A source-backed item is protected when it is:
 
 Protected items must appear in the source baseline plan. They may not disappear, be hidden only in `Common Error / Trap`, or be reduced to one checklist phrase. If a protected item is genuinely low value, keep it brief and label it `★`; do not remove it unless a QA flag records why it cannot be supported.
 
+## Knowledge-Only Student View
+
+For ordinary `exam_prep_notes_docx`, student-facing output must contain only knowledge-related revision content.
+
+Do not include:
+
+- assessment percentages;
+- exam timing;
+- mark splits;
+- Section A / Section B administrative rules;
+- historical-paper comparability notes;
+- `no mark scheme supplied` notes;
+- `Coverage note` warnings;
+- source-quality caveats;
+- ELM-check warnings;
+- audit, provenance, extraction-quality, source-coverage, or lineage explanations.
+
+Keep these in an internal audit file or chat-only diagnostic only when explicitly requested. The public DOCX is a knowledge document, not an exam-format audit.
+
+Replace `Course-Level Exam Map` with `Course Knowledge Map`.
+
+Allowed public top matter:
+
+- course/module title;
+- knowledge section map;
+- lecture/topic mapping;
+- one short sentence on how the knowledge is organised.
+
+Exam information may appear only inside module-level `Exam Use`, and only when it helps apply the knowledge. Do not expose exam timing, marks, paper comparability, source limitations, or audit caveats inside `Exam Use`.
+
+## Background Demotion Rule
+
+Background/context modules include industry overview, stakeholder landscape, broad pipeline narration, commercial context, historical framing, and assessment administration.
+
+Default rating: `★`.
+
+Raise to `★★` only when the background is needed to justify target choice, candidate progression, regulatory logic, or case-study decisions.
+
+Raise to `★★★` only when the current source set shows that the exam explicitly asks students to define, compare, calculate, or justify using that background as the central answer operation.
+
+Background modules must normally be capped at 4-6 lines and must not appear before higher-yield definitional, mechanistic, methodological, or criteria-list modules when this would obscure exam-core material.
+
+## Granularity Rule
+
+Use one card per examinable concept.
+
+Do not merge the following into one dense paragraph:
+
+- definition + criteria + example;
+- mechanism + limitation + named drug;
+- method principle + readout + limitation;
+- graph parameter + calculation + interpretation;
+- contrast pair + application.
+
+If a source section contains a list, preserve it as a numbered or bulleted list when the list itself is examinable.
+
+If a source gives a named example, include it under `Canonical Example` unless the example is clearly decorative.
+
+## Module Density Floor
+
+The Skill must not compress a lecture or PPT section below the density demonstrated by supplied source-style exemplars.
+
+For each lecture or PPT file:
+
+- every major source heading must become either a module or a named submodule;
+- every protected list must be preserved as a list;
+- every named method must receive a module or submodule;
+- every named example must appear under `Canonical Example`;
+- every diagram, table, equation, or workflow that teaches knowledge must be explained;
+- no module may combine more than one definition set, mechanism, criteria list, method workflow, named example, graph, or calculation logic unless each receives its own visible subheading.
+
+Heuristic minimum:
+
+- If a lecture contains 1-10 protected atomic units: at least 2 modules.
+- If a lecture contains 11-25 protected atomic units: at least 4 modules.
+- If a lecture contains 26+ protected atomic units: at least 6 modules or clearly separated submodules.
+- A course section spanning more than 2 lectures must not be represented by fewer than 4 modules unless the source itself is extremely short.
+
+Fail QA when broad cards replace lecture-level coverage.
+
 ## Student-Facing Structure
 
 Use a Word-first structure that reads as revision notes, not an audit:
 
 ```text
 Title Page
-Course-Level Exam Map
-Course Section: [Title]
-Section Exam Function
-Lecture Mapping
+Course Knowledge Map
+Knowledge Sections
+Section: [Knowledge Section Title]
+Section Knowledge Function
+Lecture Coverage
 Core Conceptual Threads
 Lecture [Number or Name]
 Lecture Function Within Section
@@ -162,6 +306,8 @@ Priority meanings:
 - `★★★` = answer-producing exam core: standalone definition, mechanism, calculation, graph/data operation, criteria list, method workflow, named source example, or case-study decision point.
 - `★★` = supporting examinable knowledge: useful for explanation, comparison, justification, or transfer.
 - `★` = background/context: useful framing only; keep brief unless directly tested.
+
+For ordinary Academic Exam-Ready Notes, the public DOCX is a knowledge document, not an exam-format audit. The Skill must first decompose all official source material into an `AtomicKnowledgeLedger`, exclude administrative items from student output, preserve every source-backed knowledge item in a baseline module or named submodule, and only then apply exam evidence as module-level `Exam Use`, priority, and density adjustment. Past papers may change emphasis; they must not define the factual boundary of the notes.
 
 ## Academic Exam-Ready Notes Language
 
@@ -247,6 +393,13 @@ Block or rewrite when any of these appear:
 
 - `original_note_order_leakage`;
 - `exam_emphasis_without_formal_evidence`;
+- `past_paper_loaded_before_baseline_qa`;
+- `administrative_exam_audit_in_student_notes`;
+- `atomic_knowledge_unit_missing`;
+- `broad_card_below_density_floor`;
+- `protected_item_only_in_trap_or_must_master`;
+- `non_black_docx_text`;
+- `blue_docx_heading`;
 - `student_note_used_as_fact_without_verification`;
 - `ai_note_used_as_fact`;
 - `definition_specificity_without_support`;

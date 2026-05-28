@@ -8,7 +8,7 @@ The project exists because exam preparation is not one task. The correct output 
 
 ## What This Skill Does
 
-The Skill reads the supplied materials, classifies their evidence role, detects the relevant exam format, and organises examinable knowledge first. The default route for general revision is `exam_prep_notes_docx`: it accepts readable ordered course notes, ranks source authority, reconstructs course sections, uses formal past papers for emphasis when available, and writes Academic Exam-Ready Notes in the compatible public artifact `Lecture_Knowledge_Walkthrough.docx`.
+The Skill reads the supplied materials, classifies their evidence role, and organises examinable knowledge first. The default route for general revision is `exam_prep_notes_docx`: it accepts readable ordered course notes, ranks source authority, reconstructs course sections, decomposes sources into an atomic knowledge ledger, locks a source-first baseline, then uses formal past papers for emphasis only after baseline coverage passes. It writes Academic Exam-Ready Notes in the compatible public artifact `Lecture_Knowledge_Walkthrough.docx`.
 
 Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report, Short Answer Exam Analysis Report, Long Answer/Project/Scenario Report, and Essay Module Example Essays. `knowledge_walkthrough_docx` remains a compatibility route for explicitly lecture-first walkthroughs. Past-paper analysis is used as a chat-only pre-generation brief to guide outputs. Excel workbooks and public prediction workbooks are no longer student-facing output routes.
 
@@ -19,6 +19,8 @@ The invariant is that process helper files stay separate. Public outputs may inc
 The workflow is course-agnostic and evidence-bound. It routes from the uploaded source pack, verified reading, and requested exam format rather than hard-coded course, lecture, or example names. It can identify examinable themes, question archetypes, and likely emphasis, but prediction language stays probabilistic and source-qualified.
 
 Public student-facing outputs are Word-first study artifacts. Excel workbooks, run manifests, source maps, QA JSON, citation logs, lineage files, rendered previews, and internal audit folders remain helper artifacts unless the user explicitly requests an audit package.
+
+Ordinary Academic Exam-Ready Notes are knowledge documents, not exam-format audits. Assessment timing, mark splits, paper comparability notes, source-coverage caveats, ELM warnings, and provenance text stay internal unless explicitly requested.
 
 Example Essay output quality should be calibrated against submission-ready assessed work: polished argument, precise source integration, clean paragraph logic, complete formatting, and examiner-fit synthesis.
 
@@ -33,10 +35,10 @@ Example Essay outputs are revision exemplars whose language, structure, formatti
 The Skill is designed around one first-principles chain:
 
 ```text
-inputs -> source authority -> exam format -> question type -> examiner operation -> course-section reconstruction -> knowledge point -> preparation output
+inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> exam overlay -> preparation output
 ```
 
-It is not a topic-hotness predictor. Frequency and recency are useful signals, but the main task is to infer how the examiner asks, what kind of reasoning the question rewards, and what preparation artefact best matches that strategy.
+It is not a topic-hotness predictor. Frequency and recency are useful signals, but they may adjust density and `Exam Use` only after source-backed knowledge coverage is locked.
 
 For any non-trivial run, the Skill uses a typed planning chain before generation:
 
@@ -79,13 +81,13 @@ benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour onl
 
 1. Classify source files by role, trust level, extraction quality, and evidence limits.
 2. Record visual-inspection status for diagrams, tables, figures, presentations, image exemplars, and image-only sources.
-3. Diagnose the exam format and split incompatible exam regimes before comparing papers.
-4. When formal papers are present, extract question records and archetypes as optional evidence modules for emphasis and answer operations.
-5. Convert source fragments into reconstructed course sections, knowledge points, and examiner operations.
-6. Select Academic Exam-Ready Notes or the explicit lecture-first walkthrough plus any question-type add-on that matches the evidence and requested artifact.
-7. Use examples and feedback only for internal style/density rules unless their factual claims are independently verified.
-8. Rewrite internal reasoning into student-facing revision content.
-9. Run QA so unsupported claims and process helper files do not enter the final public output.
+3. Convert source fragments into reconstructed course sections, knowledge points, and an `AtomicKnowledgeLedger`.
+4. Build a source-first baseline and run coverage-floor QA before loading past-paper evidence.
+5. When formal papers are present, extract question records and archetypes as optional evidence modules for emphasis and answer operations.
+6. Apply the exam overlay only to priority, density, ordering, examples, traps, and module-level `Exam Use`.
+7. Filter the public view to `Course Knowledge Map` plus knowledge modules only.
+8. Use examples and feedback only for internal style/density rules unless their factual claims are independently verified.
+9. Run DOCX style, coverage, student-output, and helper-file QA so unsupported claims and process helper files do not enter the final public output.
 
 ## Quick Start
 
@@ -159,7 +161,7 @@ The updater refuses dirty working trees, creates a local backup before changing 
 The Skill treats exam preparation as an operational object graph rather than a loose file index:
 
 ```text
-SourceDocument -> SourceFragment -> KnowledgePoint -> ExaminerOperation -> QuestionArchetype -> EvidenceClaim -> PrepArtifact -> QAFlag
+SourceDocument -> SourceFragment -> AtomicKnowledgeLedger -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> ExamOverlayPass -> PrepArtifact -> QAFlag
 ```
 
 This matters because exam preparation needs evidence permissions, not only retrieval. For example:
@@ -180,7 +182,7 @@ The Skill treats each non-trivial run as a small auditable data product. Interna
 ```text
 Bronze: source inventory, extraction status, source hashes
 Silver: source fragments, fragment partitions, past-paper question records
-Gold: course sections, knowledge points, examiner operations, archetypes, evidence claims, QA flags
+Gold: course sections, atomic knowledge ledgers, source baselines, knowledge-only student views, knowledge points, examiner operations, archetypes, evidence claims, QA flags
 Serving: Academic Exam-Ready Notes DOCX, compatibility walkthrough DOCX, question-type report DOCX, direct answer, optional audit package
 ```
 

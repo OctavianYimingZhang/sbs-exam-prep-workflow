@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,7 @@ REQUIRED_FILES = [
     "schemas/input_readiness_report.schema.json",
     "schemas/knowledge_walkthrough_plan.schema.json",
     "schemas/exam_prep_notes_plan.schema.json",
+    "schemas/atomic_knowledge_ledger.schema.json",
     "schemas/exam_emphasis_profile.schema.json",
     "schemas/question_type_addon.schema.json",
     "schemas/visual_aid_spec.schema.json",
@@ -31,6 +33,8 @@ REQUIRED_FILES = [
     "scripts/input_readiness_check.py",
     "scripts/validate_exam_prep_notes_plan.py",
     "scripts/exam_prep_notes_linter.py",
+    "scripts/exam_prep_docx_style_linter.py",
+    "scripts/generate_exam_prep_notes_docx.py",
     "scripts/generate_knowledge_walkthrough_docx.py",
     "scripts/knowledge_walkthrough_linter.py",
     "scripts/render_workflow_plan.py",
@@ -82,6 +86,16 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def load_planner_module(root: Path):
+    planner_path = root / "scripts/plan_workflow.py"
+    spec = importlib.util.spec_from_file_location("plan_workflow_contract_check", planner_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("cannot load plan_workflow.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def validate(root: Path) -> dict[str, Any]:
     failures: list[dict[str, Any]] = []
     for rel_path in REQUIRED_FILES:
@@ -101,7 +115,17 @@ def validate(root: Path) -> dict[str, Any]:
         failures.append({"type": "missing_plan_workflow_action"})
     if "AnalyzeStyleExamples" not in action_types:
         failures.append({"type": "missing_style_analysis_action"})
-    for action in ["BuildSourceBaselineNotesPlan", "RunBaselineCoverageFloorQA", "ApplyExamOverlayPass", "RunOverlayCoverageQA", "LintExamPrepNotes"]:
+    for action in [
+        "BuildAtomicKnowledgeLedger",
+        "BuildSourceBaselineNotesPlan",
+        "RunBaselineCoverageFloorQA",
+        "ApplyExamOverlayPass",
+        "RunOverlayCoverageQA",
+        "BuildKnowledgeOnlyStudentView",
+        "GenerateExamPrepNotesDocx",
+        "LintExamPrepDocxStyle",
+        "LintExamPrepNotes",
+    ]:
         if action not in action_types:
             failures.append({"type": "missing_baseline_overlay_action", "action_type": action})
     for link in sorted(REQUIRED_LINKS - link_types):
@@ -149,9 +173,31 @@ def validate(root: Path) -> dict[str, Any]:
     for optional_module in ["past_paper_questions", "question_archetypes", "examiner_operations", "style_analysis"]:
         if optional_module not in plan_text:
             failures.append({"type": "planner_missing_optional_module", "module": optional_module})
-    for baseline_module in ["source_baseline_notes_plan", "baseline_coverage_floor_qa", "exam_overlay_pass", "overlay_did_not_damage_coverage_qa", "exam_prep_notes_linter"]:
+    for baseline_module in [
+        "atomic_knowledge_ledger",
+        "source_baseline_notes_plan",
+        "baseline_coverage_floor_qa",
+        "exam_overlay_pass",
+        "overlay_did_not_damage_coverage_qa",
+        "knowledge_only_student_view_filter",
+        "exam_prep_docx_style_linter",
+        "exam_prep_notes_linter",
+    ]:
         if baseline_module not in plan_text:
             failures.append({"type": "planner_missing_baseline_overlay_module", "module": baseline_module})
+    try:
+        planner = load_planner_module(root)
+        available = {"any_source", "readable_course_notes", "formal_past_papers"}
+        config = {"source_inputs": {"course_notes": ["fixture"], "formal_past_papers": ["fixture"]}}
+        modules = planner.modules_for_preset("exam_prep_notes_docx", available, config)
+        order = {module: index for index, module in enumerate(modules)}
+        for module in ["exam_regime", "past_paper_questions", "question_archetypes", "examiner_operations"]:
+            if order.get("baseline_coverage_floor_qa", 999) > order.get(module, -1):
+                failures.append({"type": "past_paper_module_before_baseline_floor", "module": module})
+            if order.get(module, 999) > order.get("exam_emphasis_profile", -1):
+                failures.append({"type": "past_paper_module_after_exam_emphasis", "module": module})
+    except Exception as exc:
+        failures.append({"type": "planner_order_check_error", "error": str(exc)})
 
     combined_docs = "\n".join(
         read(root / path)

@@ -113,6 +113,24 @@ Each KP must be labelled across five task dimensions:
 
 This matrix is how the Skill expands from seen questions to all plausible examinable variants.
 
+## Not-Past-Paper-Only Rule
+
+The Skill must not restrict coverage to already-examined content.
+
+For every official source-backed KnowledgePoint, assign one internal status:
+
+- `exam-proven`: appears in supplied compatible formal past papers;
+- `exam-plausible`: foregrounded by source headings, definitions, examples, diagrams, summaries, ILOs, or method workflows even if not yet tested;
+- `supporting-background`: useful context that rarely produces marks alone.
+
+Student-facing output must not display these internal labels. Convert them into star ratings:
+
+- `exam-proven` plus answer-producing content is usually `★★★`;
+- `exam-plausible` plus source-foregrounded content is usually `★★` or `★★★`;
+- `supporting-background` is usually `★`.
+
+Never omit `exam-plausible` content merely because it has not yet appeared in supplied past papers.
+
 ## Paper Comparability
 
 Use:

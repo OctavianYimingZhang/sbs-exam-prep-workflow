@@ -17,6 +17,9 @@ REQUIRED_FILES = [
     "references/knowledge_walkthrough_docx_protocol.md",
     "schemas/student_output_contract.schema.json",
     "schemas/knowledge_walkthrough_plan.schema.json",
+    "schemas/atomic_knowledge_ledger.schema.json",
+    "scripts/generate_exam_prep_notes_docx.py",
+    "scripts/exam_prep_docx_style_linter.py",
     "scripts/generate_knowledge_walkthrough_docx.py",
     "scripts/knowledge_walkthrough_linter.py",
 ]
@@ -71,7 +74,7 @@ def validate(root: Path) -> dict[str, Any]:
     exam_prep_notes = read(root / "references/exam_prep_notes_protocol.md")
     walkthrough = read(root / "references/knowledge_walkthrough_docx_protocol.md")
     combined = policy + "\n" + exam_prep_notes + "\n" + walkthrough
-    for term in ["ExamPrepNotesStudentContract", "Academic Exam-Ready Notes", "MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap", "Canonical Example", "Exam Use", "★★★"]:
+    for term in ["ExamPrepNotesStudentContract", "Academic Exam-Ready Notes", "Course Knowledge Map", "MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap", "Canonical Example", "Exam Use", "★★★"]:
         if term not in combined:
             failures.append({"type": "student_policy_missing_term", "term": term})
     for field in sorted(FORBIDDEN_VISIBLE_FIELDS):

@@ -38,9 +38,32 @@
           "task_verb",
           "recurrence_count",
           "lecture_centrality",
-          "prediction_score"
+          "prediction_score",
+          "assessment_timing",
+          "mark_split",
+          "current_regime",
+          "older_papers",
+          "no_mark_scheme",
+          "coverage_note",
+          "source_coverage",
+          "extraction_quality"
         ]
       }
+    },
+    "exam_prep_notes_student_contract": {
+      "type": "object",
+      "properties": {
+        "course_knowledge_map": { "type": "string" },
+        "knowledge_sections": { "type": "array", "items": { "type": "string" } },
+        "lecture_mapping": { "type": "array", "items": { "type": "string" } },
+        "exam_ready_knowledge_notes": {
+          "type": "array",
+          "items": { "$ref": "#/properties/exam_prep_knowledge_card" }
+        },
+        "question_type_addons": { "type": "array", "items": { "type": "object" } },
+        "optional_visual_aids": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
     },
     "exam_prep_knowledge_card": {
       "type": "object",

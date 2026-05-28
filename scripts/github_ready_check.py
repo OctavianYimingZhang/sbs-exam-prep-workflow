@@ -90,6 +90,8 @@ def main() -> int:
         deliverable_qa_dir = tmp_dir / "deliverable_docx_internal_qa"
         knowledge_walkthrough_dir = tmp_dir / "knowledge_walkthrough_docx"
         knowledge_walkthrough_qa_dir = tmp_dir / "knowledge_walkthrough_internal_qa"
+        exam_prep_notes_dir = tmp_dir / "exam_prep_notes_docx"
+        exam_prep_notes_qa_dir = tmp_dir / "exam_prep_notes_internal_qa"
         bad_public_dir = tmp_dir / "bad_public_output"
         bad_workbook_dir = tmp_dir / "bad_public_workbook"
         citation_fallback_dir = tmp_dir / "citation_fallback"
@@ -271,6 +273,56 @@ def main() -> int:
                     ],
                     expect_failure=True,
                 ),
+                run_command(
+                    "exam_prep_notes_linter_omics_atomic_density",
+                    [
+                        py,
+                        "scripts/exam_prep_notes_linter.py",
+                        "tests/fixtures/exam_prep_notes/omics_source_first_density/final_notes.md",
+                        "--ledger",
+                        "tests/fixtures/exam_prep_notes/omics_source_first_density/atomic_ledger.json",
+                        "--min-modules",
+                        "19",
+                        "--require-module-term",
+                        "PCR primer logic",
+                        "--require-module-term",
+                        "BLAST homology orthology paralogy",
+                        "--require-module-term",
+                        "Genetic manipulation CRISPR homologous recombination",
+                    ],
+                ),
+                run_command(
+                    "exam_prep_notes_linter_rejects_omics_broad_cards",
+                    [
+                        py,
+                        "scripts/exam_prep_notes_linter.py",
+                        "tests/fixtures/exam_prep_notes/omics_source_first_density/bad_final_notes.md",
+                        "--ledger",
+                        "tests/fixtures/exam_prep_notes/omics_source_first_density/atomic_ledger.json",
+                        "--min-modules",
+                        "19",
+                    ],
+                    expect_failure=True,
+                ),
+                run_command(
+                    "exam_prep_notes_docx_generate",
+                    [
+                        py,
+                        "scripts/generate_exam_prep_notes_docx.py",
+                        "--plan",
+                        "tests/fixtures/exam_prep_notes/valid_exam_prep_notes_plan.json",
+                        "--output-dir",
+                        str(exam_prep_notes_dir),
+                        "--qa-dir",
+                        str(exam_prep_notes_qa_dir),
+                        "--clean",
+                        "--strict",
+                        "--deliverable-only",
+                    ],
+                ),
+                run_command("exam_prep_docx_style_lint", [py, "scripts/exam_prep_docx_style_linter.py", str(exam_prep_notes_dir)]),
+                run_command("exam_prep_docx_style_linter_rejects_bad_style", [py, "scripts/exam_prep_docx_style_linter.py", "--self-test-bad"], expect_failure=True),
+                run_command("exam_prep_notes_public_output", [py, "scripts/final_deliverable_linter.py", str(exam_prep_notes_dir), "--allowed", ".docx"]),
                 run_command(
                     "workflow_plan_render_fixture",
                     [

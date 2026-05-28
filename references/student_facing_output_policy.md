@@ -9,6 +9,8 @@ internal reasoning: evidence -> operation -> priority -> output type
 student output: priority -> point -> explanation -> exam-use answer or walkthrough
 ```
 
+Ordinary Academic Exam-Ready Notes are knowledge documents, not exam-format audits. They must not display assessment percentages, exam timing, mark splits, Section A/Section B administrative rules, historical-paper comparability notes, `Coverage note` warnings, source-quality caveats, ELM-check warnings, or provenance/audit explanations. Keep those items internal unless the user explicitly requests an audit package.
+
 ## Forbidden Visible Fields
 
 Do not show these fields in ordinary student-facing reports:
@@ -28,6 +30,14 @@ Do not show these fields in ordinary student-facing reports:
 - evidence limit;
 - past-paper year mapping;
 - prediction score.
+- assessment timing;
+- mark split;
+- current regime;
+- older papers;
+- no mark scheme;
+- coverage note;
+- source coverage;
+- extraction quality;
 
 Canonical forbidden field IDs:
 
@@ -71,13 +81,15 @@ Visible structure:
 
 ```yaml
 ExamPrepNotesStudentContract:
-  course_level_exam_map: string
-  course_sections: list[string]
+  course_knowledge_map: string
+  knowledge_sections: list[string]
   lecture_mapping: list[string]
   exam_ready_knowledge_notes: list[ExamPrepKnowledgeCard]
   question_type_addons: list[QuestionTypeAddOn]
   optional_visual_aids: list[GeneratedVisualAidCaption]
 ```
+
+The visible top matter is `Course Knowledge Map`, not `Course-Level Exam Map`. It may state how the knowledge is organised, list knowledge sections, and map lectures/topics to those sections. Exam information may appear only inside module-level `Exam Use`, and only as knowledge-application guidance.
 
 Visible knowledge card:
 
