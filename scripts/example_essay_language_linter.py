@@ -34,8 +34,17 @@ META_OPENERS = re.compile(
 SOURCE_TRACE = [
     ("page_trace", re.compile(r"\bPages?\s+\d+\b", re.I)),
     ("slide_trace", re.compile(r"\bSlides?\s+\d+\b", re.I)),
+    ("lecture_cited_source_route", re.compile(r"\blecture-cited\b", re.I)),
     ("lecture_sequence_narration", re.compile(r"\blecture sequence\b", re.I)),
     ("source_walkthrough", re.compile(r"\b(first establishes|then develops|then closes|later pages add|slide sequence)\b", re.I)),
+    (
+        "visible_source_role_narration",
+        re.compile(
+            r"\b(?:the\s+)?(?:lecture|lectures|slides?|source|chapter|uploaded\s+reading|reading\s+chapter|uploaded\s+material)\s+"
+            r"(?:frames?|shows?|refines?|supports?|defines?)\b",
+            re.I,
+        ),
+    ),
     (
         "lecture_route_narration",
         re.compile(
@@ -72,6 +81,17 @@ WEAK_OPENERS = re.compile(r"^\s*(background|introduction|firstly|secondly|thirdl
 EXAMPLE_TERMS = re.compile(r"\b(for example|case study|case|firm|company|example)\b", re.I)
 EXAMPLE_TO_ARGUMENT = re.compile(r"\b(shows|demonstrates|supports|indicates|suggests|therefore|consequently|implies|evidence|illustrates)\b", re.I)
 NEGATIVE_FRAMING = re.compile(r"\b(not\s+(?:a|an|the|only|merely|simply)|rather than)\b", re.I)
+NEGATIVE_SENTENCE_START = re.compile(
+    r"^\s*(?:The|A|An|This|That|These|Those|[A-Z][A-Za-z0-9βγα/+\-\s]{1,80})\s+"
+    r"(?:is|are|was|were)\s+not\b",
+    re.I,
+)
+POSITIVE_RESTATEMENT_START = re.compile(
+    r"^\s*(?:It|This|That|They|These|Those|The\s+[A-Za-z0-9βγα/+\-]+|[A-Z][A-Za-z0-9βγα/+\-\s]{1,70})\s+"
+    r"(?:is|are|was|were|functions?|acts?|operates?|transforms?|converts?|provides?|generates?|organises?)\b",
+    re.I,
+)
+NOT_BUT_CONTRAST = re.compile(r"\b(?:is|are|was|were)\s+not\b[^.!?]{0,120}\bbut\b", re.I)
 BROAD_IMPORTANCE = re.compile(r"\b(this matters|this is important|this is critical|the important point)\b", re.I)
 IMPORTANCE_WITH_CONSEQUENCE = re.compile(r"\b(because|therefore|consequently|as a result|so|means that|explains|limits|enables|constrains)\b", re.I)
 SUPPORT_TO_CAUSE_OVERCLAIM = re.compile(
@@ -96,9 +116,19 @@ DESCRIPTIVE_START = re.compile(
 )
 ANALYTIC_SENTENCE_MARKERS = re.compile(
     r"\b(because|therefore|so|whereas|although|while|thereby|this\s+(?:means|shows|demonstrates|limits|explains)|"
-    r"solves?|distinguish(?:es)?|rather than|in contrast|as a result|consequently|link(?:s|ed)?\s+to)\b",
+    r"the\s+(?:point|key\s+issue|analytical\s+point|consequence)\s+is|matters\s+because|"
+    r"solves?|distinguish(?:es)?|rules?\s+out|undermines?|supports?|proves?|fails?\s+to\s+prove|"
+    r"rather than|in contrast|as a result|consequently|link(?:s|ed)?\s+to)\b",
     re.I,
 )
+INTRO_CONCLUSION_PART_LIST = re.compile(
+    r"\b(this\s+essay\s+(?:will|has)\s+(?:first|shown|argued|demonstrated)|"
+    r"first(?:ly)?[,;:]|second(?:ly)?[,;:]|third(?:ly)?[,;:]|finally[,;:]|"
+    r"the\s+(?:first|second|third|final)\s+(?:part|section|paragraph))\b",
+    re.I,
+)
+EVIDENCE_CLAIM_START = re.compile(r"\b(?:strongest|decisive|key)\s+evidence\b[^.!?]{0,160}\bis\s+that\b", re.I)
+RESULT_CONNECTOR = re.compile(r"^\s*(?:yet|therefore|so|this|which|showing|supporting|indicating|demonstrating)\b|\b(?:yet|therefore|showing|supporting|indicating|demonstrating|because|so|which\s+means)\b", re.I)
 
 
 @dataclass
@@ -139,6 +169,48 @@ def has_three_descriptive_sentences_without_analysis(items: list[str]) -> bool:
         else:
             streak = 0
     return False
+
+
+def sentence_balance(items: list[str]) -> dict[str, Any]:
+    analytic = 0
+    descriptive = 0
+    for sentence in items:
+        if ANALYTIC_SENTENCE_MARKERS.search(sentence):
+            analytic += 1
+        elif words(sentence):
+            descriptive += 1
+    total = analytic + descriptive
+    ratio = analytic / total if total else 0.0
+    return {
+        "sentences": total,
+        "analytic_sentences": analytic,
+        "descriptive_sentences": descriptive,
+        "analytic_ratio": round(ratio, 3),
+    }
+
+
+def has_negative_then_positive_restatement(items: list[str]) -> bool:
+    if len(items) < 2:
+        return False
+    return bool(NEGATIVE_SENTENCE_START.search(items[0]) and POSITIVE_RESTATEMENT_START.search(items[1]))
+
+
+def has_fragmented_evidence_sequence(items: list[str]) -> bool:
+    if len(items) < 3:
+        return False
+    if not EVIDENCE_CLAIM_START.search(items[0]):
+        return False
+    setup = items[1]
+    result = items[2]
+    if RESULT_CONNECTOR.search(result):
+        return False
+    setup_like = re.search(r"\b(experiment|experiments|preparation|preparations|trial|assay|dataset|lesion|ablation|recording|stimulation|dorsal roots?|limb|condition)\b", setup, re.I)
+    return bool(setup_like and words(result))
+
+
+def is_intro_or_conclusion(record: ParagraphRecord) -> bool:
+    function = (record.function or "").lower()
+    return record.index == 1 or "intro" in function or record.is_conclusion
 
 
 def paragraph_text(paragraph: dict[str, Any]) -> str:
@@ -299,6 +371,18 @@ def lint_paragraph(record: ParagraphRecord, min_words: int, max_words: int) -> t
     if not CLAIM_CONNECTORS.search(text) and count >= min_words:
         warnings.append({"type": "no_visible_mechanism_or_inference_connector"})
 
+    sentence_items = sentences(text)
+    if has_negative_then_positive_restatement(sentence_items):
+        failures.append({"type": "negative_opener_before_positive_claim", "phrase": " ".join(sentence_items[:2])[:220]})
+    if NOT_BUT_CONTRAST.search(first):
+        warnings.append({"type": "negative_but_opener_consider_direct_claim", "phrase": first[:160]})
+    if has_fragmented_evidence_sequence(sentence_items):
+        failures.append({"type": "fragmented_evidence_sequence", "phrase": " ".join(sentence_items[:3])[:260]})
+    if is_intro_or_conclusion(record) and INTRO_CONCLUSION_PART_LIST.search(text):
+        failures.append({"type": "intro_or_conclusion_lists_parts", "phrase": INTRO_CONCLUSION_PART_LIST.search(text).group(0)})
+    if is_intro_or_conclusion(record) and text.count(";") >= 4 and sentence_balance(sentence_items)["analytic_sentences"] <= 1:
+        warnings.append({"type": "intro_or_conclusion_summary_list_needs_synthesis"})
+
     for sentence in sentences(text):
         if len(AUTHOR_YEAR_RE.findall(sentence)) >= 3:
             failures.append({"type": "citation_stack", "phrase": sentence[:180]})
@@ -313,10 +397,11 @@ def lint_paragraph(record: ParagraphRecord, min_words: int, max_words: int) -> t
         failures.append({"type": "unnecessary_channel_catalogue", "terms": sorted(channel_terms)[:8]})
     if SCOPE_COLLAPSE.search(text):
         failures.append({"type": "compression_changed_claim_scope", "phrase": SCOPE_COLLAPSE.search(text).group(0)})
-    sentence_items = sentences(text)
     if has_three_descriptive_sentences_without_analysis(sentence_items):
         failures.append({"type": "descriptive_list_without_analysis"})
     if len(NEGATIVE_FRAMING.findall(text)) >= 4:
+        failures.append({"type": "repeated_negative_framing"})
+    elif len(NEGATIVE_FRAMING.findall(text)) >= 2:
         warnings.append({"type": "repeated_negative_framing"})
     if BROAD_IMPORTANCE.search(text) and not IMPORTANCE_WITH_CONSEQUENCE.search(text):
         warnings.append({"type": "broad_importance_without_specific_consequence"})
@@ -345,12 +430,41 @@ def record_payload(record: ParagraphRecord, issues: list[dict[str, Any]]) -> dic
 def lint_records(records: list[ParagraphRecord], min_words: int = 35, max_words: int = 280) -> dict[str, Any]:
     failures = []
     warnings = []
+    all_sentences: list[str] = []
     for record in records:
         record_failures, record_warnings = lint_paragraph(record, min_words=min_words, max_words=max_words)
+        all_sentences.extend(sentences(record.text))
         if record_failures:
             failures.append(record_payload(record, record_failures))
         if record_warnings:
             warnings.append(record_payload(record, record_warnings))
+    balance = sentence_balance(all_sentences)
+    if balance["sentences"] >= 5:
+        ratio = balance["analytic_ratio"]
+        if ratio < 0.35:
+            failures.append(
+                {
+                    "source": records[0].source if records else None,
+                    "essay_id": records[0].essay_id if records else None,
+                    "paragraph_id": None,
+                    "paragraph_index": None,
+                    "function": "essay_level_language_balance",
+                    "issues": [{"type": "essay_descriptive_analytic_imbalance_low_analytic", **balance}],
+                    "preview": "",
+                }
+            )
+        elif ratio < 0.4 or ratio > 0.7:
+            warnings.append(
+                {
+                    "source": records[0].source if records else None,
+                    "essay_id": records[0].essay_id if records else None,
+                    "paragraph_id": None,
+                    "paragraph_index": None,
+                    "function": "essay_level_language_balance",
+                    "issues": [{"type": "essay_descriptive_analytic_balance_outside_target", **balance}],
+                    "preview": "",
+                }
+            )
     return {
         "pass": not failures,
         "fail_reasons": sorted({issue["type"] for row in failures for issue in row["issues"]}),
@@ -358,6 +472,7 @@ def lint_records(records: list[ParagraphRecord], min_words: int = 35, max_words:
             "paragraphs": len(records),
             "failing_paragraphs": len(failures),
             "warning_paragraphs": len(warnings),
+            **balance,
         },
         "failures": failures,
         "warnings": warnings[:100],

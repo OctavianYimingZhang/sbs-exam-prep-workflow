@@ -85,16 +85,19 @@ claim -> mechanism/process/evidence -> scope or limitation -> consequence -> lin
 Language rules:
 
 - Start with the answer, not with generic metacommentary.
+- Aim for roughly balanced descriptive and analytic prose across the full essay.
+- Prefer direct positive claims; use negative framing only when it marks a necessary boundary.
 - Compress repeated or low-value detail without deleting required academic mechanisms.
 - Remove lecture-route narration and exam-guidance phrasing from the essay body.
 - Use examples as evidence for a broader claim, not as disconnected case descriptions.
 - Convert evidence-heavy examples into `evidence -> mechanism -> interpretation -> limitation`.
+- Keep paragraph logic linear. Avoid claim, setup, repeated-claim ordering when the result can be attached to the setup.
 - Make contrasts explicit and non-ambiguous.
 - Keep citations minimal and sufficient; support theory, mechanisms, data, experiments, or non-obvious generalisations.
 - Calibrate citation strength; do not write support, association, or mechanistic plausibility as sole-cause proof.
 - Do not cite-stack.
 - Omit unsupported claims rather than inventing citations.
-- Conclude by synthesis, not by adding new content.
+- Conclude by synthesis, not by adding new content or listing every body-part conclusion.
 
 ## Highlighting Rules
 

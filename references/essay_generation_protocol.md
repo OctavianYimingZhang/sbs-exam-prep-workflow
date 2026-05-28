@@ -37,6 +37,9 @@ ExampleEssayMode:
   compression_budget_estimate:
   expression_efficiency_compression_pass:
   accuracy_preservation_pass:
+  positive_claim_framing_pass:
+  logic_linearity_pass:
+  descriptive_analytic_balance_pass:
   analytic_argument_pass:
   micro_extra_reading_enhancement_pass:
   highlight_plan:
@@ -387,6 +390,22 @@ Use this pattern:
 description -> description -> analysis
 ```
 
+For the full essay, aim for roughly 50% descriptive material and 50% analytic material. Descriptive material gives the required mechanism, evidence, source-backed detail, example, or result. Analytic material states the consequence, boundary, interpretation, comparison, or reason the detail matters for the question. If the draft reads as a fact catalogue, add analysis by linking each important detail to its function; do not add a detached "discussion" sentence after a list.
+
+Run a positive-claim framing pass:
+
+- prefer direct positive claims over `X is not... It is...`;
+- use `not`, `but`, `rather than`, and `however` only when they mark an examiner-relevant boundary or a genuine model contrast;
+- if the rejected idea is not needed, delete it and state the correct mechanism directly;
+- if the rejected idea is needed, place it after the positive claim as a compact boundary.
+
+Run a logic-linearity pass:
+
+- keep each paragraph in a single forward sequence;
+- avoid `A -> B -> A`, where a claim is stated, interrupted by setup, and then restated;
+- for experiments, prefer `claim -> setup and result -> interpretation`, not `claim -> setup -> repeated result`;
+- combine setup and result with a connector such as `yet`, `showing that`, `therefore`, or `which means` when it improves flow.
+
 Do not leave named components as a list. Rewrite list-like content into an answer function: which problem each component solves, what distinction it supports, or what consequence follows.
 
 Reject and rewrite:
@@ -547,10 +566,12 @@ Use the following style discipline for every Example Essay:
 3. A paragraph should move from claim to evidence and then to implication. Do not list facts and leave the inference unstated.
 4. Use examples as proof of a broader mechanism or sector/system pattern. Do not let examples become disconnected mini-case studies.
 5. Make contrasts explicit. Avoid ambiguous `rather than` sentences unless both sides of the contrast are named precisely.
-6. Prefer precise upper-level terms when a list is only illustrative, but keep the list when the listed mechanisms are examiner-relevant.
-7. Avoid lecture-route narration and exam-guidance phrasing inside the answer.
-8. End paragraphs with a consequence, limitation, or direct answer to the question.
-9. End the essay with synthesis, not new evidence.
+6. Prefer direct positive wording. Do not add a negative contrast merely to sound sophisticated.
+7. Keep the logic order smooth: no claim, detour, repeated claim pattern unless the paragraph is deliberately returning to evaluate the claim.
+8. Prefer precise upper-level terms when a list is only illustrative, but keep the list when the listed mechanisms are examiner-relevant.
+9. Avoid lecture-route narration and exam-guidance phrasing inside the answer.
+10. End paragraphs with a consequence, limitation, or direct answer to the question.
+11. End the essay with synthesis, not new evidence or a list of section conclusions.
 
 Strong paragraph shape:
 
@@ -571,7 +592,7 @@ Introduction:
 - state the question's core problem;
 - define only terms required for the answer;
 - state the thesis;
-- preview the organising logic, not a list of all facts.
+- preview the organising logic, not a list of all facts, section conclusions, or every later part.
 
 Body paragraphs:
 
@@ -584,7 +605,9 @@ Conclusion:
 
 - answer the question directly;
 - synthesise the main mechanisms or comparisons;
-- do not add new examples or unsupported claims.
+- use roughly half factual synthesis and half analytic consequence;
+- do not add new examples or unsupported claims;
+- do not simply list the conclusion of each body paragraph.
 
 ## Comparison Essays
 

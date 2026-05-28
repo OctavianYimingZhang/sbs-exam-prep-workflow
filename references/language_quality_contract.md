@@ -49,9 +49,17 @@ Acceptable variants:
 - `shared problem -> comparison axis -> contrast -> synthesis`;
 - `sector/system problem -> example evidence -> implementation mechanism -> wider implication`.
 
+Across a complete Example Essay, keep descriptive and analytic material in balance. A good default is roughly half descriptive content and half analytic content:
+
+- descriptive content states the relevant fact, mechanism, source-backed detail, experiment condition, pathway, case, or observed result;
+- analytic content explains why the detail matters, what it proves or fails to prove, which boundary it sets, which mechanism it distinguishes, or how it answers the question.
+
+Do not solve weak analysis by adding a decorative sentence at the end. Integrate analysis into the factual sequence so that evidence and interpretation stay adjacent.
+
 ## Required Rules
 
 - Start with the answer or problem, not with metacommentary.
+- Prefer direct positive claims. Use negative framing only when the false model is examiner-relevant and the contrast must be stated.
 - Preserve necessary mechanisms when compressing language.
 - Remove repeated definitions, repeated claims, decorative transitions, and low-value case details.
 - Remove lecture-route narration and exam-guidance phrasing from the answer body.
@@ -61,6 +69,8 @@ Acceptable variants:
 - Use examples as evidence for a wider claim.
 - Convert experiments, data, and examples into evidence, mechanism, interpretation, and limitation when the question is evidence-heavy.
 - Make contrasts explicit; do not rely on ambiguous `rather than` phrasing.
+- Do not open with a negative-only sentence and then restate the correct claim in the next sentence. Write the correct claim first, adding the rejected model only as a compact boundary when needed.
+- Keep logic linear. Avoid `A -> B -> A` sequencing where a claim is stated, interrupted by setup, and then restated. Combine setup and result when possible, especially for experiment evidence.
 - Separate model, mechanism, evidence, and implication when a question asks for evaluation.
 - Use citations only for non-obvious facts, theories, mechanisms, methods, evidence, data, or broad generalisations.
 - Calibrate citation strength. Use `supports`, `implicates`, `is consistent with`, or `contributes to` unless the verified source directly proves causality.
@@ -68,6 +78,7 @@ Acceptable variants:
 - Do not invent statistics, dates, mechanisms, source names, quotations, or citations.
 - If the user supplies no Example Essay citations, cite only sources found by slide-citation mining or verified classic-experiment fallback; never cite from memory.
 - Conclude by synthesis. Do not add new evidence in the conclusion.
+- Openings and conclusions should state the problem, thesis, or synthesis. They must not list every later section or repeat each body paragraph's conclusion.
 
 ## Banned Patterns
 
@@ -77,6 +88,10 @@ Reject or rewrite paragraphs that:
 - narrate the lecture/source route instead of giving the answer;
 - say how the student should write instead of writing the answer;
 - include exam-guidance sentences such as telling the student what the final thesis should be;
+- open with an unnecessary `X is not...` sentence when the next sentence gives the real claim;
+- use repeated `not... but`, `not simply`, `rather than`, or `however` structures when direct positive wording would be clearer;
+- sequence evidence as claim, setup, repeated claim instead of claim, setup plus result, interpretation;
+- use an introduction or conclusion as a list of parts rather than as a synthesis;
 - list examples without explaining what they prove;
 - repeat the question using different words without adding mechanism;
 - overuse broad claims such as `this is important` without specifying consequence;
@@ -131,7 +146,7 @@ For every named detail, ask:
 
 ## Analytic-Over-Descriptive Standard
 
-A paragraph fails if it contains more than two consecutive descriptive sentences without an analytic sentence.
+A paragraph fails if it contains more than two consecutive descriptive sentences without an analytic sentence. A complete essay also fails when the sentence-level balance is strongly descriptive-dominant. The target is approximately 40-60% analytic sentences, with enough descriptive material to keep the answer factual and enough analytic material to make the answer argumentative.
 
 A valid analytic sentence must do at least one of the following:
 

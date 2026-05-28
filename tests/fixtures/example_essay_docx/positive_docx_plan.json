@@ -103,21 +103,21 @@
           ],
           "text_runs": [
             {
-              "text": "The lecture frames the response as a control problem in which a defined signal must be detected, converted into intracellular change and translated into altered physiology. ",
+              "text": "Signal control is a conversion problem in which a defined cue must be detected, converted into intracellular change and translated into altered physiology. ",
               "source_type": "lecture_slide_core",
               "source_anchor": "fixture_lecture_slides.pdf slides 10-11",
               "highlight": "none",
               "in_text_citation": null
             },
             {
-              "text": "The uploaded reading chapter refines this by showing that signal duration can alter the stability of the downstream state, so timing as well as amplitude affects the final response. ",
+              "text": "Signal duration can alter downstream-state stability by prolonging pathway occupancy under sustained stimulation, so timing as well as amplitude affects the final response. ",
               "source_type": "extra_reading_book",
               "source_anchor": "fixture_extra_reading.pdf chapter 2 section signal duration",
               "highlight": "yellow",
               "in_text_citation": null
             },
             {
-              "text": "Together, the lecture and reading support an essay argument in which control is explained as a sequence from detection to mechanism to consequence.",
+              "text": "Control is therefore best explained as a sequence from detection to mechanism to consequence.",
               "source_type": "lecture_slide_core",
               "source_anchor": "fixture_lecture_slides.pdf slide 11",
               "highlight": "none",
@@ -183,7 +183,7 @@
               "in_text_citation": null
             },
             {
-              "text": "A lecture-cited experiment showed that blocking the receptor prevented the downstream transition, supporting a causal rather than merely correlative relationship (Author et al., 2026). ",
+              "text": "A blocking experiment showed that receptor inhibition prevented the downstream transition, supporting causal interpretation of the signal-to-response link (Author et al., 2026). ",
               "source_type": "citation_original_source",
               "source_anchor": "Author et al. 2026 original paper, read section Results",
               "highlight": "green",
@@ -191,7 +191,7 @@
               "citation_original_read": true
             },
             {
-              "text": "The consequence is that the physiological response can be explained as regulated conversion of signal information into a coordinated output, rather than as an isolated endpoint. The answer therefore stays focused on the causal chain from signal detection to pathway selection and functional interpretation, including the threshold logic that makes weak and strong stimulation produce different outcomes.",
+              "text": "The consequence is that the physiological response can be explained as regulated conversion of signal information into a coordinated output. The answer therefore stays focused on the causal chain from signal detection to pathway selection and functional interpretation, including the threshold logic that makes weak and strong stimulation produce different outcomes.",
               "source_type": "lecture_slide_core",
               "source_anchor": "fixture_lecture_slides.pdf slide 14",
               "highlight": "none",

@@ -63,6 +63,31 @@
       "text": "This version has been compressed by 30% while preserving the main points. The target word count is lower, so the paragraph removes some evidence and keeps only the broad conclusion about spinal rhythm generation."
     },
     {
+      "id": "negative_opener_before_positive_claim_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "The spinal cord is not a passive relay between brain and muscle. It is the lowest level of the motor hierarchy, transforming sensory input, descending command and motor-neuron feedback into organised motor output. That delayed positive claim should have opened the paragraph directly."
+    },
+    {
+      "id": "fragmented_evidence_sequence_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "The strongest evidence for spinal CPGs is that rhythmic flexor-extensor alternation can persist after sensory reafference from the limb has been removed. In Graham Brown's decerebrate cat experiments, descending influence was reduced, the limb was fixed, and dorsal roots were cut. Rhythmic alternation between flexor tibialis anterior and extensor gastrocnemius still emerged. The result is correct, but the paragraph states the claim, detours into setup, and then restates the claim instead of attaching the result to the setup."
+    },
+    {
+      "id": "descriptive_analytic_imbalance_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Renshaw cells receive motor-neuron collateral input. Ia inhibitory interneurons inhibit antagonist motor pools. Ib interneurons receive tendon-organ force feedback. Commissural interneurons cross the midline. Propriospinal interneurons link spinal segments. Axo-axonic interneurons act on afferent terminals. The paragraph names components but gives too little analysis of what control problem these components solve."
+    },
+    {
+      "id": "intro_part_list_bad",
+      "expected": "fail",
+      "function": "introduction",
+      "has_lecture_anchor": true,
+      "text": "This essay will first explain spinal rhythm generation, second describe proprioceptive feedback, third discuss brainstem command and finally summarise vestibular control. The introduction lists the later parts instead of giving a thesis about distributed locomotor control."
+    },
+    {
       "id": "claim_mechanism_good",
       "expected": "pass",
       "has_lecture_anchor": true,
@@ -85,6 +110,25 @@
       "expected": "pass",
       "has_lecture_anchor": true,
       "text": "A central pattern generator is best treated as a spinal or brainstem network, not a single pacemaker cell. Its recurrent circuitry can produce timed flexor-extensor sequences without sensory reafference, whereas sensory input entrains and adjusts that rhythm to load, speed and phase. The exam-relevant point is therefore layered control: movement has a central timing source, but useful locomotion remains feedback-tuned rather than sensory-independent."
+    },
+    {
+      "id": "linear_evidence_sequence_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "The strongest evidence for spinal CPGs is that rhythmic flexor-extensor alternation persists when limb-derived sensory reafference is removed. In Graham Brown's decerebrate cat experiments, descending influence was reduced, the limb was fixed, and dorsal roots were cut, yet alternating activity still emerged between flexor tibialis anterior and extensor gastrocnemius. The result separates rhythm generation from rhythm adjustment because the core timing survives without the sensory events that normally tune phase and load."
+    },
+    {
+      "id": "direct_positive_claim_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "The spinal cord is the lowest level of the motor hierarchy, transforming sensory input, descending command and motor-neuron feedback into organised motor output. This framing makes reflexes part of local sensorimotor computation: afferent signals, interneuron relays and motor-neuron feedback are routed into responses that are fast, task-dependent and coordinated."
+    },
+    {
+      "id": "balanced_conclusion_good",
+      "expected": "pass",
+      "function": "conclusion",
+      "has_lecture_anchor": true,
+      "text": "Overall, rhythmic movement depends on spinal timing circuits, pattern-formation pathways, proprioceptive phase gating, brainstem initiation and vestibular stabilisation. Analytically, this organisation makes locomotion a distributed control problem: central circuits provide usable timing only because sensory and descending systems continuously tune that timing to mechanical support, behavioural demand and balance."
     }
   ]
 }
