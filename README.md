@@ -87,8 +87,8 @@ benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour onl
 5. When formal papers are present, extract question records and archetypes as optional evidence modules for emphasis and answer operations.
 6. Apply the exam overlay only to priority, density, ordering, examples, traps, and module-level `Exam Use`.
 7. Filter the public view to `Course Knowledge Map` plus knowledge modules only.
-8. Use examples and feedback only for internal style/density rules unless their factual claims are independently verified.
-9. Run DOCX style, coverage, student-output, and helper-file QA so unsupported claims and process helper files do not enter the final public output.
+8. Convert examples and feedback into `ExampleReviewLedger` records, transferable-rule synthesis, rule-promotion QA, and example-transfer linting before any production rule changes.
+9. Run DOCX style, coverage, example-transfer, student-output, and helper-file QA so unsupported claims and process helper files do not enter the final public output.
 
 ## Quick Start
 
@@ -197,7 +197,7 @@ No lineage -> no reproducible publish.
 No QA pass -> no publish.
 ```
 
-This is implemented with a fragment metadata index, optional past-paper evidence modules, style-only example analysis, visual-inspection metadata, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
+This is implemented with a fragment metadata index, optional past-paper evidence modules, example-learning promotion gates, visual-inspection metadata, a runtime ontology validator, and run manifest/lineage linting. The goal is not to run a cloud data platform; the goal is to make local exam-prep generation pruneable, auditable, and reproducible.
 
 ## Output Routes
 
@@ -519,7 +519,7 @@ Essay/problem-essay predictions must be labelled as predicted themes. Practice s
 | `ontology/` | Machine-readable operational ontology: object types, link types, action types, validation rules, and query templates. |
 | `references/` | Protocols for evidence handling, routing, Academic Exam-Ready Notes, visual aids, planning, student-facing filters, language quality, Example Essays, legacy internal workbook compatibility, regression, and release. |
 | `scripts/` | Helper CLIs for planning, readiness checks, extraction, grouping, DOCX generation, student-output linting, language linting, citation resolution, source audit, deliverable linting, gap reporting, and GitHub-ready QA. |
-| `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, student output contracts, knowledge walkthrough plans, Example Essay plans, language deltas, example contributions, runtime objects, fragment partitions, run manifests, and lineage events. |
+| `schemas/` | JSON schemas for setup config, workflow plans/actions, readiness reports, student output contracts, knowledge walkthrough plans, Academic Exam-Ready Notes, Example Essay plans, language deltas, example review ledgers, runtime objects, fragment partitions, run manifests, and lineage events. |
 | `benchmarks/` | Sanitized benchmark metadata and lint fixtures. They preserve transferable workflow rules only. |
 | `tests/fixtures/` | Small public fixtures for DOCX, source-grounding, and citation-fallback checks. |
 | `agents/` | Optional Skill interface metadata, presets, prompt cards, and setup wizard metadata. |
@@ -708,10 +708,11 @@ Check that public output excludes helper artefacts:
 python scripts/final_deliverable_linter.py /path/to/public_output
 ```
 
-Analyse external examples into transferable deltas:
+Analyse external examples into review-ledger records and transferable deltas:
 
 ```bash
 python scripts/analyze_example_corpus.py /path/to/examples --output /path/to/example_analysis.json --max-files 80
+python scripts/example_transfer_linter.py /path/to/example_review_ledger.json
 ```
 
 Run metadata-only regression checks:

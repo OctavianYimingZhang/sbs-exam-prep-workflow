@@ -217,6 +217,12 @@ STYLE_AWARE_PRESETS = {
 }
 
 PAST_PAPER_EVIDENCE_MODULES = ["exam_regime", "past_paper_questions", "question_archetypes", "examiner_operations"]
+EXAMPLE_LEARNING_MODULES = [
+    "example_learning",
+    "transferable_rule_synthesis",
+    "rule_promotion_gate",
+    "example_transfer_linter",
+]
 
 MODULE_DEFS = {
     "source_inventory": {
@@ -231,11 +237,50 @@ MODULE_DEFS = {
         "expected_outputs": ["FragmentPartition"],
         "qa_checks": ["partition metadata", "source hash"],
     },
-    "style_analysis": {
-        "action_type": "AnalyzeStyleExamples",
+    "example_learning": {
+        "action_type": "AnalyzeExamplesIntoTransferableRules",
         "minimum_inputs": ["style_or_example_evidence"],
+        "expected_outputs": ["ExampleReviewLedger", "TransferableRuleSet", "NonTransferableContentBlocklist", "ExampleTransferQA"],
+        "qa_checks": [
+            "one review record per example",
+            "what worked and what failed recorded",
+            "no course topic or example-name hardcoding",
+            "non-transferable content blocked",
+            "no factual or prediction support",
+        ],
+    },
+    "transferable_rule_synthesis": {
+        "action_type": "SynthesizeTransferableRules",
+        "minimum_inputs": ["ExampleReviewLedger", "NonTransferableContentBlocklist"],
+        "expected_outputs": ["TransferableRuleSet", "QAFlag"],
+        "qa_checks": [
+            "source-specific content stripped",
+            "rules expressed as generic conditions",
+            "rule destination declared",
+            "anti-overfit rule retained",
+        ],
+    },
+    "rule_promotion_gate": {
+        "action_type": "RunRulePromotionGate",
+        "minimum_inputs": ["ExampleReviewLedger", "TransferableRuleSet", "NonTransferableContentBlocklist"],
+        "expected_outputs": ["ExampleTransferQA", "QAFlag"],
+        "qa_checks": [
+            "each promoted rule has validation check",
+            "positive and negative regression coverage declared",
+            "non-transferable content absent from promoted rules",
+            "promotion status explicit",
+        ],
+    },
+    "example_transfer_linter": {
+        "action_type": "LintExampleTransfer",
+        "minimum_inputs": ["ExampleReviewLedger", "TransferableRuleSet", "ExampleTransferQA"],
         "expected_outputs": ["QAFlag"],
-        "qa_checks": ["style-only transfer", "non-transferable content blocked", "no factual or prediction support"],
+        "qa_checks": [
+            "good and bad analysis present",
+            "anti-overfit rule present",
+            "no direct example-to-skill copying",
+            "accepted rules have validation checks",
+        ],
     },
     "lecture_module_extraction": {
         "action_type": "BuildLectureModules",
@@ -671,7 +716,7 @@ def modules_for_preset(
     if selected_preset in PAST_PAPER_AWARE_PRESETS and "formal_past_papers" in available:
         insert_after_once(modules, "baseline_coverage_floor_qa", PAST_PAPER_EVIDENCE_MODULES)
     if selected_preset in STYLE_AWARE_PRESETS and style_evidence_available(config, source_scan):
-        insert_after_once(modules, "fragment_index", ["style_analysis"])
+        insert_after_once(modules, "fragment_index", EXAMPLE_LEARNING_MODULES)
     return modules
 
 
@@ -711,7 +756,13 @@ def build_plan(config: dict[str, Any], source_scan: dict[str, Any] | None = None
         "optional_modules_enabled": [
             module
             for module in modules
-            if module in {"exam_regime", "past_paper_questions", "question_archetypes", "examiner_operations", "style_analysis"}
+            if module in {
+                "exam_regime",
+                "past_paper_questions",
+                "question_archetypes",
+                "examiner_operations",
+                *EXAMPLE_LEARNING_MODULES,
+            }
         ],
     }
     target_group_key = str(project.get("target_group_key") or "unspecified_target")

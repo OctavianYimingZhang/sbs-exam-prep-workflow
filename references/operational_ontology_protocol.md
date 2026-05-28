@@ -57,6 +57,7 @@ Core objects:
 - `CourseSection`, `LectureSession`, `LectureConceptModule`, `AtomicKnowledgeLedger`, `SourceBaselineNotesPlan`, `KnowledgeOnlyStudentView`, `ExamEmphasisProfile`, `ExamOverlayPass`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure, decompose source blocks into atomic units, protect source-first baseline coverage, filter public output to knowledge-only content, then apply exam overlay before writing.
 - `QuestionTypeAddOn`, `VisualAidSpec`, and `GeneratedVisualAid`: final-layer add-on objects that may extend notes without becoming factual authority.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
+- `ExampleReviewLedger`, `TransferableRuleSet`, `NonTransferableContentBlocklist`, and `ExampleTransferQA`: internal example-learning objects that require good/bad analysis, block example-specific content, and gate rule promotion before production changes.
 - `SourceFragment`: slide, page, question, figure, table, protocol step, chapter, or section.
 - `FragmentPartition`: metadata partition used to prune irrelevant fragments before expensive reasoning or generation.
 - `AssessmentRegime` and `ExamBlueprint`: current versus old exam structures.
@@ -174,6 +175,10 @@ RecordGateResult
 PlanWorkflow
 ExtractFragments
 BuildFragmentIndex
+AnalyzeExamplesIntoTransferableRules
+SynthesizeTransferableRules
+RunRulePromotionGate
+LintExampleTransfer
 BuildLectureModules
 BuildKnowledgeWalkthroughPlan
 ReconstructCourseSections

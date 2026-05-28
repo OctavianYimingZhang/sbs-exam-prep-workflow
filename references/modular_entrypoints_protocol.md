@@ -65,14 +65,15 @@ Minimum inputs:
 Outputs:
 
 - example category counts;
-- `ExampleContribution` records;
+- `ExampleReviewLedger` records;
 - `LanguageDelta` records;
 - non-transferable content notes;
 - protocol/script gap list.
 
 Standalone behaviour:
 
-- do not use example factual content for target predictions.
+- do not use example factual content for target predictions;
+- run rule-promotion gating before updating production protocols, schemas, scripts, or regression fixtures.
 
 ### 3. Target Grouping / Regime Split
 

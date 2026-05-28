@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract transferable language deltas from external example material."""
+"""Extract language deltas and ExampleReviewLedger records from external examples."""
 
 from __future__ import annotations
 
@@ -184,6 +184,7 @@ def analyse_file(path: Path) -> dict[str, Any]:
             "qa_flags": [f"unsupported_extension:{path.suffix.lower() or '[none]'}"],
             "language_deltas": [],
             "example_contributions": [],
+            "example_review_records": [],
         }
     try:
         text = read_text(path)
@@ -195,6 +196,7 @@ def analyse_file(path: Path) -> dict[str, Any]:
             "qa_flags": [f"example_unreadable:{type(exc).__name__}"],
             "language_deltas": [],
             "example_contributions": [],
+            "example_review_records": [],
         }
     if not text.strip():
         return {
@@ -204,6 +206,7 @@ def analyse_file(path: Path) -> dict[str, Any]:
             "qa_flags": ["example_unreadable"],
             "language_deltas": [],
             "example_contributions": [],
+            "example_review_records": [],
         }
     features = detect_source_features(path, text) if detect_source_features is not None else []
     detected_role = detect_role(path, text, source_features=features) if detect_role is not None else "external_example"
@@ -222,6 +225,34 @@ def analyse_file(path: Path) -> dict[str, Any]:
         "affected_workflows": ["example_essay_mode", "kp_synthesis", "qa", "cross_subject_regression"],
         "validation_checks": sorted({delta["validation_check"] for delta in deltas}) or ["manual_review_required"],
     }
+    review_record = {
+        "example_id": source_id,
+        "source_role": "style_exemplar" if detected_role in {"exemplar_answer", "essay_guidance"} else "other_example",
+        "example_scope": "external example inspected for transferable language and workflow behaviour",
+        "what_worked": [
+            "The example can expose reusable prose, structure, density, or QA behaviour without becoming target evidence."
+        ],
+        "why_it_worked": [
+            "The reusable part is the condition detected by language deltas or workflow review, not the example's factual content."
+        ],
+        "what_failed": [delta["observed_problem"] for delta in deltas] or ["no failure observed"],
+        "why_it_failed": [
+            "Detected paragraph patterns matched a known student-output risk."
+        ] if deltas else ["not applicable because no failure was observed"],
+        "transferable_principle": (
+            "Promote only generic condition-based language, structure, density, or QA rules after stripping example identity."
+        ),
+        "non_transferable_content": [
+            "factual claims, citations, names, dates, topics, recurrence details, and exact headings from this example"
+        ],
+        "anti_overfit_rule": "Do not branch production behaviour on this example identity or copy its topic sequence.",
+        "affected_protocols": ["references/example_analysis_protocol.md"],
+        "affected_scripts": ["scripts/example_transfer_linter.py"],
+        "validation_check": "scripts/example_transfer_linter.py must pass on the ExampleReviewLedger before rule promotion.",
+        "regression_fixture": "tests/fixtures/example_learning",
+        "promotion_status": "candidate",
+        "confidence": "medium",
+    }
     return {
         "source_id": source_id,
         "path": str(path),
@@ -232,6 +263,7 @@ def analyse_file(path: Path) -> dict[str, Any]:
         "language_delta_scan": language_delta_scan,
         "language_deltas": deltas,
         "example_contributions": [contribution],
+        "example_review_records": [review_record],
         "paragraphs_read": len(paragraphs(text)),
         "word_count": len(WORD_RE.findall(text)),
     }
@@ -272,6 +304,25 @@ def main() -> int:
         },
         "language_deltas": [delta for report in reports for delta in report["language_deltas"]],
         "example_contributions": [item for report in reports for item in report["example_contributions"]],
+        "example_review_ledger": {
+            "object_type": "ExampleReviewLedger",
+            "ledger_id": "ledger_external_example_corpus",
+            "target_group_key": "external_example_learning",
+            "records": [item for report in reports for item in report.get("example_review_records", [])],
+            "non_transferable_content": sorted({
+                item
+                for report in reports
+                for record in report.get("example_review_records", [])
+                for item in record.get("non_transferable_content", [])
+            }),
+            "promotion_summary": {
+                "accepted_count": 0,
+                "candidate_count": sum(1 for report in reports for item in report.get("example_review_records", []) if item.get("promotion_status") == "candidate"),
+                "rejected_count": 0,
+                "blocked_count": 0,
+            },
+            "qa_status": "warning",
+        },
         "non_transferable_content": sorted({item for report in reports for contribution in report["example_contributions"] for item in contribution["non_transferable_content"]}),
         "qa_flags": [flag for report in reports for flag in report["qa_flags"]],
         "sources": reports,

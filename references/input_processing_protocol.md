@@ -136,13 +136,14 @@ Cross-target examples must be converted into transferable workflow contributions
 | `benchmark_fixture` | no | no | no | no | no | yes |
 | `unsupported_or_unreadable` | no | no | no | no | no | no |
 
-## ExampleContribution Schema
+## ExampleReviewRecord Schema
 
-Every non-target example used by a protocol or benchmark must be represented as a contribution object:
+Every non-target example used by a protocol or benchmark must be represented as a review record before any lesson is promoted:
 
 ```yaml
-ExampleContribution:
-  source_id:
+ExampleReviewRecord:
+  example_id:
+  source_role:
   source_materials:
     - lecture_slides
     - lecture_notes
@@ -153,35 +154,30 @@ ExampleContribution:
     - marking_guidance
     - exemplar_answers
     - handwritten_or_image_examples
-  observed_source_pattern:
-  generic_skill_contribution:
-  transferable_rule:
-  future_source_diagnostic_questions:
-    - question
+  example_scope:
+  what_worked:
+    - reusable behaviour demonstrated by the example
+  why_it_worked:
+    - source or output condition that made the behaviour valid
+  what_failed:
+    - failure observed, or no failure observed
+  why_it_failed:
+    - cause, or not applicable because no failure was observed
+  transferable_principle:
   non_transferable_content:
     - topic/content/lecturer/year detail that must not be reused
-  affected_workflows:
-    - source_inventory
-    - target_grouping_regime_split
-    - question_type_gate
-    - exam_format_diagnosis
-    - lecture_segmentation
-    - knowledge_point_optimisation
-    - archetype_mapping
-    - past_paper_statistics
-    - pattern_detection
-    - question_type_outputs
-    - example_essay_mode
-    - long_answer_project_mode
-    - extra_reading_and_exemplars
-    - docx_add_on_generation
-    - qa
-    - cross_subject_regression
-  anti_patterns_prevented:
-    - pooling content across unrelated source sets
-  validation_checks:
-    - check
+  anti_overfit_rule:
+  affected_protocols:
+    - protocol path or protocol name
+  affected_scripts:
+    - script path or linter name
+  validation_check:
+  regression_fixture:
+  promotion_status: candidate | accepted | rejected | blocked
+  confidence: high | medium | low
 ```
+
+Promotion is blocked unless the review record explains both useful and failed behaviours, strips non-transferable content, names the destination, and includes a validation check. Examples may improve workflow logic and QA only; they cannot support target facts or predictions.
 
 ## Target Group Key And Regime Split
 
@@ -192,7 +188,7 @@ All question-pattern inference must stay inside the same target course/module gr
 3. collapse whitespace and punctuation;
 4. retain the normalized course/module group as `target_group_key`.
 
-Never use content from one `target_group_key` to predict the content of another target group. External examples may be used only as ExampleContribution records that teach reusable workflow logic, output structure, QA checks, or evidence-handling discipline.
+Never use content from one `target_group_key` to predict the content of another target group. External examples may be used only as `ExampleReviewRecord` entries that teach reusable workflow logic, output structure, QA checks, or evidence-handling discipline after non-transferable content is blocked.
 
 Within the same target group, split formal papers into `exam_regime` groups when any of these change materially:
 

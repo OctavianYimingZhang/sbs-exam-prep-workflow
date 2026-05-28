@@ -35,13 +35,16 @@ FORBIDDEN_PUBLIC_PHRASES = [
     "extraction quality",
 ]
 
-REQUIRED_CLINICAL_MODULES = {
-    "drug_target_definition": ["drug target definition"],
-    "on_target_vs_off_target": ["on-target", "off-target"],
-    "good_drug_target_criteria": ["good drug target criteria"],
-    "why_gpcrs_are_good_targets": ["why gpcr"],
-    "target_validation": ["target validation"],
-    "assay_vs_screen": ["assay", "screen"],
+PROTECTED_ITEM_TYPE_REQUIREMENTS = {
+    "definition": "must appear under Key Definitions or as a standalone definition module",
+    "contrast_pair": "must compare both sides before traps or must-master lists",
+    "criteria_list": "must appear under Criteria / Components / Steps as a list",
+    "why_x_block": "must appear under Canonical Example or as a standalone Why-X module",
+    "named_example": "must appear under Canonical Example or a named-example module",
+    "assay_or_method": "must include method principle, readout, interpretation, and limitation when those terms are required by the fixture",
+    "calculation_rule": "must include formula, units, substitution logic, and interpretation when those terms are required by the fixture",
+    "graph_readout": "must include axis, trend, parameter extraction, and conclusion when those terms are required by the fixture",
+    "workflow": "must preserve ordered steps when the source provides a workflow",
 }
 
 MODULE_HEADING_RE = re.compile(r"^(?:#{1,6}\s*)?Module\s*:\s*(.+?)\s*$", re.IGNORECASE)
@@ -114,6 +117,24 @@ def find_module(modules: list[dict[str, Any]], required_terms: list[str]) -> dic
     return None
 
 
+def terms_from_config(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [normalize(str(item)) for item in value if normalize(str(item))]
+    if isinstance(value, str) and normalize(value):
+        return [normalize(value)]
+    return []
+
+
+def term_present(text: str, term: str) -> bool:
+    return normalize(term) in normalize(text)
+
+
+def load_protected_items(path: Path | None) -> dict[str, Any] | None:
+    if not path:
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
 def section_after(body: str, heading: str) -> str:
     pattern = re.compile(rf"^{re.escape(heading)}:\s*$", re.IGNORECASE | re.MULTILINE)
     match = pattern.search(body)
@@ -172,11 +193,104 @@ def lint_atomic_coverage(text: str, ledger: dict[str, Any] | None) -> list[dict[
     return failures
 
 
+def lint_protected_item(module: dict[str, Any], item: dict[str, Any]) -> list[dict[str, Any]]:
+    failures: list[dict[str, Any]] = []
+    item_id = item.get("item_id")
+    item_type = item.get("item_type")
+    if item_type not in PROTECTED_ITEM_TYPE_REQUIREMENTS:
+        failures.append({"type": "unknown_protected_item_type", "item_id": item_id, "item_type": item_type})
+        return failures
+
+    body = module["body"]
+    for term in terms_from_config(item.get("required_terms")):
+        if not term_present(body, term):
+            failures.append({"type": "protected_item_required_term_missing", "item_id": item_id, "term": term})
+
+    for term in terms_from_config(item.get("body_terms")):
+        if not term_present(body, term):
+            failures.append({"type": "protected_item_body_term_missing", "item_id": item_id, "term": term})
+
+    required_section = str(item.get("required_section") or "").strip()
+    section_text = section_after(body, required_section) if required_section else ""
+    if required_section and not section_text:
+        failures.append({"type": "protected_item_required_section_missing", "item_id": item_id, "section": required_section})
+    for term in terms_from_config(item.get("section_terms")):
+        if not term_present(section_text, term):
+            failures.append({"type": "protected_item_section_term_missing", "item_id": item_id, "section": required_section, "term": term})
+    min_bullets = item.get("min_section_bullets")
+    if isinstance(min_bullets, int) and bullet_count(section_text) < min_bullets:
+        failures.append({
+            "type": "protected_item_list_collapsed_into_prose",
+            "item_id": item_id,
+            "section": required_section,
+            "bullets": bullet_count(section_text),
+            "minimum": min_bullets,
+        })
+
+    pre_trap_terms = terms_from_config(item.get("pre_trap_terms"))
+    if pre_trap_terms:
+        before_trap = body.split("Common Error / Trap:", 1)[0].split("Must Master:", 1)[0]
+        for term in pre_trap_terms:
+            if not term_present(before_trap, term):
+                failures.append({"type": "protected_item_only_in_trap_or_must_master", "item_id": item_id, "term": term})
+
+    if item_type == "definition" and not (section_after(body, "Key Definitions") or "definition" in normalize(module["title"])):
+        failures.append({"type": "definition_not_visible_as_definition", "item_id": item_id})
+    if item_type == "criteria_list" and bullet_count(section_after(body, required_section or "Criteria / Components / Steps")) < int(min_bullets or 1):
+        failures.append({"type": "criteria_list_not_preserved_as_list", "item_id": item_id})
+    if item_type in {"why_x_block", "named_example"} and not (section_after(body, "Canonical Example") or normalize(module["title"]).startswith("why ")):
+        failures.append({"type": "named_example_or_why_block_not_visible", "item_id": item_id})
+
+    return failures
+
+
+def lint_protected_items(modules: list[dict[str, Any]], protected_config: dict[str, Any] | None) -> list[dict[str, Any]]:
+    if not protected_config:
+        return []
+    failures: list[dict[str, Any]] = []
+    items = protected_config.get("protected_items", [])
+    if not isinstance(items, list):
+        return [{"type": "protected_items_not_list"}]
+
+    found: dict[str, dict[str, Any]] = {}
+    for item in items:
+        if not isinstance(item, dict):
+            failures.append({"type": "protected_item_not_object"})
+            continue
+        item_id = str(item.get("item_id") or "")
+        title_terms = terms_from_config(item.get("title_terms") or item.get("module_title_terms"))
+        module = find_module(modules, title_terms) if title_terms else None
+        if not module:
+            failures.append({"type": "missing_protected_standalone_module", "item_id": item_id, "title_terms": title_terms})
+            continue
+        found[item_id] = module
+        failures.extend(lint_protected_item(module, item))
+
+    core_item_ids = {str(item_id) for item_id in protected_config.get("core_item_ids", [])}
+    core_modules = [module for item_id, module in found.items() if item_id in core_item_ids]
+    if core_modules:
+        max_core_priority = max(priority_value(module.get("priority")) for module in core_modules)
+        max_core_length = max(len(normalize(module["body"]).split()) for module in core_modules)
+        for background in protected_config.get("background_modules", []):
+            terms = terms_from_config(background.get("title_terms") if isinstance(background, dict) else background)
+            if not terms:
+                continue
+            for module in modules:
+                if all(term in normalize(module["title"]) for term in terms):
+                    if priority_value(module.get("priority")) > max_core_priority:
+                        failures.append({"type": "background_module_priority_exceeds_protected_core", "module_title": module["title"]})
+                    allow_longer_if = normalize(str(background.get("allow_longer_if", ""))) if isinstance(background, dict) else ""
+                    if len(normalize(module["body"]).split()) > max_core_length and (not allow_longer_if or allow_longer_if not in normalize(module["body"])):
+                        failures.append({"type": "background_module_longer_than_protected_core", "module_title": module["title"]})
+
+    return failures
+
+
 def lint(
     text: str,
     *,
-    clinical_target_discovery: bool,
     ledger: dict[str, Any] | None = None,
+    protected_config: dict[str, Any] | None = None,
     min_modules: int | None = None,
     require_module_terms: list[str] | None = None,
 ) -> dict[str, Any]:
@@ -201,47 +315,7 @@ def lint(
             failures.append({"type": "missing_required_module_term", "term": required})
 
     failures.extend(lint_atomic_coverage(text, ledger))
-
-    if clinical_target_discovery:
-        found: dict[str, dict[str, Any]] = {}
-        for module_id, required_terms in REQUIRED_CLINICAL_MODULES.items():
-            module = find_module(modules, required_terms)
-            if not module:
-                failures.append({"type": "missing_standalone_module", "module": module_id})
-            else:
-                found[module_id] = module
-
-        criteria = found.get("good_drug_target_criteria")
-        if criteria:
-            criteria_section = section_after(criteria["body"], "Criteria / Components / Steps")
-            if bullet_count(criteria_section) < 3:
-                failures.append({"type": "good_target_criteria_collapsed_into_prose"})
-
-        gpcr = found.get("why_gpcrs_are_good_targets")
-        if gpcr:
-            gpcr_text = normalize(gpcr["body"])
-            for term in ["physiolog", "access", "modulat", "divers"]:
-                if term not in gpcr_text:
-                    failures.append({"type": "gpcr_rationale_missing_component", "component": term})
-
-        on_off = found.get("on_target_vs_off_target")
-        if on_off:
-            body = on_off["body"]
-            before_trap = body.split("Common Error / Trap:", 1)[0].split("Must Master:", 1)[0]
-            if "on-target" not in normalize(before_trap) or "off-target" not in normalize(before_trap):
-                failures.append({"type": "on_off_target_only_in_trap_or_must_master"})
-
-        target_priorities = [priority_value(module.get("priority")) for module in found.values()]
-        max_target_priority = max(target_priorities) if target_priorities else 0
-        target_lengths = [len(normalize(module["body"]).split()) for module in found.values()]
-        max_target_length = max(target_lengths) if target_lengths else 0
-        for module in modules:
-            title = normalize(module["title"])
-            if any(term in title for term in ["pipeline", "stakeholder", "background"]):
-                if priority_value(module.get("priority")) > max_target_priority:
-                    failures.append({"type": "background_module_priority_exceeds_target_core", "module_title": module["title"]})
-                if len(normalize(module["body"]).split()) > max_target_length and "direct exam-operation justification" not in normalize(module["body"]):
-                    failures.append({"type": "background_module_longer_than_target_core", "module_title": module["title"]})
+    failures.extend(lint_protected_items(modules, protected_config))
 
     return {
         "pass": not failures,
@@ -250,6 +324,7 @@ def lint(
             "legacy_strings_checked": len(OLD_VISIBLE_STRINGS),
             "forbidden_public_phrases_checked": len(FORBIDDEN_PUBLIC_PHRASES),
             "atomic_units_checked": len((ledger or {}).get("units", [])) if isinstance(ledger, dict) else 0,
+            "protected_items_checked": len((protected_config or {}).get("protected_items", [])) if isinstance(protected_config, dict) else 0,
         },
         "failures": failures,
     }
@@ -258,8 +333,8 @@ def lint(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("path", type=Path)
-    parser.add_argument("--clinical-target-discovery", action="store_true")
     parser.add_argument("--ledger", type=Path, help="Optional AtomicKnowledgeLedger JSON for generic coverage linting.")
+    parser.add_argument("--protected-items", type=Path, help="Optional protected-item fixture JSON for generic source-feature coverage linting.")
     parser.add_argument("--min-modules", type=int, help="Fail if fewer modules are detected.")
     parser.add_argument("--require-module-term", action="append", default=[], help="Fail unless a module title contains all terms.")
     parser.add_argument("--output", type=Path)
@@ -268,8 +343,8 @@ def main() -> int:
     try:
         result = lint(
             collect_text(args.path),
-            clinical_target_discovery=args.clinical_target_discovery,
             ledger=load_ledger(args.ledger),
+            protected_config=load_protected_items(args.protected_items),
             min_modules=args.min_modules,
             require_module_terms=args.require_module_term,
         )

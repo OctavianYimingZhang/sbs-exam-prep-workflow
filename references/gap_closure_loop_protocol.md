@@ -7,8 +7,9 @@ The Skill is not complete after one rewrite. It is complete when the example-ana
 ```text
 collect examples
 -> classify source roles
--> extract ExampleContribution and LanguageDelta records
--> update protocols/scripts
+-> extract ExampleReviewLedger and LanguageDelta records
+-> run rule-promotion gate
+-> update protocols/scripts only after promotion passes
 -> generate or lint representative outputs
 -> import external review notes when available
 -> produce gap report

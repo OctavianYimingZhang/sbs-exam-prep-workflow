@@ -184,7 +184,7 @@ def main() -> int:
                     ],
                 ),
                 run_command(
-                    "workflow_plan_style_examples_enable_style_analysis",
+                    "workflow_plan_style_examples_enable_example_learning",
                     [
                         py,
                         "scripts/plan_workflow.py",
@@ -195,8 +195,31 @@ def main() -> int:
                         "--output",
                         str(style_plan_path),
                         "--require-module",
-                        "style_analysis",
+                        "example_learning",
+                        "--require-module",
+                        "transferable_rule_synthesis",
+                        "--require-module",
+                        "rule_promotion_gate",
+                        "--require-module",
+                        "example_transfer_linter",
                     ],
+                ),
+                run_command(
+                    "example_transfer_linter_accepts_valid_review_ledger",
+                    [
+                        py,
+                        "scripts/example_transfer_linter.py",
+                        "tests/fixtures/example_learning/valid_example_review_ledger.json",
+                    ],
+                ),
+                run_command(
+                    "example_transfer_linter_rejects_direct_example_copying",
+                    [
+                        py,
+                        "scripts/example_transfer_linter.py",
+                        "tests/fixtures/example_learning/invalid_example_review_ledger.json",
+                    ],
+                    expect_failure=True,
                 ),
                 run_command(
                     "workflow_plan_knowledge_walkthrough_fixture",
@@ -255,21 +278,23 @@ def main() -> int:
                     expect_failure=True,
                 ),
                 run_command(
-                    "exam_prep_notes_linter_clinical_target_discovery",
+                    "exam_prep_notes_linter_generic_protected_item_fixture",
                     [
                         py,
                         "scripts/exam_prep_notes_linter.py",
                         "tests/fixtures/exam_prep_notes/clinical_target_discovery/final_notes.md",
-                        "--clinical-target-discovery",
+                        "--protected-items",
+                        "tests/fixtures/exam_prep_notes/clinical_target_discovery/protected_items.json",
                     ],
                 ),
                 run_command(
-                    "exam_prep_notes_linter_rejects_legacy_compressed_target_discovery",
+                    "exam_prep_notes_linter_rejects_legacy_compressed_protected_items",
                     [
                         py,
                         "scripts/exam_prep_notes_linter.py",
                         "tests/fixtures/exam_prep_notes/clinical_target_discovery/bad_final_notes.md",
-                        "--clinical-target-discovery",
+                        "--protected-items",
+                        "tests/fixtures/exam_prep_notes/clinical_target_discovery/protected_items.json",
                     ],
                     expect_failure=True,
                 ),

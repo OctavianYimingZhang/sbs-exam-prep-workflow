@@ -14,13 +14,14 @@ Style/layout exemplars = wording, structure, density, formatting, and answer org
 Benchmark fixtures = tests only; never production rules.
 ```
 
-## Benchmark Contribution Schema
+## Benchmark Review Schema
 
-Every benchmark or external example must be converted into this schema before it can influence workflow design:
+Every benchmark or external example must be converted into an `ExampleReviewRecord` before it can influence workflow design:
 
 ```yaml
-BenchmarkContribution:
-  benchmark_id:
+ExampleReviewRecord:
+  example_id:
+  source_role: benchmark_fixture
   source_materials:
     - lecture_slides
     - lecture_notes
@@ -31,30 +32,30 @@ BenchmarkContribution:
     - marking_guidance
     - exemplar_answers
     - image_examples
-  observed_source_pattern:
+  example_scope:
   what_worked:
     - reusable workflow behaviour demonstrated by the example
-  what_failed_or_should_not_transfer:
+  why_it_worked:
+    - source or output condition that made the behaviour valid
+  what_failed:
+    - failure observed, or no failure observed
+  why_it_failed:
+    - cause, or not applicable because no failure was observed
+  transferable_principle:
+  non_transferable_content:
     - concrete topic/content/example/lecturer/year/detail that must not be reused
-  generic_skill_contribution:
-    - evidence handling
-    - regime split
-    - question-type routing
-    - answer-shape modelling
-    - output layout
-    - Example Essay language quality
-    - citation or extra-reading discipline
-    - QA rule
-  transferable_rule:
-    - evidence-condition-based rule for future source sets
-  diagnostic_questions:
-    - question to ask before applying the rule
-  anti_patterns_prevented:
-    - content leakage
-    - production branching on benchmark identity
-  validation_checks:
-    - check
+  anti_overfit_rule:
+  affected_protocols:
+    - protocol path or protocol name
+  affected_scripts:
+    - script path or linter name
+  validation_check:
+  regression_fixture:
+  promotion_status: candidate | accepted | rejected | blocked
+  confidence: high | medium | low
 ```
+
+Benchmarks may contribute only condition-based rules and tests. A target-specific fixture requirement belongs in the fixture; the production rule must be expressed in generic source features such as official definitions, contrast pairs, criteria lists, named teaching examples, `Why X?` blocks, workflows, calculations, and graph or method operations.
 
 ## Required Regression Axes
 

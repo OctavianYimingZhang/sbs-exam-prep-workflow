@@ -67,7 +67,7 @@ Past-paper objects must not be visible to module segmentation, atomic-item extra
 
 If no formal past papers are supplied, generate notes from source centrality, conceptual dependency, and official course emphasis only. Do not invent exam frequency or future-question probability.
 
-Cross-target examples, exemplar answers, and feedback sources may add an internal style-analysis action. That action may control paragraph density, answer ordering, and transferable workflow rules only; it must not support target factual claims, prediction claims, official answers, or priority labels.
+Cross-target examples, exemplar answers, and feedback sources must run the internal example-learning chain before they affect any rule: example review ledger, transferable-rule synthesis, rule-promotion gate, and example-transfer linting. Accepted rules may control paragraph density, answer ordering, and transferable workflow checks only; they must not support target factual claims, prediction claims, official answers, priority labels, or production branching on example identity.
 
 Visual-heavy PDFs, presentations, figures, tables, image exemplars, and image-only files must carry visual-inspection metadata in source inventory and fragment partitions. If a requested output depends on the visual content, inspect it before making the claim or keep the relevant conclusion limited.
 
@@ -246,7 +246,7 @@ If a source gives a named example, include it under `Canonical Example` unless t
 
 ## Module Density Floor
 
-The Skill must not compress a lecture or PPT section below the density demonstrated by supplied source-style exemplars.
+The Skill must not compress a lecture or PPT section below the density required by protected source features. Supplied examples may raise this floor only after the example-learning promotion gate converts the observation into a generic validation rule.
 
 For each lecture or PPT file:
 

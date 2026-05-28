@@ -23,6 +23,7 @@ REQUIRED_FILES = [
     "schemas/knowledge_walkthrough_plan.schema.json",
     "schemas/exam_prep_notes_plan.schema.json",
     "schemas/atomic_knowledge_ledger.schema.json",
+    "schemas/example_review_ledger.schema.json",
     "schemas/exam_emphasis_profile.schema.json",
     "schemas/question_type_addon.schema.json",
     "schemas/visual_aid_spec.schema.json",
@@ -33,6 +34,7 @@ REQUIRED_FILES = [
     "scripts/input_readiness_check.py",
     "scripts/validate_exam_prep_notes_plan.py",
     "scripts/exam_prep_notes_linter.py",
+    "scripts/example_transfer_linter.py",
     "scripts/exam_prep_docx_style_linter.py",
     "scripts/generate_exam_prep_notes_docx.py",
     "scripts/generate_knowledge_walkthrough_docx.py",
@@ -114,8 +116,14 @@ def validate(root: Path) -> dict[str, Any]:
         failures.append({"type": "missing_workflow_plan_object"})
     if "PlanWorkflow" not in action_types:
         failures.append({"type": "missing_plan_workflow_action"})
-    if "AnalyzeStyleExamples" not in action_types:
-        failures.append({"type": "missing_style_analysis_action"})
+    for action in [
+        "AnalyzeExamplesIntoTransferableRules",
+        "SynthesizeTransferableRules",
+        "RunRulePromotionGate",
+        "LintExampleTransfer",
+    ]:
+        if action not in action_types:
+            failures.append({"type": "missing_example_learning_action", "action_type": action})
     for action in [
         "BuildAtomicKnowledgeLedger",
         "BuildSourceBaselineNotesPlan",
@@ -171,7 +179,15 @@ def validate(root: Path) -> dict[str, Any]:
             failures.append({"type": "preset_missing_from_agents_file", "preset": preset})
 
     plan_text = read(root / "scripts/plan_workflow.py")
-    for optional_module in ["past_paper_questions", "question_archetypes", "examiner_operations", "style_analysis"]:
+    for optional_module in [
+        "past_paper_questions",
+        "question_archetypes",
+        "examiner_operations",
+        "example_learning",
+        "transferable_rule_synthesis",
+        "rule_promotion_gate",
+        "example_transfer_linter",
+    ]:
         if optional_module not in plan_text:
             failures.append({"type": "planner_missing_optional_module", "module": optional_module})
     for baseline_module in [
@@ -197,6 +213,14 @@ def validate(root: Path) -> dict[str, Any]:
                 failures.append({"type": "past_paper_module_before_baseline_floor", "module": module})
             if order.get(module, 999) > order.get("exam_emphasis_profile", -1):
                 failures.append({"type": "past_paper_module_after_exam_emphasis", "module": module})
+        example_available = {"any_source", "readable_course_notes", "style_or_example_evidence"}
+        example_config = {"source_inputs": {"course_notes": ["fixture"], "exemplars_or_feedback": ["fixture"]}}
+        example_modules = planner.modules_for_preset("exam_prep_notes_docx", example_available, example_config)
+        example_order = {module: index for index, module in enumerate(example_modules)}
+        expected_chain = ["fragment_index", "example_learning", "transferable_rule_synthesis", "rule_promotion_gate", "example_transfer_linter", "course_section_reconstruction"]
+        for left, right in zip(expected_chain, expected_chain[1:]):
+            if example_order.get(left, 999) > example_order.get(right, -1):
+                failures.append({"type": "example_learning_chain_order_invalid", "left": left, "right": right})
     except Exception as exc:
         failures.append({"type": "planner_order_check_error", "error": str(exc)})
 

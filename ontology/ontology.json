@@ -72,6 +72,22 @@
       "description": "Every supplied or discovered file.",
       "required_properties": ["source_id", "path", "file_role", "trust_level", "analysis_context", "allowed_evidence_use", "extraction_status"]
     },
+    "ExampleReviewLedger": {
+      "description": "Internal ledger that reviews each style, feedback, benchmark, or cross-target example before any transferable rule can be promoted.",
+      "required_properties": ["ledger_id", "target_group_key", "records", "non_transferable_content", "qa_status"]
+    },
+    "TransferableRuleSet": {
+      "description": "Internal set of example-derived rules rewritten as generic conditions with declared destinations and validation checks.",
+      "required_properties": ["rule_set_id", "ledger_id", "rules", "destination_map", "validation_checks", "qa_status"]
+    },
+    "NonTransferableContentBlocklist": {
+      "description": "Internal blocklist of example-specific content that may not appear in promoted production rules or target factual claims.",
+      "required_properties": ["blocklist_id", "ledger_id", "blocked_items", "scope", "qa_status"]
+    },
+    "ExampleTransferQA": {
+      "description": "QA result for example learning, transferable-rule synthesis, and rule promotion.",
+      "required_properties": ["qa_id", "ledger_id", "rule_set_id", "promotion_gate_status", "failures", "qa_status"]
+    },
     "SourceFragment": {
       "description": "A page, slide, question, figure, table, protocol step, chapter, or section extracted from a source document.",
       "required_properties": ["fragment_id", "source_id", "fragment_type", "locator", "text", "image_anchor", "extraction_confidence"]
@@ -176,6 +192,10 @@
   "link_types": {
     "CONTAINS": {"from": "SourceDocument", "to": "SourceFragment"},
     "PARTITIONED_AS": {"from": "SourceDocument", "to": "FragmentPartition"},
+    "EXAMPLE_REVIEW_USES_SOURCE": {"from": "ExampleReviewLedger", "to": "SourceDocument"},
+    "RULE_SET_DERIVED_FROM_REVIEW": {"from": "TransferableRuleSet", "to": "ExampleReviewLedger"},
+    "BLOCKLIST_DERIVED_FROM_REVIEW": {"from": "NonTransferableContentBlocklist", "to": "ExampleReviewLedger"},
+    "EXAMPLE_QA_CHECKS_RULE_SET": {"from": "ExampleTransferQA", "to": "TransferableRuleSet"},
     "GROUPS_FRAGMENT": {"from": "FragmentPartition", "to": "SourceFragment"},
     "SUPPORTS_KP": {"from": "SourceFragment", "to": "KnowledgePoint"},
     "SUPPORTS_CLAIM": {"from": "KnowledgePoint", "to": "EvidenceClaim"},
@@ -260,7 +280,10 @@
     "CreateSourceInventory": ["SourceDocument"],
     "ExtractFragments": ["SourceFragment", "QAFlag"],
     "BuildFragmentIndex": ["FragmentPartition"],
-    "AnalyzeStyleExamples": ["QAFlag"],
+    "AnalyzeExamplesIntoTransferableRules": ["ExampleReviewLedger", "TransferableRuleSet", "NonTransferableContentBlocklist", "ExampleTransferQA", "QAFlag"],
+    "SynthesizeTransferableRules": ["TransferableRuleSet", "QAFlag"],
+    "RunRulePromotionGate": ["ExampleTransferQA", "QAFlag"],
+    "LintExampleTransfer": ["QAFlag"],
     "BuildLectureModules": ["LectureModule", "QAFlag"],
     "BuildKnowledgeWalkthroughPlan": ["KnowledgeWalkthroughPlan"],
     "ReconstructCourseSections": ["CourseSection", "QAFlag"],
@@ -331,6 +354,9 @@
     "lecturer_style_cannot_raise_confidence_above_medium_without_repeated_current_regime_support",
     "fragment_partition_pruning_precedes_deep_reasoning",
     "style_examples_do_not_support_factual_or_prediction_claims",
+    "example_review_required_before_rule_promotion",
+    "example_rules_must_strip_source_identity",
+    "examples_cannot_support_target_facts_or_predictions",
     "lineage_required_for_publish",
     "blocking_qa_flag_blocks_publish",
     "student_output_excludes_internal_helper_artifacts"
@@ -339,6 +365,7 @@
     "source_coverage_card": ["requested_mode", "required_source_classes", "available_source_classes", "missing_blocking_sources", "blocked_conclusions"],
     "output_view_selection": ["user_request", "source_coverage_map", "allowed_artifact_policy", "minimum_dependencies"],
     "workflow_plan_preview": ["request_scope", "selected_preset", "target_group_key", "actions", "skipped_modules", "blockers", "publish_gate"],
+    "example_learning": ["example_review_ledger", "transferable_rule_set", "non_transferable_content_blocklist", "example_transfer_qa"],
     "student_output_filter": ["internal_objects", "student_visible_structure", "forbidden_student_fields", "output_mode"],
     "exam_prep_notes_docx": ["course_knowledge_map", "knowledge_sections", "lecture_mapping", "atomic_knowledge_ledger", "source_baseline_notes_plan", "knowledge_only_student_view", "exam_overlay_pass", "knowledge_cards", "exam_emphasis_profile", "question_type_addons", "optional_visual_aids", "forbidden_student_fields"],
     "knowledge_walkthrough_docx": ["lecture_order", "lecture_overview", "module_map", "lecture_modules", "lecture_recap", "forbidden_student_fields"],

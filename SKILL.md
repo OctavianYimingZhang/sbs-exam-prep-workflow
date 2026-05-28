@@ -30,7 +30,7 @@ Default behaviour:
 - For essay/problem-essay prediction language, use `Predicted essay theme` as the default label, not predicted question wording.
 - If the user asks only for inventory, linting, QA, or release checks, run the narrow audit route and do not generate study artifacts.
 - When formal past papers are supplied with ordinary notes generation, route them through optional exam-regime, question-record, archetype, and examiner-operation planning actions. These actions may shape overlay emphasis and add-ons but must not become factual authority, exact future-question claims, or reasons to delete source-backed baseline modules.
-- When style examples, feedback, or cross-target examples are supplied, run style analysis only as an internal transferable-rule layer; do not use example content as target factual or prediction evidence.
+- When style examples, feedback, or cross-target examples are supplied, run the example-learning chain: one review record per example, transferable-rule synthesis, rule-promotion gate, and example-transfer linting. Example content may teach generic structure, density, language, and QA only; it must not support target factual claims, prediction claims, or production branching on example identity.
 - When sources contain diagrams, tables, figures, presentations, or image-only content, preserve visual-inspection metadata and warn internally before relying on visual content.
 
 Hard boundaries:
@@ -207,6 +207,7 @@ Before delivery, fail or rewrite outputs that contain:
 - public exposure of internal source anchors, confidence, task verbs, discriminator axes, source maps, QA JSON, manifests, or lineage files;
 - Example Essay content that replaces lecture logic with Extra Reading, overstates citation strength, leaks process language, or loses protected source skeleton during compression;
 - benchmark/example factual leakage into production content.
+- promoted example-derived rules that lack good/bad analysis, non-transferable content, an anti-overfit rule, a destination, and a validation check.
 
 Targeted checks:
 
@@ -215,6 +216,7 @@ python3 scripts/no_identity_trigger_linter.py --forbid-legacy-label
 python3 scripts/validate_workflow_planning_contract.py
 python3 scripts/validate_interaction_contract.py
 python3 scripts/validate_student_output_contract.py
+python3 scripts/example_transfer_linter.py tests/fixtures/example_learning/valid_example_review_ledger.json
 python3 scripts/example_essay_language_linter.py --fixture benchmarks/example_essay_language_linter_fixtures.json
 ```
 

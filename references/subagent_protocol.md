@@ -14,7 +14,7 @@ Use subagents when available for large multi-source exam-analysis jobs. Keep tas
 - `coverage-closure agent`: maps every KP into compatible archetype slots and labels tested, partially tested, fresh, or saturated variants.
 - `question-output agent`: drafts MCQ Point Cards, short-answer reports, long-answer/project/scenario reports, or essay module packs for a specific question type.
 - `docx-output agent`: builds or reviews the student-facing walkthrough or question-type DOCX layout.
-- `ExampleContributionAgent`: extracts observed source pattern, generic Skill contribution, transferable rule, future-source diagnostic questions, non-transferable content, affected workflows, anti-patterns prevented, and validation checks from any external example.
+- `ExampleReviewAgent`: creates one `ExampleReviewRecord` per external example, records what worked and what failed, strips non-transferable content, writes an anti-overfit rule, declares the destination, and adds validation and regression checks before promotion.
 - `RegressionAgent`: runs benchmark fixtures separately and reports both fixture pass/fail and generic contribution pass/fail against `cross_subject_regression_protocol.md`. It must explain what reusable workflow rule each benchmark validates.
 - `docx-verifier agent`: reviews generated DOCX reports for formatting, readability, missing anchors, and unsupported claims.
 
