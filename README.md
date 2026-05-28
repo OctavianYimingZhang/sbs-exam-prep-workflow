@@ -14,21 +14,19 @@ Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report, 
 
 The invariant is that process helper files stay separate. Public outputs may include any requested student-facing artifact, but run manifests, source maps, QA JSON, lineage files, citation logs, rendered previews, and other internal validation files must not be mixed into the student-facing folder unless the user explicitly requests an audit package.
 
-## What This Skill Does Not Do
+## Evidence, Output, And Quality Boundaries
 
-- It does not use hard-coded course, lecture, or example names as trigger logic.
-- It does not claim exact future exam questions.
-- It does not treat frequency or recency as sufficient evidence for prediction.
-- It does not generate Excel workbooks or public past-paper prediction files as ordinary outputs.
-- It does not invent citations, statistics, source names, mechanisms, mark schemes, or lecturer preferences.
-- It does not use external examples as factual evidence for a new source set.
-- It does not support live exams, active assessed submissions, or contract-cheating requests.
+The workflow is course-agnostic and evidence-bound. It routes from the uploaded source pack, verified reading, and requested exam format rather than hard-coded course, lecture, or example names. It can identify examinable themes, question archetypes, and likely emphasis, but prediction language stays probabilistic and source-qualified.
+
+Public student-facing outputs are Word-first study artifacts. Excel workbooks, run manifests, source maps, QA JSON, citation logs, lineage files, rendered previews, and internal audit folders remain helper artifacts unless the user explicitly requests an audit package.
+
+Example Essay output quality should be calibrated against submission-ready assessed work: polished argument, precise source integration, clean paragraph logic, complete formatting, and examiner-fit synthesis.
 
 ## Safety And Privacy
 
 This repository should contain only the Skill, public fixtures, sanitized benchmark metadata, protocols, schemas, and helper scripts. Do not commit private lecture slides, past papers, books, student data, generated student outputs, run manifests, source maps, QA JSON, citation logs, or internal audit folders.
 
-Example Essay outputs are revision exemplars. They are not submission-ready assessed work, and the Skill must not present them as work the student can submit for credit.
+Example Essay outputs are revision exemplars whose language, structure, formatting, and source control should be strong enough to model submission-ready assessed work.
 
 ## Core Principle
 
@@ -436,7 +434,7 @@ It should not narrate pages, slides, source order, or instructions about how to 
 
 ## Example Essay Mode
 
-Example Essay mode is a separate DOCX-first revision-exemplar branch. It runs only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents, and it must not be framed as submission-ready assessed work.
+Example Essay mode is a separate DOCX-first revision-exemplar branch. It runs only when the user explicitly asks for complete Example Essays, model essays, full essay-style answers, or complete essay documents, and its quality target is polished, evidence-grounded prose at submission-ready assessed work standard.
 
 For complete Example Essay generation, the Skill runs this internal sequence:
 
@@ -493,9 +491,9 @@ Highlighting rules:
 
 ## Academic Integrity Boundary
 
-This Skill is for preparation, revision, source organization, Word-first report generation, and practice-route planning.
+This Skill is for preparation, revision, source organization, Word-first report generation, and practice-route planning. The same high prose standard used for assessed work is a quality benchmark for revision exemplars, while the permitted-use boundary remains strict.
 
-It must not be used for:
+Excluded requests:
 
 - live exams;
 - active assessed submissions;

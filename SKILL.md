@@ -32,12 +32,15 @@ Default behaviour:
 
 Hard boundaries:
 
-- Do not support live exams, active assessed submissions, or contract-cheating requests.
 - Do not use hard-coded course, lecture, source-pack, benchmark, or example names as production triggers.
 - Do not claim exact future exam questions, official answers, mark schemes, citations, statistics, mechanisms, dates, source names, or lecturer preferences unless verified from reliable evidence.
 - Do not generate Excel workbooks, prediction workbooks, confidence-band files, archetype-registry files, or helper JSON as ordinary student-facing outputs.
 - Do not edit, rename, delete, or overwrite source files.
 - Do not self-update the Skill package silently; package updates must be previewed, approved, backed up, and health-checked.
+
+Quality target:
+
+- For permitted revision-exemplar runs, complete Example Essay outputs should be written and formatted to the standard expected of submission-ready assessed work: polished argument, accurate synthesis, complete source grounding, examiner-fit structure, and clean DOCX presentation.
 
 ## Routing Decision Tree
 
