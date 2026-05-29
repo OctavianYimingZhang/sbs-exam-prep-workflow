@@ -155,7 +155,7 @@ REQUIRED_ACTION_TYPES = {
     "BuildPublicOutputPoints",
     "BindAtomicItemsToPublicPoints",
     "LintPublicOutputPoints",
-    "LintOutputLanguageNeutrality",
+    "LintOutputLanguageRequestPolicy",
     "BuildExamPrepNotesPlan",
     "BuildQuestionTypeAddOns",
     "PlanVisualAid",

@@ -56,7 +56,7 @@ Run the route in this order:
 11. Apply `ExamOverlayPass` to priority, density, ordering, examples, traps, and question-type add-ons.
 12. Run `OverlayDidNotDamageCoverageQA`.
 13. Build the `KnowledgeOnlyStudentView` filter.
-14. Select the `OutputLanguageProfile` from the user request and source languages.
+14. Select the `OutputLanguageProfile` from the user request; keep default English labels unless the user explicitly requests another language.
 15. Select the route-specific `RouteDocxStyleProfile`.
 16. Build `PublicOutputPoint` and `PublicPointBlock` objects from the internal cards.
 17. Bind protected atomic items to public points with `PointCoverageBinding`.
@@ -331,7 +331,7 @@ Use these as internal planning functions, not required public headings:
 - `Common Error / Trap`;
 - `Must Master`.
 
-Public labels should be localized, source-language matched, or suppressed according to `OutputLanguageProfile`. The Skill must not restrict ordinary outputs to English. If the user requests a language, use it; otherwise follow the dominant source-pack language and preserve mixed technical wording when it improves accuracy.
+Skill package files, fixtures, and protocol text are authored in English. This is a package-authoring convention, not a restriction on user-requested outputs. Public labels should stay as default English labels unless the user explicitly requests another language or mixed-language output. Do not infer multilingual output from source-language mixture alone.
 
 Avoid:
 

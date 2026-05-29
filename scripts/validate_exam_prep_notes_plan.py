@@ -237,8 +237,10 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             failures.append({"type": "output_language_profile_missing_policy"})
         if not non_empty_list(language_profile.get("public_label_policy")):
             failures.append({"type": "output_language_profile_missing_label_policy"})
-        if "allow_mixed_language" not in language_profile:
-            failures.append({"type": "output_language_profile_missing_allow_mixed_language"})
+        if "explicit_language_request" not in language_profile:
+            failures.append({"type": "output_language_profile_missing_explicit_language_request"})
+        if language_profile.get("user_requested_mixed_language") is True and language_profile.get("explicit_language_request") is not True:
+            failures.append({"type": "mixed_language_without_explicit_user_request"})
 
     style_profile = plan.get("route_docx_style_profile", {})
     if not isinstance(style_profile, dict):

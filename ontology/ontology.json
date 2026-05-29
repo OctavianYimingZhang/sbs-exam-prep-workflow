@@ -137,8 +137,8 @@
       "required_properties": ["block_id", "point_id", "block_type", "label", "content", "covered_atomic_units"]
     },
     "OutputLanguageProfile": {
-      "description": "Public output language and label policy selected from the user request and source languages; schema keys may be English but public labels must follow this profile.",
-      "required_properties": ["profile_id", "requested_language", "source_languages", "output_language_policy", "public_label_policy", "allow_mixed_language"]
+      "description": "Public output language override policy selected from an explicit user request; schema keys, Skill files, fixtures, and default labels remain English.",
+      "required_properties": ["profile_id", "requested_language", "source_languages", "output_language_policy", "public_label_policy", "explicit_language_request"]
     },
     "RouteDocxStyleProfile": {
       "description": "Route-specific DOCX style contract so exam-prep notes use compact revision-note formatting while essay outputs keep essay-submission formatting.",
@@ -341,7 +341,7 @@
     "BuildPublicOutputPoints": ["PublicOutputPoint", "PublicPointBlock", "RenderDecision", "QAFlag"],
     "BindAtomicItemsToPublicPoints": ["PointCoverageBinding", "QAFlag"],
     "LintPublicOutputPoints": ["QAFlag"],
-    "LintOutputLanguageNeutrality": ["QAFlag"],
+    "LintOutputLanguageRequestPolicy": ["QAFlag"],
     "BuildExamPrepNotesPlan": ["ExamPrepNotesPlan", "QAFlag"],
     "BuildQuestionTypeAddOns": ["QuestionTypeAddOn", "QAFlag"],
     "PlanVisualAid": ["VisualAidSpec", "QAFlag"],

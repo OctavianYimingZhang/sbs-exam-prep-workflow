@@ -20,7 +20,7 @@ Use internal planning functions such as these to decide content, but do not forc
 - `Common Error / Trap`;
 - `Must Master`.
 
-Ordinary Academic Exam-Ready Notes render compact public points and knowledge-bearing blocks. Public labels should be localized, matched to the source language, or suppressed according to `OutputLanguageProfile`; schema field names may remain English internally.
+Ordinary Academic Exam-Ready Notes render compact public points and knowledge-bearing blocks. Public labels stay in default English unless the user explicitly requests another language or mixed-language output; schema field names and Skill package files remain English.
 
 Avoid:
 

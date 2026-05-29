@@ -291,21 +291,22 @@
     },
     "OutputLanguageProfile": {
       "type": "object",
-      "required": ["requested_language", "source_languages", "output_language_policy", "public_label_policy", "allow_mixed_language"],
+      "required": ["requested_language", "source_languages", "output_language_policy", "public_label_policy", "explicit_language_request"],
       "properties": {
         "requested_language": { "type": ["string", "null"] },
         "source_languages": { "type": "array", "items": { "type": "string" } },
         "output_language_policy": {
           "type": "array",
-          "items": { "enum": ["follow_user_request", "follow_primary_source_language", "preserve_mixed_language"] },
+          "items": { "enum": ["default_english_unless_requested", "follow_user_request"] },
           "minItems": 1
         },
         "public_label_policy": {
           "type": "array",
-          "items": { "enum": ["localized_labels", "suppress_nonessential_labels", "source_language_labels"] },
+          "items": { "enum": ["default_english_labels", "explicit_user_requested_labels", "suppress_nonessential_labels"] },
           "minItems": 1
         },
-        "allow_mixed_language": { "type": "boolean" }
+        "explicit_language_request": { "type": "boolean" },
+        "user_requested_mixed_language": { "type": "boolean" }
       },
       "additionalProperties": false
     },

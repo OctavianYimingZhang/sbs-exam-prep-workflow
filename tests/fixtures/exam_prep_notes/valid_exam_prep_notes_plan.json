@@ -86,9 +86,10 @@
   "output_language_profile": {
     "requested_language": null,
     "source_languages": ["English"],
-    "output_language_policy": ["follow_primary_source_language"],
-    "public_label_policy": ["localized_labels"],
-    "allow_mixed_language": true
+    "output_language_policy": ["default_english_unless_requested"],
+    "public_label_policy": ["default_english_labels"],
+    "explicit_language_request": false,
+    "user_requested_mixed_language": false
   },
   "route_docx_style_profile": {
     "route": "exam_prep_notes_docx",

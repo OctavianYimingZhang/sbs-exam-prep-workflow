@@ -97,7 +97,8 @@ Student-facing output filter:
 - Visible priority labels are only `★★★`, `★★`, and `★`.
 - Use `Course Knowledge Map` as the public top matter for ordinary notes. Do not use `Course-Level Exam Map` in public notes.
 - Ordinary Academic Exam-Ready Notes render compact `PublicOutputPoint` blocks by lecture. Do not expose internal headings named `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, or `Must Master`.
-- Select an `OutputLanguageProfile`: follow the requested language when supplied; otherwise follow the dominant source language and preserve mixed technical wording when useful. Public labels must be localized, source-language matched, or suppressed.
+- Skill package files, fixtures, and protocol text are authored in English. This is a package-authoring convention, not a restriction on user-requested outputs.
+- Select an `OutputLanguageProfile` only to honor an explicit user language request or to keep default English labels. Do not infer or force multilingual output from mixed-language sources; if the user wants multilingual output, they must request it.
 - Select a route-specific DOCX style: `exam_prep_notes_docx` uses Arial, 2.0 cm margins, compact line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX formatting remains separate.
 - Internal helper artifacts may be generated for validation, but they must stay outside ordinary student-facing output folders.
 

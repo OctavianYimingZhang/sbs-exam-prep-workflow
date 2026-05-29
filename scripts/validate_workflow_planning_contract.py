@@ -136,7 +136,7 @@ def validate(root: Path) -> dict[str, Any]:
         "BuildPublicOutputPoints",
         "BindAtomicItemsToPublicPoints",
         "LintPublicOutputPoints",
-        "LintOutputLanguageNeutrality",
+        "LintOutputLanguageRequestPolicy",
         "GenerateExamPrepNotesDocx",
         "LintExamPrepDocxStyle",
         "LintExamPrepNotes",
@@ -208,7 +208,7 @@ def validate(root: Path) -> dict[str, Any]:
         "public_output_point_build",
         "point_coverage_binding",
         "public_output_point_linter",
-        "output_language_neutrality_linter",
+        "output_language_request_linter",
         "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
     ]:
