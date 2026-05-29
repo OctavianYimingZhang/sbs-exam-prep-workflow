@@ -69,6 +69,8 @@ def paragraph_kind(paragraph: dict[str, Any]) -> str:
 def normalize_paragraph(paragraph, kind: str) -> None:
     pf = paragraph.paragraph_format
     pf.line_spacing = 1.5
+    pf.space_before = Pt(0)
+    pf.space_after = Pt(0)
     if kind == "title":
         paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     elif kind in {"subtitle", "heading"}:
@@ -77,6 +79,9 @@ def normalize_paragraph(paragraph, kind: str) -> None:
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     for run in paragraph.runs:
         normalize_run(run)
+        run.italic = False
+        if kind in {"subtitle", "body"}:
+            run.bold = False
 
 
 def normalize_run(run) -> None:
@@ -96,6 +101,8 @@ def set_document_defaults(doc: Document) -> None:
     normal = styles["Normal"]
     normal.font.name = "Arial"
     normal.paragraph_format.line_spacing = 1.5
+    normal.paragraph_format.space_before = Pt(0)
+    normal.paragraph_format.space_after = Pt(0)
 
     for style_name in ["EssayTitle", "EssaySubtitle", "EssayHeading", "EssayBody"]:
         if style_name not in styles:
@@ -103,6 +110,8 @@ def set_document_defaults(doc: Document) -> None:
         style = styles[style_name]
         style.font.name = "Arial"
         style.paragraph_format.line_spacing = 1.5
+        style.paragraph_format.space_before = Pt(0)
+        style.paragraph_format.space_after = Pt(0)
 
 
 def add_text_run(paragraph, run_data: dict[str, Any]) -> None:

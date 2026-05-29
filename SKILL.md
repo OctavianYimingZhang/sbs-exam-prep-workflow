@@ -118,8 +118,10 @@ Example Essay hard gates:
 - For complete essay planning or assessed-style drafting, follow `references/essay_tutor_workflow_protocol.md` before drafting: collect essay constraints, run DeepResearch, produce a subtitle-level plan, and use the plan-approval gate unless the user explicitly asks for direct generation.
 - Follow `references/essay_generation_protocol.md` and `references/example_essay_docx_output_protocol.md`.
 - Use lecture/PPT/source logic as the skeleton; Extra Reading is a precision layer, not a replacement.
+- Do not pad Example Essays to increase Extra Reading, citation, or molecular-detail volume; add external detail only when it replaces vague wording or sharpens an existing lecture/source mechanism slot.
 - Add molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent source mechanism slot and preserves claim level, scope, and exam function.
 - Run citation/Extra Reading integration before final compression; estimate a safe compression budget and preserve protected source skeleton, evidence, named academic details, and analytic limitations.
+- Example Essay DOCX output must use 0 pt paragraph spacing; the main title is centered, while the essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
 - Run language lint, DOCX formatting lint, source audit, and render/structural QA where scripts exist.
 
 ## Reference Map

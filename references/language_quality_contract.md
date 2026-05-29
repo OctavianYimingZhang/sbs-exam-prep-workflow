@@ -75,7 +75,9 @@ Do not solve weak analysis by adding a decorative sentence at the end. Integrate
 - Convert experiments, data, and examples into evidence, mechanism, interpretation, and limitation when the question is evidence-heavy.
 - Make contrasts explicit; do not rely on ambiguous `rather than` phrasing.
 - Do not open with a negative-only sentence and then restate the correct claim in the next sentence. Write the correct claim first, adding the rejected model only as a compact boundary when needed.
+- Use `not...but` and `rather than` sparingly. One necessary contrast can clarify a model boundary; repeated contrast framing usually signals that the paragraph should be rewritten as a direct positive claim.
 - Keep logic linear. Avoid `A -> B -> A` sequencing where a claim is stated, interrupted by setup, and then restated. Combine setup and result when possible, especially for experiment evidence.
+- Reject `A -> B -> A -> C` sequencing: do not state a claim, insert setup or example context, restart the same claim, and only then give the consequence. Attach the result to the setup and move directly to interpretation.
 - Separate model, mechanism, evidence, and implication when a question asks for evaluation.
 - Use citations only for non-obvious facts, theories, mechanisms, methods, evidence, data, or broad generalisations.
 - Calibrate citation strength. Use `supports`, `implicates`, `is consistent with`, or `contributes to` unless the verified source directly proves causality.
@@ -97,6 +99,7 @@ Reject or rewrite paragraphs that:
 - open with an unnecessary `X is not...` sentence when the next sentence gives the real claim;
 - use repeated `not... but`, `not simply`, `rather than`, or `however` structures when direct positive wording would be clearer;
 - sequence evidence as claim, setup, repeated claim instead of claim, setup plus result, interpretation;
+- restart the same claim after a setup sentence, producing A-B-A-C logic instead of a forward A-B-C argument;
 - use an introduction or conclusion as a list of parts rather than as a synthesis;
 - list examples without explaining what they prove;
 - repeat the question using different words without adding mechanism;
@@ -143,6 +146,8 @@ If the user asks for a percentage reduction that would delete protected source s
 Named detail is valuable only when it improves the answer's function. Do not include a list of channels, receptors, nuclei, genes, cell classes, molecules, methods, firms, case names, equations, or pathways unless the lecture/source logic or exact question requires that level.
 
 When a list is illustrative, compress it to a higher-level mechanism. When a list is examiner-relevant, keep only the items that distinguish mechanisms, evidence, limitations, or consequences.
+
+Extra Reading and named mechanism detail should normally replace vague wording inside an existing lecture-derived sentence. They should not be added as separate expansion sentences unless the question requires that detail and the paragraph still gains mechanism or evidence density per word.
 
 For every named detail, ask:
 

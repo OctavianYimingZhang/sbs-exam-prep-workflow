@@ -237,6 +237,8 @@ DetailAdmissionMatrix:
 
 High detail is not automatically high quality. The standard is: PPT/source-anchored, citation-supported, analytically interpreted mechanism per word.
 
+Extra Reading and molecular/mechanism detail must not make the essay longer by default. Treat them as substitutions for vague wording, not additions on top of already complete lecture-derived prose. A detail that requires its own explanatory sentence, creates a second argument, or changes a paragraph from answer prose into review prose should be rejected or moved into an explicitly requested supplementary note.
+
 ## Knowledge Inventory
 
 Before writing, classify material:
@@ -347,6 +349,7 @@ Remove:
 
 - repeated definitions;
 - repeated claim restatements;
+- A-B-A-C logic where the paragraph states a claim, detours into setup, restates the same claim, and only then adds the consequence;
 - repeated case descriptions;
 - firm/example-level details that do not support the question;
 - lecture-route or source-route narration;
@@ -412,6 +415,7 @@ Run a positive-claim framing pass:
 
 - prefer direct positive claims over `X is not... It is...`;
 - use `not`, `but`, `rather than`, and `however` only when they mark an examiner-relevant boundary or a genuine model contrast;
+- do not repeat `not...but` or `rather than` framing across a paragraph when one direct positive claim would carry the same logic;
 - if the rejected idea is not needed, delete it and state the correct mechanism directly;
 - if the rejected idea is needed, place it after the positive claim as a compact boundary.
 
@@ -419,6 +423,7 @@ Run a logic-linearity pass:
 
 - keep each paragraph in a single forward sequence;
 - avoid `A -> B -> A`, where a claim is stated, interrupted by setup, and then restated;
+- reject A-B-A-C ordering when the same claim is restarted after experimental setup, source context, or an example before the consequence appears;
 - for experiments, prefer `claim -> setup and result -> interpretation`, not `claim -> setup -> repeated result`;
 - combine setup and result with a connector such as `yet`, `showing that`, `therefore`, or `which means` when it improves flow.
 
@@ -449,6 +454,7 @@ Purpose:
 
 - do not rewrite the essay;
 - do not add new paragraphs;
+- do not add separate Extra Reading expansion blocks;
 - add only short verified named details to unhighlighted sentences whose parent mechanism is explicit in the lecture/PPT/source logic;
 - increase molecular, circuit, method, chemical, or pathway precision without changing the lecture-derived argument, level, scope, or exam function.
 
@@ -510,6 +516,7 @@ Accept an insertion only when all conditions are true:
 - the parent PPT/source mechanism slot is identified explicitly;
 - the inserted phrase is supported directly by a verified source anchor;
 - the inserted phrase is compact enough to remain a phrase or short clause inside the original sentence;
+- the insertion replaces vague wording or tightens an existing sentence rather than increasing essay length by standalone expansion;
 - the insertion names one concrete object, step, source, species, domain, compartment, readout, or module;
 - the insertion preserves the grammar and argument direction of the original sentence;
 - the addition improves causal precision, assay precision, or mechanistic specificity;
@@ -538,6 +545,7 @@ Reject an insertion when:
 - author-year, DOI, PubMed, publisher, chapter, or section verification is missing where required;
 - the phrase requires a new explanatory sentence;
 - the phrase is long enough to become a new explanation or second argument;
+- the phrase is added only to increase Extra Reading or molecular-detail volume;
 - it starts a new subtopic;
 - it replaces lecture logic with external-source logic;
 - it makes a stronger claim than the source supports;
@@ -720,7 +728,8 @@ Allowed use:
 Extra reading must not:
 
 - replace lecture/source logic;
-- exceed roughly 10-15% of essay body words unless instructed;
+- exceed 15% of essay body words unless instructed;
+- become padding added only to raise the Extra Reading ratio;
 - introduce unrelated mechanisms;
 - contradict official sources without explaining the distinction;
 - appear without verified author/year/source details.

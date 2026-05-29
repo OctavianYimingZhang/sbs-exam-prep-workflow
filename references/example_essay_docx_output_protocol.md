@@ -50,12 +50,15 @@ Font:
 - Arial.
 - Font size: Word default unless the user specifies a size.
 - Title: Arial, bold allowed, centered.
-- Subtitle / section heading: Arial, bold allowed, left aligned.
+- Essay-question subtitle: Arial, plain, not bold, not italic, not enlarged, left aligned.
+- Section heading: Arial, bold allowed, left aligned.
 - Body: Arial.
 
 Paragraph:
 
 - Line spacing: 1.5.
+- Paragraph spacing before: 0 pt.
+- Paragraph spacing after: 0 pt.
 - Body alignment: justified.
 - Title alignment: centered.
 - Subtitle / section heading alignment: left.
@@ -64,7 +67,7 @@ Paragraph:
 Structure:
 
 - Title paragraph.
-- Optional subtitle paragraph containing the essay question.
+- Optional subtitle paragraph containing only the exact essay question or user-approved topic wording. Do not add decorative `Question:`, `Essay Topic:`, bold, italic, enlarged text, or spacer paragraphs around it.
 - Numbered section headings if useful, matching the reference style:
   - `1 Introduction`
   - `2 Main mechanism / argument`
@@ -221,9 +224,13 @@ Fail or flag the essay if a requested compression target is followed after the b
 If relevant Extra Reading Books are uploaded:
 
 - integrate Extra Reading content into the essay;
-- target 10-15% of total essay body word count;
+- treat Extra Reading as a precision layer, not a quota;
+- default to short integrated phrase or clause insertions when they sharpen a lecture-derived mechanism, evidence point, comparison, or limitation;
+- target roughly 5-10% of total essay body word count when enough relevant material passes the anchor and question-relevance gates;
+- allow 10-15% only when the question genuinely needs external detail and the added material remains lecture-anchored and analytically interpreted;
 - count only yellow-highlighted words as Extra Reading content;
 - do not include more than 15% unless the user explicitly requests more external material;
+- do not add separate Extra Reading expansion paragraphs or pad the essay to reach a ratio;
 - if no relevant chapter can be found, flag `extra_reading_chapter_not_found` and do not invent.
 
 If Extra Reading Books are not uploaded:
@@ -310,6 +317,7 @@ Fail DOCX generation or mark the essay as non-compliant if:
 - green-highlighted content is not linked to a read original citation source;
 - classic-experiment fallback content was used without verification or without direct relevance to the paragraph claim;
 - margins, font family, line spacing, title alignment, subtitle alignment, or body justification fail the DOCX linter;
+- paragraph spacing is non-zero, the question/topic subtitle is bold, italic, enlarged, or separated by empty spacer paragraphs;
 - the essay is generic and not traceable to lecture logic;
 - the essay contains slide/page narration, repeated filler, unsupported claims, citation stacking, or examples used as standalone case detail rather than evidence for the answer;
 - the essay contains lecture-route narration, exam-guidance phrasing, or citation-strength overclaiming;

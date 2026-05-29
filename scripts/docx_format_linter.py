@@ -32,6 +32,7 @@ except Exception:  # pragma: no cover
 
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?")
+QUESTION_SUBTITLE_RE = re.compile(r"^\s*(explain|discuss|compare|evaluate|describe|how|why|what|to what extent)\b", re.I)
 CM_TOL = 0.08
 PT_TOL = 0.25
 
@@ -48,6 +49,14 @@ def pt_value(value) -> float | None:
     if value is None:
         return None
     return float(value.pt)
+
+
+def paragraph_spacing_pt(paragraph, attr: str) -> float:
+    value = getattr(paragraph.paragraph_format, attr)
+    if value is None and paragraph.style is not None:
+        value = getattr(paragraph.style.paragraph_format, attr)
+    numeric = pt_value(value)
+    return 0.0 if numeric is None else numeric
 
 
 def close(actual: float | None, expected: float, tol: float) -> bool:
@@ -74,10 +83,12 @@ def run_font_size_pt(run) -> float | None:
     return pt_value(run.font.size)
 
 
-def paragraph_kind_from_map(source_map: dict[str, Any] | None, index: int) -> str:
+def paragraph_kind_from_map(source_map: dict[str, Any] | None, index: int, text: str = "") -> str:
     if not source_map:
         if index == 1:
             return "title"
+        if index == 2 and QUESTION_SUBTITLE_RE.match(text):
+            return "subtitle"
         return "body"
     paragraphs = source_map.get("paragraphs", [])
     if index - 1 < len(paragraphs):
@@ -99,9 +110,11 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         ),
         "arial": True,
         "line_spacing_1_5": True,
+        "no_paragraph_spacing": True,
         "body_justified": True,
         "title_centered": True,
         "subtitles_left": True,
+        "question_subtitle_plain": True,
         "no_empty_spacer_paragraphs": True,
     }
     if not format_checks["margins_2_5_cm"]:
@@ -133,12 +146,25 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
             failures.append({"type": "empty_spacer_paragraph"})
             continue
         visible_paragraph_index += 1
-        kind = paragraph_kind_from_map(source_map, visible_paragraph_index)
+        kind = paragraph_kind_from_map(source_map, visible_paragraph_index, paragraph.text)
         source_para = source_paragraphs[visible_paragraph_index - 1] if visible_paragraph_index - 1 < len(source_paragraphs) else {}
 
         if paragraph.paragraph_format.line_spacing != 1.5:
             format_checks["line_spacing_1_5"] = False
             failures.append({"type": "line_spacing_not_1_5", "paragraph": visible_paragraph_index, "line_spacing": paragraph.paragraph_format.line_spacing})
+
+        space_before = paragraph_spacing_pt(paragraph, "space_before")
+        space_after = paragraph_spacing_pt(paragraph, "space_after")
+        if not close(space_before, 0.0, PT_TOL) or not close(space_after, 0.0, PT_TOL):
+            format_checks["no_paragraph_spacing"] = False
+            failures.append(
+                {
+                    "type": "paragraph_spacing_not_zero",
+                    "paragraph": visible_paragraph_index,
+                    "space_before_pt": round(space_before, 3),
+                    "space_after_pt": round(space_after, 3),
+                }
+            )
 
         if kind == "title" and paragraph.alignment != WD_ALIGN_PARAGRAPH.CENTER:
             format_checks["title_centered"] = False
@@ -160,6 +186,20 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
             if run_font_name(run) != "Arial":
                 format_checks["arial"] = False
                 failures.append({"type": "run_font_not_arial", "paragraph": visible_paragraph_index, "run": r_idx, "font": run_font_name(run)})
+            if kind == "subtitle":
+                subtitle_size = run_font_size_pt(run)
+                if run.bold is True or run.italic is True or (subtitle_size is not None and subtitle_size > 12.0 + PT_TOL):
+                    format_checks["question_subtitle_plain"] = False
+                    failures.append(
+                        {
+                            "type": "question_subtitle_not_plain",
+                            "paragraph": visible_paragraph_index,
+                            "run": r_idx,
+                            "bold": run.bold,
+                            "italic": run.italic,
+                            "font_size_pt": subtitle_size,
+                        }
+                    )
 
             source_run = source_runs[r_idx - 1] if r_idx - 1 < len(source_runs) else {}
             wc = len(words(run.text))
@@ -208,8 +248,8 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
     extra_status = (source_map or {}).get("extra_reading_status")
     if yellow_words and extra_reading_ratio > 0.15:
         failures.append({"type": "extra_reading_ratio_above_15_percent", "ratio": extra_reading_ratio})
-    if extra_status in {"supplied_found", "found", "chapter_found"} and extra_reading_ratio < 0.10:
-        failures.append({"type": "extra_reading_ratio_below_10_percent", "ratio": extra_reading_ratio})
+    if extra_status in {"supplied_found", "found", "chapter_found"} and 0 < extra_reading_ratio < 0.05:
+        warnings.append({"type": "extra_reading_ratio_low_no_padding_required", "ratio": extra_reading_ratio})
 
     used_citations = set(AUTHOR_YEAR_RE.findall("\n".join(p.text for p in doc.paragraphs)))
     if source_map and allowed_author_years and not used_citations.issubset(allowed_author_years):

@@ -83,6 +83,8 @@ WEAK_OPENERS = re.compile(r"^\s*(background|introduction|firstly|secondly|thirdl
 EXAMPLE_TERMS = re.compile(r"\b(for example|case study|case|firm|company|example)\b", re.I)
 EXAMPLE_TO_ARGUMENT = re.compile(r"\b(shows|demonstrates|supports|indicates|suggests|therefore|consequently|implies|evidence|illustrates)\b", re.I)
 NEGATIVE_FRAMING = re.compile(r"\b(not\s+(?:a|an|the|only|merely|simply)|rather than)\b", re.I)
+NOT_BUT_FRAMING = re.compile(r"\bnot\b[^.!?]{0,140}\bbut\b", re.I)
+RATHER_THAN_FRAMING = re.compile(r"\brather than\b", re.I)
 NEGATIVE_SENTENCE_START = re.compile(
     r"^\s*(?:The|A|An|This|That|These|Those|[A-Z][A-Za-z0-9βγα/+\-\s]{1,80})\s+"
     r"(?:is|are|was|were)\s+not\b",
@@ -131,6 +133,42 @@ INTRO_CONCLUSION_PART_LIST = re.compile(
 )
 EVIDENCE_CLAIM_START = re.compile(r"\b(?:strongest|decisive|key)\s+evidence\b[^.!?]{0,160}\bis\s+that\b", re.I)
 RESULT_CONNECTOR = re.compile(r"^\s*(?:yet|therefore|so|this|which|showing|supporting|indicating|demonstrating)\b|\b(?:yet|therefore|showing|supporting|indicating|demonstrating|because|so|which\s+means)\b", re.I)
+SETUP_LIKE_SENTENCE = re.compile(
+    r"\b(experiment|experiments|preparation|preparations|trial|assay|dataset|lesion|ablation|recording|"
+    r"stimulation|condition|method|model|case|example|figure|measurement|comparison|observation)\b",
+    re.I,
+)
+CLAIM_RESTART_STOPWORDS = {
+    "about",
+    "after",
+    "also",
+    "because",
+    "before",
+    "between",
+    "could",
+    "does",
+    "from",
+    "have",
+    "into",
+    "only",
+    "over",
+    "same",
+    "should",
+    "that",
+    "their",
+    "there",
+    "these",
+    "this",
+    "through",
+    "under",
+    "when",
+    "where",
+    "which",
+    "while",
+    "with",
+    "without",
+    "would",
+}
 
 
 @dataclass
@@ -208,6 +246,34 @@ def has_fragmented_evidence_sequence(items: list[str]) -> bool:
         return False
     setup_like = re.search(r"\b(experiment|experiments|preparation|preparations|trial|assay|dataset|lesion|ablation|recording|stimulation|dorsal roots?|limb|condition)\b", setup, re.I)
     return bool(setup_like and words(result))
+
+
+def content_tokens(text: str) -> list[str]:
+    tokens = []
+    for token in words(text.lower()):
+        if len(token) < 4 or token in CLAIM_RESTART_STOPWORDS:
+            continue
+        tokens.append(token)
+    return tokens
+
+
+def has_claim_restart_after_setup(items: list[str]) -> bool:
+    if len(items) < 3:
+        return False
+    first_terms = set(content_tokens(items[0])[:12])
+    if len(first_terms) < 4:
+        return False
+    for idx in range(1, len(items) - 1):
+        setup = items[idx]
+        restart = items[idx + 1]
+        if RESULT_CONNECTOR.search(restart):
+            continue
+        if not SETUP_LIKE_SENTENCE.search(setup):
+            continue
+        restart_terms = set(content_tokens(restart)[:14])
+        if len(first_terms & restart_terms) >= 4:
+            return True
+    return False
 
 
 def is_intro_or_conclusion(record: ParagraphRecord) -> bool:
@@ -380,8 +446,16 @@ def lint_paragraph(record: ParagraphRecord, min_words: int, max_words: int) -> t
         failures.append({"type": "negative_opener_before_positive_claim", "phrase": " ".join(sentence_items[:2])[:220]})
     if NOT_BUT_CONTRAST.search(first):
         warnings.append({"type": "negative_but_opener_consider_direct_claim", "phrase": first[:160]})
+    not_but_count = len(NOT_BUT_FRAMING.findall(text))
+    rather_than_count = len(RATHER_THAN_FRAMING.findall(text))
+    if not_but_count >= 2 or (not_but_count + rather_than_count) >= 4:
+        failures.append({"type": "repeated_not_but_or_rather_than_framing", "not_but": not_but_count, "rather_than": rather_than_count})
+    elif not_but_count + rather_than_count >= 2:
+        warnings.append({"type": "contrast_framing_density_check", "not_but": not_but_count, "rather_than": rather_than_count})
     if has_fragmented_evidence_sequence(sentence_items):
         failures.append({"type": "fragmented_evidence_sequence", "phrase": " ".join(sentence_items[:3])[:260]})
+    if has_claim_restart_after_setup(sentence_items):
+        failures.append({"type": "claim_restart_after_setup", "phrase": " ".join(sentence_items[:3])[:260]})
     if is_intro_or_conclusion(record) and INTRO_CONCLUSION_PART_LIST.search(text):
         failures.append({"type": "intro_or_conclusion_lists_parts", "phrase": INTRO_CONCLUSION_PART_LIST.search(text).group(0)})
     if is_intro_or_conclusion(record) and text.count(";") >= 4 and sentence_balance(sentence_items)["analytic_sentences"] <= 1:

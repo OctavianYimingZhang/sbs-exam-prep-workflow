@@ -486,16 +486,17 @@ Essay language is controlled by the shared language contract:
 - build paragraphs through claim, mechanism, evidence, scope, and consequence;
 - convert evidence-heavy examples into `evidence -> mechanism -> interpretation -> limitation`;
 - use lecture/PPT/source logic as the skeleton and Extra Reading only as a precision layer;
+- do not pad essays to increase Extra Reading, citation, or molecular-detail volume;
 - add named molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent PPT/source mechanism slot;
 - reject true-but-unneeded catalogues, review-style drift, and details that need a new explanatory sentence before they are useful;
 - estimate a safe compression budget before shortening, protecting the source skeleton, essential evidence, citation-supported named details, and analytic limitations;
 - run final compression after citation and Extra Reading integration, preserving causal strength, scope qualifiers, model boundaries, and evidence interpretation;
-- remove lecture-route narration and exam-guidance phrasing;
+- remove lecture-route narration, exam-guidance phrasing, repeated `not...but` framing, and A-B-A-C claim restarts;
 - calibrate citation strength, using cautious verbs unless a source directly proves causality;
 - require analytic sentences, not just descriptive lists of components;
 - conclude by synthesis, not by adding new evidence.
 
-DOCX output uses Arial, 2.5 cm margins, justified body text, centered title, left-aligned headings, and 1.5 line spacing.
+DOCX output uses Arial, 2.5 cm margins, justified body text, centered title, left-aligned headings, 1.5 line spacing, and 0 pt paragraph spacing. The essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
 
 Highlighting rules:
 

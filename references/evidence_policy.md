@@ -25,7 +25,7 @@ EvidenceUse:
   extra_reading_book:
     meaning: uploaded textbook/book/chapter material supplied by the user for enrichment
     highlight: yellow
-    allowed_use: 10-15% of Example Essay body if relevant chapter/section is found
+    allowed_use: compact precision layer, usually 5-10% of Example Essay body, with 15% as a hard cap unless the user requests more
 
   lecture_slide_citation_original:
     meaning: original paper/book/theory cited on relevant lecture slides and read by the Skill
@@ -95,13 +95,12 @@ Extra Reading source priority:
 
 Extra reading may be inserted into essays only as:
 
-- one short enrichment paragraph;
 - one precise sentence inside a mechanism paragraph;
 - one short named-detail insertion inside an otherwise lecture-derived sentence;
 - one comparison point that sharpens the lecture argument;
 - one evidence-based example that strengthens the lecture mechanism.
 
-It must not replace lecture content, exceed 15% of the essay, introduce an unrelated mechanism, contradict slides without explanation, or appear without verified source anchoring. In explicit Example Essay Mode, uploaded Extra Reading Book content should be 10-15% of body words when a relevant chapter/section is found, and those words must be yellow-highlighted.
+Use a separate enrichment paragraph only when the essay question requires it and the paragraph still advances the lecture-derived argument. It must not replace lecture content, exceed 15% of the essay, introduce an unrelated mechanism, contradict slides without explanation, or appear without verified source anchoring. In explicit Example Essay Mode, uploaded Extra Reading Book content should normally be a compact 5-10% precision layer when relevant chapter/section evidence is found; 10-15% is allowed only when the question genuinely benefits from that detail. Those words must be yellow-highlighted.
 
 For sentence-level micro-detail insertions, the source rule is stricter: the inserted phrase must be directly supported by a verified chapter, section, original paper, or classic source. Keep the addition compact enough that it remains a phrase or short clause inside the original sentence. Highlight only the inserted phrase. Reject the insertion if it changes the claim, starts a new topic, duplicates nearby detail, requires a new explanatory sentence, or makes the extra-reading detail dominate the lecture-derived claim.
 

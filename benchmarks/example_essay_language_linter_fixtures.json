@@ -81,6 +81,18 @@
       "text": "The strongest evidence for spinal CPGs is that rhythmic flexor-extensor alternation can persist after sensory reafference from the limb has been removed. In Graham Brown's decerebrate cat experiments, descending influence was reduced, the limb was fixed, and dorsal roots were cut. Rhythmic alternation between flexor tibialis anterior and extensor gastrocnemius still emerged. The result is correct, but the paragraph states the claim, detours into setup, and then restates the claim instead of attaching the result to the setup."
     },
     {
+      "id": "repeated_not_but_framing_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Locomotor control is not a single spinal reflex but a layered timing problem. The spinal network is not merely a relay but a generator of core rhythmic output. Sensory input is not the origin of the rhythm but the mechanism that tunes load, phase and terrain adaptation, so the paragraph repeats the same contrast form instead of stating the positive control architecture directly."
+    },
+    {
+      "id": "claim_restart_after_setup_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Spinal timing circuits generate rhythmic locomotor output without requiring sensory feedback. In reduced preparation experiments, descending input was limited and peripheral feedback was removed to test whether the spinal network retained intrinsic timing. Spinal timing circuits generate rhythmic locomotor output without requiring sensory feedback, which shows why the setup should have been connected to the result instead of restarting the claim."
+    },
+    {
       "id": "descriptive_analytic_imbalance_bad",
       "expected": "fail",
       "has_lecture_anchor": true,

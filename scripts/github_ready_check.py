@@ -579,6 +579,14 @@ def main() -> int:
             ]
         )
         checks.append(run_command("positive_docx_format_and_language", [py, "scripts/docx_format_linter.py", str(positive_dir), "--check-language"]))
+        checks.append(run_command("negative_format_fixture_build", [py, "tests/fixtures/example_essay_docx/build_negative_format_fixture.py"]))
+        checks.append(
+            run_command(
+                "docx_format_linter_rejects_bad_spacing_and_layout",
+                [py, "scripts/docx_format_linter.py", "tests/fixtures/example_essay_docx/negative_format_fixture.docx"],
+                expect_failure=True,
+            )
+        )
         checks.append(
             run_command(
                 "deliverable_only_docx_generate",
