@@ -11,6 +11,8 @@ from html import unescape
 from pathlib import Path
 from typing import Any
 
+from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+
 
 OLD_VISIBLE_STRINGS = [
     "Priority: 必备",
@@ -325,6 +327,10 @@ def lint(
     for heading in FORBIDDEN_INTERNAL_HEADINGS:
         if internal_heading_present(text, heading):
             failures.append({"type": "forbidden_internal_heading", "heading": heading})
+    for phrase in forbidden_advisory_phrase_hits(text):
+        failures.append({"type": "forbidden_advisory_phrase", "phrase": phrase})
+    for heading in forbidden_advisory_heading_hits(text):
+        failures.append({"type": "forbidden_advisory_heading", "heading": heading})
 
     modules = parse_modules(text)
     if not modules:

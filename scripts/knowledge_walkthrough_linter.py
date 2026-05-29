@@ -17,6 +17,8 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
+from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+
 
 STYLE_LIMITS = {
     "margin_cm": 2.0,
@@ -71,7 +73,7 @@ def build_bad_style_fixture(path: Path) -> None:
     title.paragraph_format.line_spacing = 1.5
     title.add_run("Lecture Knowledge Walkthrough").font.name = "Times New Roman"
     for text in [
-        "How To Use This Document",
+        "How To Answer This Exam",
         "Lecture: Fixture Lecture",
         "What This Lecture Is About",
         "Module Map",
@@ -97,9 +99,13 @@ def lint_docx(path: Path) -> dict[str, Any]:
     for phrase in sorted(FORBIDDEN_TEXT):
         if phrase in lowered:
             failures.append({"type": "forbidden_student_text", "phrase": phrase})
+    for phrase in forbidden_advisory_phrase_hits(text):
+        failures.append({"type": "forbidden_advisory_phrase", "phrase": phrase})
+    for heading in forbidden_advisory_heading_hits(text):
+        failures.append({"type": "forbidden_advisory_heading", "heading": heading})
 
-    required_terms = ["What This Lecture Is About", "Module Map", "Knowledge Walkthrough", "Key Logic", "Must Master", "Lecture Recap"]
-    heading_terms = set(required_terms) | {"Core Logic", "What This Module Explains", "Common Confusions", "How To Use This Document"}
+    required_terms = ["What This Lecture Is About", "Module Map", "Knowledge Walkthrough", "Key Logic", "Knowledge Points", "Lecture Recap"]
+    heading_terms = set(required_terms) | {"Core Logic", "What This Module Explains", "Key Distinctions"}
     for term in required_terms:
         if term not in text:
             failures.append({"type": "missing_required_section", "section": term})

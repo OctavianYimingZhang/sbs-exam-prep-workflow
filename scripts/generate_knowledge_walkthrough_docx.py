@@ -18,6 +18,8 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
+from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+
 
 KNOWLEDGE_WALKTHROUGH_STYLE = {
     "route": "knowledge_walkthrough_docx",
@@ -214,6 +216,10 @@ def validate_plan(plan: dict[str, Any]) -> list[str]:
             for phrase in FORBIDDEN_TEXT:
                 if phrase in lowered:
                     errors.append(f"forbidden_text_in_plan:{phrase}")
+            for phrase in forbidden_advisory_phrase_hits(value):
+                errors.append(f"forbidden_advisory_phrase_in_plan:{phrase}")
+            for heading in forbidden_advisory_heading_hits(value):
+                errors.append(f"forbidden_advisory_heading_in_plan:{heading}")
     for lecture in plan.get("lectures", []):
         if not lecture.get("module_map"):
             errors.append(f"lecture_missing_module_map:{lecture.get('lecture_id', 'unknown')}")
@@ -233,13 +239,6 @@ def write_docx(plan: dict[str, Any], output_dir: Path, qa_dir: Path, strict: boo
     set_document_defaults(doc, plan)
     title = plan.get("title") or "Lecture Knowledge Walkthrough"
     add_paragraph(doc, str(title), plan, "title")
-    add_paragraph(doc, "How To Use This Document", plan, "heading")
-    add_paragraph(
-        doc,
-        "Use this document to go through the lecture knowledge in order. It is organised by lecture and conceptual module, not by slide page or hidden scoring.",
-        plan,
-        "body",
-    )
 
     manifest = {
         "walkthrough_id": plan.get("walkthrough_id"),
@@ -275,10 +274,10 @@ def write_docx(plan: dict[str, Any], output_dir: Path, qa_dir: Path, strict: boo
             add_paragraph(doc, str(module.get("key_logic", "")), plan, "body")
             common_confusions = module.get("common_confusions", [])
             if common_confusions:
-                add_paragraph(doc, "Common Confusions", plan, "subheading")
+                add_paragraph(doc, "Key Distinctions", plan, "subheading")
                 for item in common_confusions:
                     add_paragraph(doc, str(item), plan, "body")
-            add_paragraph(doc, "Must Master", plan, "subheading")
+            add_paragraph(doc, "Knowledge Points", plan, "subheading")
             for item in module.get("must_master", []):
                 add_paragraph(doc, str(item), plan, "body")
             lecture_manifest["modules"].append({"module_id": module.get("module_id"), "module_title": module.get("module_title")})

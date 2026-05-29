@@ -79,10 +79,10 @@ Knowledge Walkthrough
 [Natural explanatory prose. Bold required terms. Do not dump bullets. Do not retell slide order.]
 Key Logic
 [Arrow chain or compact mechanism chain.]
-Common Confusions
-[Only real confusion points. Omit the section when none are useful.]
-Must Master
-[3-5 short statements.]
+Key Distinctions
+[Only source-backed distinctions or misconception boundaries. Omit the section when none are useful.]
+Knowledge Points
+[3-5 short factual recall/action points.]
 ```
 
 ## Generation Steps
@@ -108,6 +108,8 @@ Step 5: Lecture recap. End each lecture with a compact recap, normally 6-10 line
 Step 6: Select `RouteDocxStyleProfile` before DOCX writing. If the user supplies a formatting screenshot, old generated DOCX, or visual layout example, analyse it only as transferable layout evidence: density, spacing, alignment, heading hierarchy, page-break policy, and label discipline. Do not copy source-specific wording, course titles, or factual content from the example.
 
 Step 7: Run the Knowledge Walkthrough DOCX style linter before publish. A walkthrough that falls back to essay-style margins, essay-style 1.5 spacing, justified body text, inconsistent fonts, or excessive whitespace must be regenerated.
+
+Step 8: Run the knowledge-only rendering gate. The walkthrough must contain only source-backed knowledge points and knowledge-bearing labels. Remove `How To Use This Document`, `How To Answer`, `Integrated reasoning`, `Integrated practical reasoning`, `Answer Logic`, `Exam Strategy`, `Recommended Approach`, `A strong answer should`, `Use this module`, and commentary about whether a topic is reliable by question type. Rewrite any real content inside those sections as factual `Knowledge Points`, `Key Logic`, `Key Distinctions`, method workflow, graph/data rule, calculation rule, comparison, or limitation.
 
 ## Forbidden Student Fields
 

@@ -343,6 +343,8 @@ The `exam_prep_notes_docx` route is the default for general revision. It accepts
 
 Ordinary Academic Exam-Ready Notes do not expose the internal card scaffold. They render by lecture, with each lecture on a new page, visible star priority labels, compact public point titles, main explanations, and only knowledge-bearing blocks such as Definitions, Criteria, Steps, Mechanism, Equation, Calculation Logic, Graph Logic, Comparison, Example, and Limitation. Headings such as `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, and `Must Master` stay internal unless the user requests a question-type add-on or trap/checklist output.
 
+A knowledge-only rendering gate blocks generic advice in ordinary notes and compatibility walkthroughs. Public DOCX output should not contain `How To Answer`, `How To Use`, `Integrated reasoning`, `Integrated practical reasoning`, `Answer Logic`, `Exam Strategy`, `Recommended Approach`, `A strong answer should`, `Use this module`, or question-type reliability commentary; any real content inside those drafts must be rewritten as source-backed knowledge points or knowledge-bearing blocks.
+
 The exam-prep notes DOCX style is route-specific: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX output keeps its separate essay-submission format.
 
 The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It uses the same compact lecture-note DOCX style as ordinary notes: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, stable headings, and lecture page breaks. It does not predict papers, write essays, or create practice packs by default.

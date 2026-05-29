@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+
 
 REQUIRED_TOP_LEVEL = {
     "notes_plan_id",
@@ -108,7 +110,20 @@ FORBIDDEN_CARD_FIELDS = {
 
 def is_forbidden_heading(value: Any) -> bool:
     text = str(value or "").strip().rstrip(":")
-    return text.casefold() in {heading.casefold() for heading in FORBIDDEN_PUBLIC_HEADINGS}
+    forbidden = {heading.casefold() for heading in FORBIDDEN_PUBLIC_HEADINGS}
+    forbidden.update(heading.casefold() for heading in forbidden_advisory_heading_hits(str(value or "")))
+    return text.casefold() in forbidden
+
+
+def collect_advisory_failures(value: Any, field: str, owner: str) -> list[dict[str, Any]]:
+    text = json.dumps(value, ensure_ascii=False) if isinstance(value, (list, dict)) else str(value or "")
+    return [
+        {"type": "public_knowledge_only_advisory_phrase", "owner": owner, "field": field, "phrase": phrase}
+        for phrase in forbidden_advisory_phrase_hits(text)
+    ] + [
+        {"type": "public_knowledge_only_advisory_heading", "owner": owner, "field": field, "heading": heading}
+        for heading in forbidden_advisory_heading_hits(text)
+    ]
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -204,6 +219,8 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             failures.append({"type": "public_output_point_invalid_kind", "point_id": point_id, "point_kind": point.get("point_kind")})
         if is_forbidden_heading(point.get("point_title")):
             failures.append({"type": "public_output_point_forbidden_internal_title", "point_id": point_id, "title": point.get("point_title")})
+        failures.extend(collect_advisory_failures(point.get("point_title"), "point_title", point_id))
+        failures.extend(collect_advisory_failures(point.get("main_text"), "main_text", point_id))
         if not str(point.get("main_text") or "").strip():
             failures.append({"type": "public_output_point_missing_main_text", "point_id": point_id})
         if not non_empty_list(point.get("covered_atomic_units")):
@@ -222,6 +239,8 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
                 failures.append({"type": "public_point_block_invalid_type", "point_id": point_id, "block_type": block.get("block_type")})
             if is_forbidden_heading(block.get("label")):
                 failures.append({"type": "public_point_block_forbidden_internal_label", "point_id": point_id, "label": block.get("label")})
+            failures.extend(collect_advisory_failures(block.get("label"), "block_label", point_id))
+            failures.extend(collect_advisory_failures(block.get("content"), "block_content", point_id))
             content = block.get("content")
             if isinstance(content, list):
                 if not non_empty_list(content):

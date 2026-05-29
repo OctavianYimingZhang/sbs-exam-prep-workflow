@@ -18,6 +18,8 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
+from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+
 
 FORBIDDEN_PUBLIC_PHRASES = [
     "Course-Level Exam Map",
@@ -286,6 +288,10 @@ def validate_plan(plan: dict[str, Any]) -> list[str]:
     for heading in FORBIDDEN_INTERNAL_HEADINGS:
         if re.search(rf"(?im)^\s*{re.escape(heading)}\s*:?\s*$", visible_text):
             failures.append(f"forbidden_internal_heading:{heading}")
+    for phrase in forbidden_advisory_phrase_hits(visible_text):
+        failures.append(f"forbidden_advisory_phrase:{phrase}")
+    for heading in forbidden_advisory_heading_hits(visible_text):
+        failures.append(f"forbidden_advisory_heading:{heading}")
     return sorted(set(failures))
 
 

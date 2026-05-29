@@ -135,6 +135,7 @@ def validate(root: Path) -> dict[str, Any]:
         "SelectRouteDocxStyleProfile",
         "BuildPublicOutputPoints",
         "BindAtomicItemsToPublicPoints",
+        "RunKnowledgeOnlyRenderingGate",
         "LintPublicOutputPoints",
         "LintOutputLanguageRequestPolicy",
         "GenerateExamPrepNotesDocx",
@@ -208,6 +209,7 @@ def validate(root: Path) -> dict[str, Any]:
         "route_docx_style_profile",
         "public_output_point_build",
         "point_coverage_binding",
+        "knowledge_only_rendering_gate",
         "public_output_point_linter",
         "output_language_request_linter",
         "exam_prep_docx_style_linter",
@@ -227,6 +229,12 @@ def validate(root: Path) -> dict[str, Any]:
                 failures.append({"type": "past_paper_module_before_baseline_floor", "module": module})
             if order.get(module, 999) > order.get("exam_emphasis_profile", -1):
                 failures.append({"type": "past_paper_module_after_exam_emphasis", "module": module})
+        if "knowledge_only_rendering_gate" not in order:
+            failures.append({"type": "exam_prep_missing_knowledge_only_rendering_gate"})
+        if order.get("knowledge_only_rendering_gate", 999) < order.get("point_coverage_binding", 0):
+            failures.append({"type": "exam_prep_knowledge_only_gate_before_point_binding"})
+        if order.get("knowledge_only_rendering_gate", 999) > order.get("exam_prep_notes_docx_generation", -1):
+            failures.append({"type": "exam_prep_knowledge_only_gate_after_generation"})
         example_available = {"any_source", "readable_course_notes", "style_or_example_evidence"}
         example_config = {"source_inputs": {"course_notes": ["fixture"], "exemplars_or_feedback": ["fixture"]}}
         example_modules = planner.modules_for_preset("exam_prep_notes_docx", example_available, example_config)
@@ -241,11 +249,15 @@ def validate(root: Path) -> dict[str, Any]:
             {"source_inputs": {"lecture_slides": ["fixture"]}},
         )
         walkthrough_order = {module: index for index, module in enumerate(walkthrough_modules)}
-        for required_module in ["route_docx_style_profile", "knowledge_walkthrough_docx_style_linter"]:
+        for required_module in ["route_docx_style_profile", "knowledge_only_rendering_gate", "knowledge_walkthrough_docx_style_linter"]:
             if required_module not in walkthrough_order:
                 failures.append({"type": "knowledge_walkthrough_missing_style_module", "module": required_module})
         if walkthrough_order.get("route_docx_style_profile", 999) > walkthrough_order.get("knowledge_walkthrough_plan", -1):
             failures.append({"type": "knowledge_walkthrough_style_profile_after_plan"})
+        if walkthrough_order.get("knowledge_only_rendering_gate", 999) < walkthrough_order.get("knowledge_walkthrough_plan", 0):
+            failures.append({"type": "knowledge_walkthrough_knowledge_only_gate_before_plan"})
+        if walkthrough_order.get("knowledge_only_rendering_gate", 999) > walkthrough_order.get("knowledge_walkthrough_docx_generation", -1):
+            failures.append({"type": "knowledge_walkthrough_knowledge_only_gate_after_generation"})
         if walkthrough_order.get("knowledge_walkthrough_docx_style_linter", 999) < walkthrough_order.get("knowledge_walkthrough_docx_generation", 0):
             failures.append({"type": "knowledge_walkthrough_style_linter_before_generation"})
         walkthrough_style_modules = planner.modules_for_preset(

@@ -89,6 +89,7 @@ def validate(root: Path) -> dict[str, Any]:
         "MCQStudentPointCard",
         "ShortAnswerPointCard",
         "Knowledge Walkthrough",
+        "Knowledge-Only Rendering Gate",
         "Lecture Recap",
         "Canonical Example",
         "Exam Use",

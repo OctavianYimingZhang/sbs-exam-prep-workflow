@@ -60,10 +60,11 @@ Run the route in this order:
 15. Select the route-specific `RouteDocxStyleProfile`.
 16. Build `PublicOutputPoint` and `PublicPointBlock` objects from the internal cards.
 17. Bind protected atomic items to public points with `PointCoverageBinding`.
-18. Generate integrated Academic Exam-Ready Notes from public points only.
-19. Append a question-type add-on layer only when useful or requested.
-20. Add optional visual aids only after the text is source-backed.
-21. Run public-point, output-language, route-style, exam-prep-notes, student-output, evidence, DOCX, and helper-file boundary QA.
+18. Run the `KnowledgeOnlyRenderingGate`.
+19. Generate Academic Exam-Ready Notes from public points only.
+20. Append a question-type add-on layer only when useful or requested.
+21. Add optional visual aids only after the text is source-backed.
+22. Run public-point, knowledge-only rendering, output-language, route-style, exam-prep-notes, student-output, evidence, DOCX, and helper-file boundary QA.
 
 Exam evidence may add, split, reorder, prioritise, densify, and enrich. Exam evidence must not delete, hide, or over-compress protected source-backed modules.
 
@@ -219,6 +220,26 @@ Allowed public top matter:
 - one short sentence on how the knowledge is organised.
 
 Generic exam advice stays internal. A concrete graph-reading rule, calculation operation, case-study decision rule, or answer-shaping rule may appear only when it adds knowledge; otherwise it belongs in a question-type add-on. Do not expose exam timing, marks, paper comparability, source limitations, or audit caveats.
+
+## Knowledge-Only Rendering Gate
+
+Before DOCX generation, ordinary notes must pass a hard knowledge-only rendering gate. Public output is allowed to contain:
+
+- source-backed definitions and official terms;
+- mechanisms and process chains;
+- criteria, stages, classes, components, and method workflows;
+- equations, calculations, graph/data interpretation rules, units, axes, and readout logic;
+- source-backed examples, comparisons, limitations, and factual caveats.
+
+Public output must not contain:
+
+- generic answer advice;
+- `How To Answer`, `How To Use`, `A strong answer should`, `Use this module`, or similar instruction prose;
+- `Integrated reasoning`, `Integrated practical reasoning`, `Answer Logic`, `Exam Strategy`, or `Recommended Approach` sections;
+- commentary that a topic is or is not reliable by question type;
+- route recommendations, study recommendations, source-quality caveats, or audit limitations.
+
+If such content is generated, suppress it when it is generic. If it contains a real knowledge distinction, rewrite only that distinction into a knowledge-bearing block such as `Comparison`, `Limitation`, `Calculation Logic`, `Graph Logic`, or `Method Workflow`.
 
 ## Background Demotion Rule
 
