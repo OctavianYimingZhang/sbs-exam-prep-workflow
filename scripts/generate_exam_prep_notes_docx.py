@@ -35,43 +35,92 @@ FORBIDDEN_PUBLIC_PHRASES = [
     "extraction quality",
 ]
 
+FORBIDDEN_INTERNAL_HEADINGS = {
+    "Exam Specificity",
+    "Core Exam Claim",
+    "Exam Use",
+    "Common Error / Trap",
+    "Must Master",
+    "How To Answer This Exam",
+}
+
+EXAM_PREP_NOTES_STYLE = {
+    "margin_cm": 2.0,
+    "line_spacing": 1.08,
+    "body_alignment": "left",
+    "body_font_pt": 10.5,
+    "heading_font_pt": 12.0,
+    "lecture_heading_font_pt": 14.0,
+    "text_color": "black",
+}
+
+BLOCK_LABELS = {
+    "definitions": "Definitions",
+    "key_points": "Key Points",
+    "criteria": "Criteria",
+    "steps": "Steps",
+    "mechanism": "Mechanism",
+    "equation": "Equation",
+    "calculation_logic": "Calculation Logic",
+    "graph_logic": "Graph Logic",
+    "comparison": "Comparison",
+    "example": "Example",
+    "limitation": "Limitation",
+}
+
 
 def load_plan(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def normalize_run(run) -> None:
+def style_value(plan: dict[str, Any], key: str) -> Any:
+    profile = plan.get("route_docx_style_profile")
+    if isinstance(profile, dict) and key in profile:
+        return profile[key]
+    return EXAM_PREP_NOTES_STYLE[key]
+
+
+def normalize_run(run, size_pt: float | None = None) -> None:
     run.font.name = "Arial"
-    run.font.size = Pt(11)
+    run.font.size = Pt(size_pt or EXAM_PREP_NOTES_STYLE["body_font_pt"])
     run.font.color.rgb = RGBColor(0, 0, 0)
     if run._element.rPr is not None:
         run._element.rPr.rFonts.set(qn("w:eastAsia"), "Arial")
 
 
-def normalize_paragraph(paragraph, kind: str) -> None:
-    paragraph.paragraph_format.line_spacing = 1.5
-    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if kind == "title" else WD_ALIGN_PARAGRAPH.LEFT if kind == "heading" else WD_ALIGN_PARAGRAPH.JUSTIFY
+def normalize_paragraph(paragraph, kind: str, plan: dict[str, Any]) -> None:
+    paragraph.paragraph_format.line_spacing = float(style_value(plan, "line_spacing"))
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if kind == "title" else WD_ALIGN_PARAGRAPH.LEFT
+    size = {
+        "title": 14.0,
+        "lecture": float(style_value(plan, "lecture_heading_font_pt")),
+        "heading": float(style_value(plan, "heading_font_pt")),
+        "body": float(style_value(plan, "body_font_pt")),
+    }[kind]
     for run in paragraph.runs:
-        normalize_run(run)
+        normalize_run(run, size)
 
 
-def set_document_defaults(doc: Document) -> None:
+def set_document_defaults(doc: Document, plan: dict[str, Any]) -> None:
+    margin_cm = float(style_value(plan, "margin_cm"))
+    line_spacing = float(style_value(plan, "line_spacing"))
+    body_font_pt = float(style_value(plan, "body_font_pt"))
     section = doc.sections[0]
-    section.top_margin = Cm(2.5)
-    section.bottom_margin = Cm(2.5)
-    section.left_margin = Cm(2.5)
-    section.right_margin = Cm(2.5)
-    for style_name in ["Normal", "EPNTitle", "EPNHeading", "EPNBody"]:
+    section.top_margin = Cm(margin_cm)
+    section.bottom_margin = Cm(margin_cm)
+    section.left_margin = Cm(margin_cm)
+    section.right_margin = Cm(margin_cm)
+    for style_name in ["Normal", "EPNTitle", "EPNLecture", "EPNHeading", "EPNBody"]:
         if style_name not in doc.styles:
             doc.styles.add_style(style_name, 1)
         style = doc.styles[style_name]
         style.font.name = "Arial"
-        style.font.size = Pt(11)
+        style.font.size = Pt(body_font_pt)
         style.font.color.rgb = RGBColor(0, 0, 0)
-        style.paragraph_format.line_spacing = 1.5
+        style.paragraph_format.line_spacing = line_spacing
 
 
-def add_marked_text(paragraph, text: str) -> None:
+def add_marked_text(paragraph, text: str, size_pt: float | None = None) -> None:
     for part in re.split(r"(\*\*[^*]+\*\*)", str(text)):
         if not part:
             continue
@@ -80,29 +129,114 @@ def add_marked_text(paragraph, text: str) -> None:
             run.bold = True
         else:
             run = paragraph.add_run(part)
-        normalize_run(run)
+        normalize_run(run, size_pt)
 
 
-def add_paragraph(doc: Document, text: str, kind: str = "body"):
-    style = {"title": "EPNTitle", "heading": "EPNHeading", "body": "EPNBody"}[kind]
+def add_paragraph(doc: Document, text: str, plan: dict[str, Any], kind: str = "body"):
+    style = {"title": "EPNTitle", "lecture": "EPNLecture", "heading": "EPNHeading", "body": "EPNBody"}[kind]
     paragraph = doc.add_paragraph(style=style)
-    add_marked_text(paragraph, text)
-    if kind in {"title", "heading"}:
+    size = {
+        "title": 14.0,
+        "lecture": float(style_value(plan, "lecture_heading_font_pt")),
+        "heading": float(style_value(plan, "heading_font_pt")),
+        "body": float(style_value(plan, "body_font_pt")),
+    }[kind]
+    add_marked_text(paragraph, text, size)
+    if kind in {"title", "lecture", "heading"}:
         for run in paragraph.runs:
             run.bold = True
-    normalize_paragraph(paragraph, kind)
+    normalize_paragraph(paragraph, kind, plan)
     return paragraph
 
 
-def add_label_block(doc: Document, label: str, value: Any) -> None:
+def public_labels_enabled(plan: dict[str, Any]) -> bool:
+    language_profile = plan.get("output_language_profile")
+    if not isinstance(language_profile, dict):
+        return True
+    policies = set(language_profile.get("public_label_policy", []))
+    return "suppress_nonessential_labels" not in policies
+
+
+def block_label(block: dict[str, Any], plan: dict[str, Any]) -> str | None:
+    label = block.get("label")
+    if label is not None and str(label).strip():
+        return str(label).strip().rstrip(":")
+    if not public_labels_enabled(plan):
+        return None
+    requested_language = str((plan.get("output_language_profile") or {}).get("requested_language") or "").strip().lower()
+    if requested_language and requested_language not in {"english", "en", "en-gb", "en-us"}:
+        return None
+    return BLOCK_LABELS.get(str(block.get("block_type") or ""))
+
+
+def add_label_block(doc: Document, plan: dict[str, Any], label: str | None, value: Any) -> None:
     if value in (None, "", [], {}):
         return
-    add_paragraph(doc, f"{label}:", "heading")
+    if label:
+        add_paragraph(doc, f"{label}:", plan, "heading")
     if isinstance(value, list):
         for item in value:
-            add_paragraph(doc, f"- {item}", "body")
+            add_paragraph(doc, f"- {item}", plan, "body")
     else:
-        add_paragraph(doc, str(value), "body")
+        add_paragraph(doc, str(value), plan, "body")
+
+
+def point_kind_from_card(card: dict[str, Any]) -> str:
+    mapping = {
+        "definition": "definition",
+        "mechanism": "mechanism",
+        "criteria list": "criteria_list",
+        "comparison": "comparison",
+        "calculation": "calculation",
+        "graph interpretation": "graph_or_data_interpretation",
+        "method workflow": "method_workflow",
+        "case justification": "compact_background",
+        "background": "compact_background",
+    }
+    return mapping.get(str(card.get("exam_specificity") or "").strip().casefold(), "compact_background")
+
+
+def derive_public_points(plan: dict[str, Any]) -> list[dict[str, Any]]:
+    points: list[dict[str, Any]] = []
+    default_lecture = ""
+    if isinstance(plan.get("lecture_mapping"), list) and plan["lecture_mapping"]:
+        first_lecture = plan["lecture_mapping"][0]
+        if isinstance(first_lecture, dict):
+            default_lecture = str(first_lecture.get("lecture_session_id") or "")
+    for card in plan.get("knowledge_cards", []):
+        if not isinstance(card, dict) or not card.get("student_visible", True):
+            continue
+        blocks: list[dict[str, Any]] = []
+        block_specs = [
+            ("key_definitions", "definitions", "Definitions"),
+            ("criteria_components_steps", "criteria", "Criteria"),
+            ("mechanism_or_process_logic", "mechanism", "Mechanism"),
+            ("canonical_example", "example", "Example"),
+        ]
+        for source_field, block_type, label in block_specs:
+            value = card.get(source_field)
+            if value:
+                blocks.append({"block_type": block_type, "label": label, "content": value, "covered_atomic_units": []})
+        main_text = " ".join(
+            str(card.get(field) or "").strip()
+            for field in ["core_exam_claim", "exam_ready_knowledge_synthesis"]
+            if str(card.get(field) or "").strip()
+        )
+        covered = [str(item) for item in card.get("protected_source_items_covered", []) if str(item).strip()]
+        points.append(
+            {
+                "point_id": f"public_{card.get('card_id', len(points) + 1)}",
+                "lecture_session_id": str(card.get("lecture_session_id") or default_lecture or card.get("section_id") or "lecture_001"),
+                "source_card_ids": [str(card.get("card_id"))] if card.get("card_id") else [],
+                "point_title": str(card.get("module_title") or "Knowledge point"),
+                "priority": card.get("priority") or "★",
+                "point_kind": point_kind_from_card(card),
+                "main_text": main_text or str(card.get("exam_ready_knowledge_synthesis") or ""),
+                "blocks": blocks,
+                "covered_atomic_units": covered or [str(card.get("kp_id") or card.get("card_id") or "covered_item")],
+            }
+        )
+    return points
 
 
 def visible_text_from_plan(plan: dict[str, Any]) -> str:
@@ -112,25 +246,14 @@ def visible_text_from_plan(plan: dict[str, Any]) -> str:
             parts.append(str(plan[key]))
     for section in plan.get("course_sections", []):
         parts.extend(str(section.get(key, "")) for key in ["section_title", "section_function"])
-    for card in plan.get("knowledge_cards", []):
-        if not card.get("student_visible", True):
+    for point in plan.get("public_output_points", []) or []:
+        if not isinstance(point, dict):
             continue
-        visible_keys = [
-            "module_title",
-            "priority",
-            "exam_specificity",
-            "core_exam_claim",
-            "key_definitions",
-            "exam_ready_knowledge_synthesis",
-            "criteria_components_steps",
-            "mechanism_or_process_logic",
-            "canonical_example",
-            "exam_use",
-            "common_error_or_trap",
-            "must_master",
-        ]
-        for key in visible_keys:
-            parts.append(json.dumps(card.get(key, ""), ensure_ascii=False))
+        parts.extend(str(point.get(key, "")) for key in ["point_title", "priority", "main_text"])
+        for block in point.get("blocks", []):
+            if isinstance(block, dict):
+                parts.append(str(block.get("label") or ""))
+                parts.append(json.dumps(block.get("content", ""), ensure_ascii=False))
     return "\n".join(parts)
 
 
@@ -139,20 +262,30 @@ def validate_plan(plan: dict[str, Any]) -> list[str]:
     if plan.get("object_type") != "ExamPrepNotesPlan":
         failures.append("plan_object_type_not_exam_prep_notes_plan")
     cards = [card for card in plan.get("knowledge_cards", []) if card.get("student_visible", True)]
-    if not cards:
-        failures.append("no_student_visible_knowledge_cards")
+    points = [point for point in plan.get("public_output_points", []) if isinstance(point, dict)]
+    if not points:
+        failures.append("no_public_output_points")
     if not plan.get("knowledge_only_student_view_binding"):
         failures.append("missing_knowledge_only_student_view_binding")
     for card in cards:
-        for field in ["module_title", "priority", "exam_specificity", "core_exam_claim", "exam_ready_knowledge_synthesis", "must_master"]:
+        for field in ["module_title", "priority", "exam_specificity", "core_exam_claim", "exam_ready_knowledge_synthesis"]:
             if not card.get(field):
                 failures.append(f"visible_card_missing_{field}:{card.get('card_id', 'unknown')}")
         if card.get("priority") not in {"★★★", "★★", "★"}:
             failures.append(f"visible_card_bad_priority:{card.get('card_id', 'unknown')}")
+    for point in points:
+        for field in ["lecture_session_id", "point_title", "priority", "point_kind", "main_text", "covered_atomic_units"]:
+            if not point.get(field):
+                failures.append(f"public_point_missing_{field}:{point.get('point_id', 'unknown')}")
+        if point.get("priority") not in {"★★★", "★★", "★"}:
+            failures.append(f"public_point_bad_priority:{point.get('point_id', 'unknown')}")
     visible_text = visible_text_from_plan(plan)
     for phrase in FORBIDDEN_PUBLIC_PHRASES:
         if phrase.lower() in visible_text.lower():
             failures.append(f"forbidden_public_phrase:{phrase}")
+    for heading in FORBIDDEN_INTERNAL_HEADINGS:
+        if re.search(rf"(?im)^\s*{re.escape(heading)}\s*:?\s*$", visible_text):
+            failures.append(f"forbidden_internal_heading:{heading}")
     return sorted(set(failures))
 
 
@@ -162,45 +295,48 @@ def write_docx(plan: dict[str, Any], output_dir: Path, qa_dir: Path, strict: boo
         return {"status": "fail", "qa_flags": failures, "documents": []}
 
     doc = Document()
-    set_document_defaults(doc)
+    set_document_defaults(doc, plan)
     title = str(plan.get("title") or "Academic Exam-Ready Knowledge Notes")
-    add_paragraph(doc, title, "title")
-    add_paragraph(doc, "Academic Exam-Ready Knowledge Notes", "title")
+    add_paragraph(doc, title, plan, "title")
 
-    add_paragraph(doc, "Course Knowledge Map", "heading")
+    add_paragraph(doc, "Course Knowledge Map", plan, "heading")
     course_map = plan.get("course_knowledge_map")
     if course_map:
-        add_paragraph(doc, str(course_map), "body")
+        add_paragraph(doc, str(course_map), plan, "body")
     else:
-        add_paragraph(doc, "The notes are organised by source-backed knowledge sections and modules.", "body")
+        add_paragraph(doc, "The notes are organised by lecture and source-backed knowledge points.", plan, "body")
 
-    if plan.get("course_sections"):
-        add_paragraph(doc, "Knowledge Sections", "heading")
-        for section in plan.get("course_sections", []):
-            title_text = section.get("section_title", "Knowledge Section")
-            function = section.get("section_function", "")
-            add_paragraph(doc, f"{title_text}: {function}", "body")
+    lectures = [lecture for lecture in plan.get("lecture_mapping", []) if isinstance(lecture, dict)]
+    lecture_by_id = {str(lecture.get("lecture_session_id")): lecture for lecture in lectures}
+    lecture_order = [str(lecture.get("lecture_session_id")) for lecture in lectures]
+    points = [point for point in plan.get("public_output_points", []) if isinstance(point, dict)] or derive_public_points(plan)
+    grouped: dict[str, list[dict[str, Any]]] = {lecture_id: [] for lecture_id in lecture_order}
+    for point in points:
+        lecture_id = str(point.get("lecture_session_id") or "")
+        if lecture_id not in grouped:
+            grouped[lecture_id] = []
+            lecture_order.append(lecture_id)
+            lecture_by_id[lecture_id] = {"title": lecture_id or "Lecture"}
+        grouped[lecture_id].append(point)
 
-    if plan.get("lecture_mapping"):
-        add_paragraph(doc, "Lecture Coverage", "heading")
-        for lecture in plan.get("lecture_mapping", []):
-            add_paragraph(doc, f"{lecture.get('title', 'Lecture')}", "body")
-
-    for card in plan.get("knowledge_cards", []):
-        if not card.get("student_visible", True):
+    for lecture_id in lecture_order:
+        lecture_points = grouped.get(lecture_id, [])
+        if not lecture_points:
             continue
-        add_paragraph(doc, f"Module: {card.get('module_title', 'Knowledge Module')}", "heading")
-        add_paragraph(doc, f"Priority: {card.get('priority', '')}", "body")
-        add_label_block(doc, "Exam Specificity", card.get("exam_specificity"))
-        add_label_block(doc, "Core Exam Claim", card.get("core_exam_claim"))
-        add_label_block(doc, "Key Definitions", card.get("key_definitions"))
-        add_label_block(doc, "Exam-Ready Knowledge Synthesis", card.get("exam_ready_knowledge_synthesis"))
-        add_label_block(doc, "Criteria / Components / Steps", card.get("criteria_components_steps"))
-        add_label_block(doc, "Mechanism / Process Logic", card.get("mechanism_or_process_logic"))
-        add_label_block(doc, "Canonical Example", card.get("canonical_example"))
-        add_label_block(doc, "Exam Use", card.get("exam_use"))
-        add_label_block(doc, "Common Error / Trap", card.get("common_error_or_trap"))
-        add_label_block(doc, "Must Master", card.get("must_master"))
+        doc.add_page_break()
+        lecture = lecture_by_id.get(lecture_id, {})
+        lecture_title = str(lecture.get("title") or lecture_id or "Lecture")
+        add_paragraph(doc, f"Lecture: {lecture_title}", plan, "lecture")
+        for point in lecture_points:
+            title_text = str(point.get("point_title") or "Knowledge Point").strip()
+            priority = str(point.get("priority") or "★").strip()
+            add_paragraph(doc, f"{priority} {title_text}", plan, "heading")
+            if point.get("main_text"):
+                add_paragraph(doc, str(point["main_text"]), plan, "body")
+            for block in point.get("blocks", []):
+                if not isinstance(block, dict):
+                    continue
+                add_label_block(doc, plan, block_label(block, plan), block.get("content"))
 
     output_dir.mkdir(parents=True, exist_ok=True)
     qa_dir.mkdir(parents=True, exist_ok=True)

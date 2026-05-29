@@ -10,7 +10,7 @@ Use this Skill to turn a student's supplied exam materials into evidence-grounde
 The first-principles chain is:
 
 ```text
-inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> exam overlay -> preparation output
+inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> public output points -> exam overlay -> preparation output
 ```
 
 ## Purpose And Trigger Boundary
@@ -96,6 +96,9 @@ Student-facing output filter:
 - Do not expose source anchors, confidence bands, recurrence counts, lecture centrality, examiner-operation labels, task verbs, discriminator axes, reference expansion, evidence limits, internal priority scores, source maps, QA JSON, run manifests, lineage files, citation logs, or rendered previews unless the user explicitly asks for an audit package.
 - Visible priority labels are only `★★★`, `★★`, and `★`.
 - Use `Course Knowledge Map` as the public top matter for ordinary notes. Do not use `Course-Level Exam Map` in public notes.
+- Ordinary Academic Exam-Ready Notes render compact `PublicOutputPoint` blocks by lecture. Do not expose internal headings named `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, or `Must Master`.
+- Select an `OutputLanguageProfile`: follow the requested language when supplied; otherwise follow the dominant source language and preserve mixed technical wording when useful. Public labels must be localized, source-language matched, or suppressed.
+- Select a route-specific DOCX style: `exam_prep_notes_docx` uses Arial, 2.0 cm margins, compact line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX formatting remains separate.
 - Internal helper artifacts may be generated for validation, but they must stay outside ordinary student-facing output folders.
 
 Public output contract:

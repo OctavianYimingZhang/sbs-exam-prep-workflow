@@ -6,7 +6,7 @@ Student-facing exam-prep outputs must be rewritten as directly usable revision c
 
 ```text
 internal reasoning: evidence -> operation -> priority -> output type
-student output: priority -> point -> explanation -> exam-use answer or walkthrough
+student output: priority -> public point -> explanation -> knowledge-bearing blocks
 ```
 
 Ordinary Academic Exam-Ready Notes are knowledge documents, not exam-format audits. They must not display assessment percentages, exam timing, mark splits, Section A/Section B administrative rules, historical-paper comparability notes, `Coverage note` warnings, source-quality caveats, ELM-check warnings, or provenance/audit explanations. Keep those items internal unless the user explicitly requests an audit package.
@@ -53,6 +53,11 @@ contrast_table
 separate_trap_bank
 mark_producing_schema
 reference_expansion
+exam_specificity
+core_exam_claim
+exam_use
+common_error_or_trap
+must_master
 ```
 
 These may appear only in internal QA or an explicit audit package requested by the user.
@@ -71,7 +76,7 @@ Meanings:
 - `★★` = supporting examinable knowledge: useful for explanation, comparison, justification, or transfer.
 - `★` = background/context: useful framing only; keep brief unless directly tested.
 
-Do not explain why a point is `★★★` by exposing recurrence, confidence, or source-scoring logic. Convert the reason into useful content: what to know, how it is tested, and what trap to avoid.
+Do not explain why a point is `★★★` by exposing recurrence, confidence, or source-scoring logic. Convert the reason into useful content: what to know, which mechanism or list matters, and which boundary or limitation prevents an error.
 
 ## Exam Prep Notes Student Contract
 
@@ -82,32 +87,44 @@ Visible structure:
 ```yaml
 ExamPrepNotesStudentContract:
   course_knowledge_map: string
-  knowledge_sections: list[string]
   lecture_mapping: list[string]
-  exam_ready_knowledge_notes: list[ExamPrepKnowledgeCard]
+  exam_ready_knowledge_notes: list[PublicOutputPoint]
   question_type_addons: list[QuestionTypeAddOn]
   optional_visual_aids: list[GeneratedVisualAidCaption]
 ```
 
-The visible top matter is `Course Knowledge Map`, not `Course-Level Exam Map`. It may state how the knowledge is organised, list knowledge sections, and map lectures/topics to those sections. Exam information may appear only inside module-level `Exam Use`, and only as knowledge-application guidance.
+The visible top matter is `Course Knowledge Map`, not `Course-Level Exam Map`. It may state how the knowledge is organised, list knowledge sections, and map lectures/topics to those sections. Generic exam advice stays internal unless the user asks for a question-type add-on.
 
-Visible knowledge card:
+Compact Public Notes Rule:
+
+- Internally, decompose sources into atomic knowledge items and protect every source-backed definition, criterion, mechanism, method, example, equation, graph, table, and workflow.
+- Publicly, render compact lecture-level exam notes. Do not expose the internal card scaffold.
+- Each lecture starts on a new page.
+- Group protected atomic items into readable public points using concise paragraphs, bullets, equations, examples, comparisons, and mechanism chains.
+- Coverage must be complete; formatting must be compact.
+
+Visible public point:
 
 ```yaml
-ExamPrepKnowledgeCard:
+PublicOutputPoint:
+  point_id: string
+  lecture_session_id: string
+  point_title: string
   priority: ★★★ | ★★ | ★
-  module_title: string
-  exam_specificity: string
-  core_exam_claim: string
-  key_definitions: list[string]
-  exam_ready_knowledge_synthesis: string
-  criteria_components_steps: list[string]
-  mechanism_or_process_logic: string
-  canonical_example: string
-  exam_use: string
-  common_error_or_trap: string
-  must_master: list[string]
+  point_kind: definition | mechanism | method_workflow | criteria_list | comparison | calculation | graph_or_data_interpretation | canonical_example | compact_background
+  main_text: string
+  blocks: list[PublicPointBlock]
+  covered_atomic_units: list[string]
+
+PublicPointBlock:
+  block_type: definitions | key_points | criteria | steps | mechanism | equation | calculation_logic | graph_logic | comparison | example | limitation
+  label: string | null
+  content: string | list[string]
 ```
+
+Internal card fields guide planning and QA. They are not public headings. Ordinary Academic Exam-Ready Notes must not render headings named `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, or `Must Master`. `Canonical Example` remains an internal planning field; public notes should render the knowledge as an `Example` block, localized equivalent, or unlabeled paragraph.
+
+`Exam Use`, `Common Error / Trap`, and `Must Master` may appear only in MCQ reports, short-answer add-ons, explicit trap/checklist outputs, or internal QA. In ordinary notes, useful distinctions should be integrated into `comparison`, `limitation`, or the main explanation.
 
 Allowed visible add-on items:
 

@@ -5,8 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import tempfile
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +21,18 @@ except Exception as exc:  # pragma: no cover
 
 
 BLUE_RGB = {"0000FF", "0563C1", "2F5496", "1F4E79"}
+EXPECTED_MARGIN_CM = 2.0
+MAX_LINE_SPACING = 1.2
+MIN_LINE_SPACING = 1.0
+FORBIDDEN_INTERNAL_HEADINGS = {
+    "Exam Specificity",
+    "Core Exam Claim",
+    "Exam Use",
+    "Common Error / Trap",
+    "Must Master",
+    "Course-Level Exam Map",
+    "How To Answer This Exam",
+}
 
 
 def iter_docx_paths(path: Path) -> list[Path]:
@@ -33,6 +47,37 @@ def cm_value(length: Any) -> float:
     return float(length.cm)
 
 
+def line_spacing_value(paragraph: Any) -> float | None:
+    value = paragraph.paragraph_format.line_spacing
+    if value is None and paragraph.style is not None:
+        value = paragraph.style.paragraph_format.line_spacing
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except TypeError:
+        return None
+
+
+def count_page_breaks(path: Path) -> int:
+    with zipfile.ZipFile(path) as archive:
+        xml = archive.read("word/document.xml").decode("utf-8", errors="ignore")
+    explicit_breaks = len(re.findall(r"<w:br\b[^>]*w:type=[\"']page[\"']", xml))
+    page_break_properties = len(re.findall(r"<w:pageBreakBefore\b", xml))
+    return explicit_breaks + page_break_properties
+
+
+def is_forbidden_heading(text: str) -> bool:
+    normalized = text.strip().rstrip(":").casefold()
+    return normalized in {heading.casefold() for heading in FORBIDDEN_INTERNAL_HEADINGS}
+
+
+def is_body_paragraph(paragraph: Any) -> bool:
+    style_name = (paragraph.style.name if paragraph.style else "").casefold()
+    text = paragraph.text.strip()
+    return bool(text) and not style_name.startswith("heading") and style_name not in {"epntitle", "epnlecture", "title"}
+
+
 def lint_docx(path: Path) -> list[dict[str, Any]]:
     failures: list[dict[str, Any]] = []
     doc = Document(path)
@@ -43,16 +88,28 @@ def lint_docx(path: Path) -> list[dict[str, Any]]:
     section = doc.sections[0]
     for margin_name in ["top_margin", "bottom_margin", "left_margin", "right_margin"]:
         value = cm_value(getattr(section, margin_name))
-        if abs(value - 2.5) > 0.08:
+        if abs(value - EXPECTED_MARGIN_CM) > 0.08:
             failures.append({"type": "bad_margin", "path": str(path), "margin": margin_name, "cm": round(value, 3)})
 
+    lecture_headings = 0
     for index, paragraph in enumerate(doc.paragraphs, start=1):
         text = paragraph.text.strip()
         if not text:
             continue
+        if is_forbidden_heading(text):
+            failures.append({"type": "forbidden_internal_heading", "path": str(path), "paragraph": index, "text": text})
+        if text.casefold().startswith("lecture:"):
+            lecture_headings += 1
         if paragraph.style and paragraph.style.name.lower().startswith("heading"):
             if paragraph.alignment not in {None, WD_ALIGN_PARAGRAPH.LEFT}:
                 failures.append({"type": "heading_not_left_aligned", "path": str(path), "paragraph": index})
+        spacing = line_spacing_value(paragraph)
+        if spacing is not None and not (MIN_LINE_SPACING <= spacing <= MAX_LINE_SPACING):
+            failures.append({"type": "bad_line_spacing", "path": str(path), "paragraph": index, "line_spacing": round(spacing, 3)})
+        if is_body_paragraph(paragraph) and paragraph.alignment not in {None, WD_ALIGN_PARAGRAPH.LEFT}:
+            failures.append({"type": "body_not_left_aligned", "path": str(path), "paragraph": index, "alignment": str(paragraph.alignment)})
+        if is_body_paragraph(paragraph) and paragraph.alignment == WD_ALIGN_PARAGRAPH.JUSTIFY:
+            failures.append({"type": "body_justified_like_essay", "path": str(path), "paragraph": index})
         for run in paragraph.runs:
             if not run.text.strip():
                 continue
@@ -64,6 +121,10 @@ def lint_docx(path: Path) -> list[dict[str, Any]]:
             font_names = {name for name in [run.font.name, paragraph.style.font.name if paragraph.style else None] if name}
             if font_names and "Arial" not in font_names:
                 failures.append({"type": "non_arial_text", "path": str(path), "paragraph": index, "fonts": sorted(font_names)})
+
+    page_breaks = count_page_breaks(path)
+    if lecture_headings and page_breaks < max(0, lecture_headings - 1):
+        failures.append({"type": "missing_lecture_page_breaks", "path": str(path), "lecture_headings": lecture_headings, "page_breaks": page_breaks})
 
     return failures
 
@@ -85,8 +146,13 @@ def lint_path(path: Path) -> dict[str, Any]:
 def create_bad_docx(path: Path) -> None:
     doc = Document()
     section = doc.sections[0]
-    section.top_margin = Cm(1.0)
-    paragraph = doc.add_paragraph()
+    section.top_margin = Cm(2.5)
+    section.bottom_margin = Cm(2.5)
+    section.left_margin = Cm(2.5)
+    section.right_margin = Cm(2.5)
+    paragraph = doc.add_paragraph("Exam Use:")
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    paragraph.paragraph_format.line_spacing = 1.5
     run = paragraph.add_run("This blue text must fail.")
     run.font.name = "Calibri"
     run.font.color.rgb = RGBColor(0, 0, 255)

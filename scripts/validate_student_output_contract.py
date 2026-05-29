@@ -38,6 +38,11 @@ FORBIDDEN_VISIBLE_FIELDS = {
     "separate_trap_bank",
     "mark_producing_schema",
     "reference_expansion",
+    "exam_specificity",
+    "core_exam_claim",
+    "exam_use",
+    "common_error_or_trap",
+    "must_master",
 }
 
 
@@ -74,7 +79,21 @@ def validate(root: Path) -> dict[str, Any]:
     exam_prep_notes = read(root / "references/exam_prep_notes_protocol.md")
     walkthrough = read(root / "references/knowledge_walkthrough_docx_protocol.md")
     combined = policy + "\n" + exam_prep_notes + "\n" + walkthrough
-    for term in ["ExamPrepNotesStudentContract", "Academic Exam-Ready Notes", "Course Knowledge Map", "MCQStudentPointCard", "ShortAnswerPointCard", "Knowledge Walkthrough", "Lecture Recap", "Canonical Example", "Exam Use", "★★★"]:
+    for term in [
+        "ExamPrepNotesStudentContract",
+        "Academic Exam-Ready Notes",
+        "Course Knowledge Map",
+        "PublicOutputPoint",
+        "PublicPointBlock",
+        "OutputLanguageProfile",
+        "MCQStudentPointCard",
+        "ShortAnswerPointCard",
+        "Knowledge Walkthrough",
+        "Lecture Recap",
+        "Canonical Example",
+        "Exam Use",
+        "★★★",
+    ]:
         if term not in combined:
             failures.append({"type": "student_policy_missing_term", "term": term})
     for field in sorted(FORBIDDEN_VISIBLE_FIELDS):

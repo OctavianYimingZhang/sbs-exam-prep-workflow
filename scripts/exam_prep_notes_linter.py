@@ -35,12 +35,21 @@ FORBIDDEN_PUBLIC_PHRASES = [
     "extraction quality",
 ]
 
+FORBIDDEN_INTERNAL_HEADINGS = [
+    "Exam Specificity",
+    "Core Exam Claim",
+    "Exam Use",
+    "Common Error / Trap",
+    "Must Master",
+    "How To Answer This Exam",
+]
+
 PROTECTED_ITEM_TYPE_REQUIREMENTS = {
-    "definition": "must appear under Key Definitions or as a standalone definition module",
-    "contrast_pair": "must compare both sides before traps or must-master lists",
-    "criteria_list": "must appear under Criteria / Components / Steps as a list",
-    "why_x_block": "must appear under Canonical Example or as a standalone Why-X module",
-    "named_example": "must appear under Canonical Example or a named-example module",
+    "definition": "must appear under Definitions or as a standalone definition module",
+    "contrast_pair": "must compare both sides in the explanation before any question-type add-on",
+    "criteria_list": "must appear under Criteria as a list",
+    "why_x_block": "must appear under Example or as a standalone Why-X module",
+    "named_example": "must appear under Example or a named-example module",
     "assay_or_method": "must include method principle, readout, interpretation, and limitation when those terms are required by the fixture",
     "calculation_rule": "must include formula, units, substitution logic, and interpretation when those terms are required by the fixture",
     "graph_readout": "must include axis, trend, parameter extraction, and conclusion when those terms are required by the fixture",
@@ -152,6 +161,10 @@ def priority_value(priority: str | None) -> int:
     return {"★★★": 3, "★★": 2, "★": 1}.get(priority or "", 0)
 
 
+def internal_heading_present(text: str, heading: str) -> bool:
+    return re.search(rf"(?im)^\s*(?:#+\s*)?{re.escape(heading)}\s*:?\s*$", text) is not None
+
+
 def load_ledger(path: Path | None) -> dict[str, Any] | None:
     if not path:
         return None
@@ -234,11 +247,19 @@ def lint_protected_item(module: dict[str, Any], item: dict[str, Any]) -> list[di
             if not term_present(before_trap, term):
                 failures.append({"type": "protected_item_only_in_trap_or_must_master", "item_id": item_id, "term": term})
 
-    if item_type == "definition" and not (section_after(body, "Key Definitions") or "definition" in normalize(module["title"])):
+    if item_type == "definition" and not (
+        section_after(body, required_section or "Definitions")
+        or section_after(body, "Key Definitions")
+        or "definition" in normalize(module["title"])
+    ):
         failures.append({"type": "definition_not_visible_as_definition", "item_id": item_id})
-    if item_type == "criteria_list" and bullet_count(section_after(body, required_section or "Criteria / Components / Steps")) < int(min_bullets or 1):
+    if item_type == "criteria_list" and bullet_count(section_after(body, required_section or "Criteria")) < int(min_bullets or 1):
         failures.append({"type": "criteria_list_not_preserved_as_list", "item_id": item_id})
-    if item_type in {"why_x_block", "named_example"} and not (section_after(body, "Canonical Example") or normalize(module["title"]).startswith("why ")):
+    if item_type in {"why_x_block", "named_example"} and not (
+        section_after(body, required_section or "Example")
+        or section_after(body, "Canonical Example")
+        or normalize(module["title"]).startswith("why ")
+    ):
         failures.append({"type": "named_example_or_why_block_not_visible", "item_id": item_id})
 
     return failures
@@ -301,6 +322,9 @@ def lint(
     for phrase in FORBIDDEN_PUBLIC_PHRASES:
         if phrase.lower() in text.lower():
             failures.append({"type": "forbidden_public_phrase", "phrase": phrase})
+    for heading in FORBIDDEN_INTERNAL_HEADINGS:
+        if internal_heading_present(text, heading):
+            failures.append({"type": "forbidden_internal_heading", "heading": heading})
 
     modules = parse_modules(text)
     if not modules:

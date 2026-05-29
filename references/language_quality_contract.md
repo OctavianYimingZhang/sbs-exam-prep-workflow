@@ -4,11 +4,11 @@ This contract is the shared prose-quality standard for lecture walkthrough expla
 
 The contract is subject-independent. Biological, chemical, quantitative, clinical, methodological, and sector-level essays use different factual evidence, but the same language discipline.
 
-## Academic Exam-Ready Notes Language
+## Academic Exam-Ready Notes Prose Policy
 
 For `exam_prep_notes_docx`, write notes as exam-ready academic synthesis, not as tutor narration or slide commentary.
 
-Prefer section functions such as:
+Use internal planning functions such as these to decide content, but do not force them into public headings:
 
 - `Core Exam Claim`;
 - `Key Definitions`;
@@ -20,6 +20,8 @@ Prefer section functions such as:
 - `Common Error / Trap`;
 - `Must Master`.
 
+Ordinary Academic Exam-Ready Notes render compact public points and knowledge-bearing blocks. Public labels should be localized, matched to the source language, or suppressed according to `OutputLanguageProfile`; schema field names may remain English internally.
+
 Avoid:
 
 - `In this section we will learn...`;
@@ -28,10 +30,10 @@ Avoid:
 - `You should understand...`;
 - source-route narration such as page, slide, or upload-order commentary inside the answer body.
 
-The paragraph shape is:
+The public paragraph shape is:
 
 ```text
-examinable claim or problem -> mechanism/process -> canonical example where source-backed -> scope or limitation -> exam use
+examinable claim or problem -> mechanism/process -> source-backed example when useful -> scope or limitation -> concrete application when it adds knowledge
 ```
 
 Do not preserve the original notes' order when that order is weaker than the exam logic, but do preserve the source-first baseline coverage of protected definitions, contrast pairs, criteria lists, named examples, diagrams, tables, equations, calculations, and workflow items before applying exam overlay.

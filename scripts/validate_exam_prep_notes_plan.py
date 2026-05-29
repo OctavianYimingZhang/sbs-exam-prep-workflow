@@ -15,7 +15,13 @@ REQUIRED_TOP_LEVEL = {
     "course_sections",
     "lecture_mapping",
     "knowledge_cards",
+    "public_output_points",
+    "output_language_profile",
+    "route_docx_style_profile",
+    "render_decisions",
+    "point_coverage_bindings",
     "official_definition_records",
+    "atomic_knowledge_ledger_binding",
     "source_baseline_binding",
     "exam_emphasis_binding",
     "exam_overlay_binding",
@@ -31,6 +37,7 @@ REQUIRED_CARD_FIELDS = {
     "card_id",
     "kp_id",
     "section_id",
+    "lecture_session_id",
     "module_id",
     "module_title",
     "source_baseline_card_id",
@@ -38,7 +45,6 @@ REQUIRED_CARD_FIELDS = {
     "exam_specificity",
     "core_exam_claim",
     "exam_ready_knowledge_synthesis",
-    "must_master",
     "protected_source_items_covered",
     "source_anchors",
     "coverage_status",
@@ -59,6 +65,39 @@ ALLOWED_EXAM_SPECIFICITY = {
     "case justification",
     "background",
 }
+ALLOWED_POINT_KINDS = {
+    "definition",
+    "mechanism",
+    "method_workflow",
+    "criteria_list",
+    "comparison",
+    "calculation",
+    "graph_or_data_interpretation",
+    "canonical_example",
+    "compact_background",
+}
+ALLOWED_BLOCK_TYPES = {
+    "definitions",
+    "key_points",
+    "criteria",
+    "steps",
+    "mechanism",
+    "equation",
+    "calculation_logic",
+    "graph_logic",
+    "comparison",
+    "example",
+    "limitation",
+}
+FORBIDDEN_PUBLIC_HEADINGS = {
+    "Exam Specificity",
+    "Core Exam Claim",
+    "Exam Use",
+    "Common Error / Trap",
+    "Must Master",
+    "Course-Level Exam Map",
+    "How To Answer This Exam",
+}
 FORBIDDEN_CARD_FIELDS = {
     "priority_label",
     "exam_function",
@@ -67,12 +106,24 @@ FORBIDDEN_CARD_FIELDS = {
 }
 
 
+def is_forbidden_heading(value: Any) -> bool:
+    text = str(value or "").strip().rstrip(":")
+    return text.casefold() in {heading.casefold() for heading in FORBIDDEN_PUBLIC_HEADINGS}
+
+
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
 def non_empty_list(value: Any) -> bool:
     return isinstance(value, list) and any(str(item).strip() for item in value)
+
+
+def number_or_none(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def validate(plan: dict[str, Any]) -> dict[str, Any]:
@@ -124,12 +175,121 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
                 failures.append({"type": "student_visible_card_missing_source_baseline_card_id", "card_id": card.get("card_id")})
             if not non_empty_list(card.get("source_anchors")):
                 failures.append({"type": "student_visible_card_missing_source_anchors", "card_id": card.get("card_id")})
-            if not non_empty_list(card.get("must_master")):
-                failures.append({"type": "student_visible_card_missing_must_master", "card_id": card.get("card_id")})
             if not non_empty_list(card.get("protected_source_items_covered")):
                 failures.append({"type": "student_visible_card_missing_protected_source_items", "card_id": card.get("card_id")})
             if card.get("coverage_status") not in ALLOWED_COVERAGE:
                 failures.append({"type": "student_visible_card_invalid_coverage_status", "card_id": card.get("card_id"), "coverage_status": card.get("coverage_status")})
+
+    points = plan.get("public_output_points", [])
+    if not isinstance(points, list) or not points:
+        failures.append({"type": "public_output_points_empty"})
+        points = []
+    point_ids: set[str] = set()
+    covered_atomic_items: set[str] = set()
+    for index, point in enumerate(points, start=1):
+        if not isinstance(point, dict):
+            failures.append({"type": "public_output_point_not_object", "index": index})
+            continue
+        point_id = str(point.get("point_id") or "")
+        if not point_id:
+            failures.append({"type": "public_output_point_missing_point_id", "index": index})
+        else:
+            point_ids.add(point_id)
+        for field in ["lecture_session_id", "point_title", "priority", "point_kind", "main_text", "blocks", "covered_atomic_units"]:
+            if field not in point:
+                failures.append({"type": "public_output_point_missing_field", "point_id": point_id, "field": field})
+        if point.get("priority") not in ALLOWED_PRIORITY:
+            failures.append({"type": "public_output_point_invalid_priority", "point_id": point_id, "priority": point.get("priority")})
+        if point.get("point_kind") not in ALLOWED_POINT_KINDS:
+            failures.append({"type": "public_output_point_invalid_kind", "point_id": point_id, "point_kind": point.get("point_kind")})
+        if is_forbidden_heading(point.get("point_title")):
+            failures.append({"type": "public_output_point_forbidden_internal_title", "point_id": point_id, "title": point.get("point_title")})
+        if not str(point.get("main_text") or "").strip():
+            failures.append({"type": "public_output_point_missing_main_text", "point_id": point_id})
+        if not non_empty_list(point.get("covered_atomic_units")):
+            failures.append({"type": "public_output_point_missing_atomic_coverage", "point_id": point_id})
+        else:
+            covered_atomic_items.update(str(item) for item in point.get("covered_atomic_units", []) if str(item).strip())
+        blocks = point.get("blocks", [])
+        if not isinstance(blocks, list):
+            failures.append({"type": "public_output_point_blocks_not_list", "point_id": point_id})
+            blocks = []
+        for block_index, block in enumerate(blocks, start=1):
+            if not isinstance(block, dict):
+                failures.append({"type": "public_point_block_not_object", "point_id": point_id, "index": block_index})
+                continue
+            if block.get("block_type") not in ALLOWED_BLOCK_TYPES:
+                failures.append({"type": "public_point_block_invalid_type", "point_id": point_id, "block_type": block.get("block_type")})
+            if is_forbidden_heading(block.get("label")):
+                failures.append({"type": "public_point_block_forbidden_internal_label", "point_id": point_id, "label": block.get("label")})
+            content = block.get("content")
+            if isinstance(content, list):
+                if not non_empty_list(content):
+                    failures.append({"type": "public_point_block_empty_content", "point_id": point_id, "block_type": block.get("block_type")})
+            elif not str(content or "").strip():
+                failures.append({"type": "public_point_block_empty_content", "point_id": point_id, "block_type": block.get("block_type")})
+
+    language_profile = plan.get("output_language_profile", {})
+    if not isinstance(language_profile, dict):
+        failures.append({"type": "output_language_profile_not_object"})
+    else:
+        if not non_empty_list(language_profile.get("output_language_policy")):
+            failures.append({"type": "output_language_profile_missing_policy"})
+        if not non_empty_list(language_profile.get("public_label_policy")):
+            failures.append({"type": "output_language_profile_missing_label_policy"})
+        if "allow_mixed_language" not in language_profile:
+            failures.append({"type": "output_language_profile_missing_allow_mixed_language"})
+
+    style_profile = plan.get("route_docx_style_profile", {})
+    if not isinstance(style_profile, dict):
+        failures.append({"type": "route_docx_style_profile_not_object"})
+    else:
+        if style_profile.get("route") != "exam_prep_notes_docx":
+            failures.append({"type": "route_docx_style_profile_invalid_route", "route": style_profile.get("route")})
+        margin_cm = number_or_none(style_profile.get("margin_cm"))
+        line_spacing = number_or_none(style_profile.get("line_spacing"))
+        if margin_cm is None or abs(margin_cm - 2.0) > 0.2:
+            failures.append({"type": "route_docx_style_profile_bad_margin", "margin_cm": style_profile.get("margin_cm")})
+        if line_spacing is None or not (1.0 <= line_spacing <= 1.2):
+            failures.append({"type": "route_docx_style_profile_bad_line_spacing", "line_spacing": style_profile.get("line_spacing")})
+        if style_profile.get("body_alignment") != "left":
+            failures.append({"type": "route_docx_style_profile_body_not_left", "body_alignment": style_profile.get("body_alignment")})
+        if style_profile.get("lecture_page_breaks") is not True:
+            failures.append({"type": "route_docx_style_profile_missing_lecture_page_breaks"})
+
+    render_decisions = plan.get("render_decisions", [])
+    if not isinstance(render_decisions, list):
+        failures.append({"type": "render_decisions_not_list"})
+        render_decisions = []
+    hidden_fields = {
+        str(item.get("source_field") or "")
+        for item in render_decisions
+        if isinstance(item, dict) and item.get("decision") == "hide_internal_field"
+    }
+    for internal_field in ["exam_specificity", "core_exam_claim", "exam_use", "common_error_or_trap", "must_master"]:
+        if internal_field not in hidden_fields:
+            failures.append({"type": "internal_field_missing_hide_render_decision", "field": internal_field})
+
+    bindings = plan.get("point_coverage_bindings", [])
+    if not isinstance(bindings, list) or not bindings:
+        failures.append({"type": "point_coverage_bindings_empty"})
+        bindings = []
+    for binding in bindings:
+        if not isinstance(binding, dict):
+            failures.append({"type": "point_coverage_binding_not_object"})
+            continue
+        if binding.get("point_id") not in point_ids:
+            failures.append({"type": "point_coverage_binding_unknown_point", "point_id": binding.get("point_id")})
+        if not non_empty_list(binding.get("covered_atomic_units")):
+            failures.append({"type": "point_coverage_binding_missing_atomic_coverage", "point_id": binding.get("point_id")})
+        if binding.get("protected_items_preserved") is not True:
+            failures.append({"type": "point_coverage_binding_protected_items_not_preserved", "point_id": binding.get("point_id")})
+        if binding.get("qa_status") not in ALLOWED_QA_STATUS:
+            failures.append({"type": "point_coverage_binding_invalid_qa_status", "point_id": binding.get("point_id"), "qa_status": binding.get("qa_status")})
+
+    ledger_binding = plan.get("atomic_knowledge_ledger_binding", {})
+    if isinstance(ledger_binding, dict) and ledger_binding.get("missing_units"):
+        failures.append({"type": "atomic_knowledge_ledger_binding_has_missing_units", "missing_units": ledger_binding.get("missing_units")})
 
     baseline = plan.get("source_baseline_binding", {})
     if not isinstance(baseline, dict):
@@ -178,6 +338,8 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             "course_sections": len(plan.get("course_sections", [])) if isinstance(plan.get("course_sections"), list) else 0,
             "lecture_mapping": len(plan.get("lecture_mapping", [])) if isinstance(plan.get("lecture_mapping"), list) else 0,
             "knowledge_cards": len(cards),
+            "public_output_points": len(points),
+            "point_coverage_bindings": len(bindings),
             "content_coverage_checks": len(checks) if isinstance(checks, list) else 0,
         },
         "failures": failures,

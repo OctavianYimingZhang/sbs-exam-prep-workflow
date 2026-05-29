@@ -9,7 +9,7 @@ This route is not a slide paraphrase, a chatty tutor explanation, a prediction f
 Accept any readable, ordered course-note source, but do not give every source the same authority.
 
 ```text
-CourseContentSource -> OrderedContentItem -> SourceFragment -> AtomicKnowledgeLedger -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> ExamOverlayPass -> PrepArtifact
+CourseContentSource -> OrderedContentItem -> SourceFragment -> AtomicKnowledgeLedger -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> PublicOutputPoint -> ExamOverlayPass -> PrepArtifact
 ```
 
 The route reconstructs the course knowledge architecture and writes a protected source-first baseline before any exam overlay is allowed to affect density, order, priority, or add-ons. Source order is used to infer prerequisites, teaching intent, and causal development, not to force the final notes to preserve the original note sequence when a better exam logic exists.
@@ -56,10 +56,14 @@ Run the route in this order:
 11. Apply `ExamOverlayPass` to priority, density, ordering, examples, traps, and question-type add-ons.
 12. Run `OverlayDidNotDamageCoverageQA`.
 13. Build the `KnowledgeOnlyStudentView` filter.
-14. Generate integrated Academic Exam-Ready Notes.
-15. Append a question-type add-on layer only when useful or requested.
-16. Add optional visual aids only after the text is source-backed.
-17. Run `exam_prep_docx_style_linter`, `exam_prep_notes_linter`, plus student-output, evidence, language, DOCX, and helper-file boundary QA.
+14. Select the `OutputLanguageProfile` from the user request and source languages.
+15. Select the route-specific `RouteDocxStyleProfile`.
+16. Build `PublicOutputPoint` and `PublicPointBlock` objects from the internal cards.
+17. Bind protected atomic items to public points with `PointCoverageBinding`.
+18. Generate integrated Academic Exam-Ready Notes from public points only.
+19. Append a question-type add-on layer only when useful or requested.
+20. Add optional visual aids only after the text is source-backed.
+21. Run public-point, output-language, route-style, exam-prep-notes, student-output, evidence, DOCX, and helper-file boundary QA.
 
 Exam evidence may add, split, reorder, prioritise, densify, and enrich. Exam evidence must not delete, hide, or over-compress protected source-backed modules.
 
@@ -214,7 +218,7 @@ Allowed public top matter:
 - lecture/topic mapping;
 - one short sentence on how the knowledge is organised.
 
-Exam information may appear only inside module-level `Exam Use`, and only when it helps apply the knowledge. Do not expose exam timing, marks, paper comparability, source limitations, or audit caveats inside `Exam Use`.
+Generic exam advice stays internal. A concrete graph-reading rule, calculation operation, case-study decision rule, or answer-shaping rule may appear only when it adds knowledge; otherwise it belongs in a question-type add-on. Do not expose exam timing, marks, paper comparability, source limitations, or audit caveats.
 
 ## Background Demotion Rule
 
@@ -242,7 +246,7 @@ Do not merge the following into one dense paragraph:
 
 If a source section contains a list, preserve it as a numbered or bulleted list when the list itself is examinable.
 
-If a source gives a named example, include it under `Canonical Example` unless the example is clearly decorative.
+If a source gives a named example, include it as an `Example` block unless the example is clearly decorative.
 
 ## Module Density Floor
 
@@ -253,7 +257,7 @@ For each lecture or PPT file:
 - every major source heading must become either a module or a named submodule;
 - every protected list must be preserved as a list;
 - every named method must receive a module or submodule;
-- every named example must appear under `Canonical Example`;
+- every named example must appear as an Example block or named example submodule;
 - every diagram, table, equation, or workflow that teaches knowledge must be explained;
 - no module may combine more than one definition set, mechanism, criteria list, method workflow, named example, graph, or calculation logic unless each receives its own visible subheading.
 
@@ -271,35 +275,21 @@ Fail QA when broad cards replace lecture-level coverage.
 Use a Word-first structure that reads as revision notes, not an audit:
 
 ```text
-Title Page
+Title
 Course Knowledge Map
-Knowledge Sections
-Section: [Knowledge Section Title]
-Section Knowledge Function
-Lecture Coverage
-Core Conceptual Threads
 Lecture [Number or Name]
-Lecture Function Within Section
-Lecture-Level Module Map
-Module: [Title]
-Priority: ★★★ | ★★ | ★
-Exam Specificity
-Core Exam Claim
-Key Definitions
-Exam-Ready Knowledge Synthesis
-Criteria / Components / Steps
-Mechanism / Process Logic
-Canonical Example
-Exam Use
-Common Error / Trap
-Must Master
+[★★★ | ★★ | ★] [Public Point Title]
+[Main explanation]
+[Definitions / Criteria / Steps / Mechanism / Equation / Calculation Logic / Graph Logic / Comparison / Example / Limitation blocks as needed]
 Question-Type Add-On Layer
 Optional Visual Aid
 ```
 
-Omit headings that add no value for a specific source set. Do not expose internal evidence fields.
+Internal card fields guide planning and QA. They are not public headings. Ordinary Academic Exam-Ready Notes must not render headings named `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, or `Must Master`.
 
-The internal `ExamPrepNotesPlan` must use structured course sections, lecture mapping, source-backed knowledge cards, official definition records, source-baseline binding, exam-emphasis binding, exam-overlay binding, question-type add-ons, content-coverage checks, QA flags, and a visible-output field filter. Every student-visible knowledge card must have source support, one visible star priority label, exam specificity, source-baseline card binding, protected-source coverage, must-master points, and a coverage status.
+Render only knowledge-bearing blocks. If a planned `Exam Use` contains only generic advice such as how to use a module in an answer, suppress it. If a planned trap contains a real distinction, integrate it into a Comparison or Limitation block.
+
+The internal `ExamPrepNotesPlan` must use structured course sections, lecture mapping, source-backed internal knowledge cards, public output points, official definition records, source-baseline binding, exam-emphasis binding, exam-overlay binding, output-language profile, route DOCX style profile, render decisions, point coverage bindings, question-type add-ons, content-coverage checks, QA flags, and a visible-output field filter. Every public output point must have source support, one visible star priority label, a point kind, protected atomic coverage, and a coverage binding.
 
 Priority meanings:
 
@@ -307,11 +297,29 @@ Priority meanings:
 - `★★` = supporting examinable knowledge: useful for explanation, comparison, justification, or transfer.
 - `★` = background/context: useful framing only; keep brief unless directly tested.
 
-For ordinary Academic Exam-Ready Notes, the public DOCX is a knowledge document, not an exam-format audit. The Skill must first decompose all official source material into an `AtomicKnowledgeLedger`, exclude administrative items from student output, preserve every source-backed knowledge item in a baseline module or named submodule, and only then apply exam evidence as module-level `Exam Use`, priority, and density adjustment. Past papers may change emphasis; they must not define the factual boundary of the notes.
+## Route DOCX Style
 
-## Academic Exam-Ready Notes Language
+`exam_prep_notes_docx` uses compact revision-note formatting, not essay-submission formatting:
 
-Prefer:
+```yaml
+RouteDocxStyleProfile:
+  route: exam_prep_notes_docx
+  margin_cm: 2.0
+  line_spacing: 1.05-1.15
+  body_alignment: left
+  body_font_pt: 10.5
+  heading_font_pt: 12
+  lecture_heading_font_pt: 14
+  lecture_page_breaks: true
+```
+
+Every lecture starts on a new page. Body text is left-aligned. The 2.5 cm margin, 1.5 line spacing, and justified-body format belongs to `example_essay_docx`, not ordinary Academic Exam-Ready Notes.
+
+For ordinary Academic Exam-Ready Notes, the public DOCX is a knowledge document, not an exam-format audit. The Skill must first decompose all official source material into an `AtomicKnowledgeLedger`, exclude administrative items from student output, preserve every source-backed knowledge item in a baseline module or named submodule, and only then apply exam evidence as priority, density, ordering, and add-on guidance. Past papers may change emphasis; they must not define the factual boundary of the notes.
+
+## Academic Exam-Ready Notes Prose Policy
+
+Use these as internal planning functions, not required public headings:
 
 - `Core Exam Claim`;
 - `Key Definitions`;
@@ -323,6 +331,8 @@ Prefer:
 - `Common Error / Trap`;
 - `Must Master`.
 
+Public labels should be localized, source-language matched, or suppressed according to `OutputLanguageProfile`. The Skill must not restrict ordinary outputs to English. If the user requests a language, use it; otherwise follow the dominant source-pack language and preserve mixed technical wording when it improves accuracy.
+
 Avoid:
 
 - `In this section we will learn...`;
@@ -331,7 +341,7 @@ Avoid:
 - `You should understand...`;
 - page-by-page or slide-by-slide narration.
 
-The writing should start with the examinable claim or problem, then explain mechanism, evidence, scope, limitation, and exam use.
+The writing should start with the examinable claim or problem, then explain mechanism, evidence, scope, limitation, and concrete application where it adds knowledge.
 
 ## Question-Type Add-On Layer
 

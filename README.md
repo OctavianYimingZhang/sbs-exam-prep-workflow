@@ -35,10 +35,10 @@ Example Essay outputs are revision exemplars whose language, structure, formatti
 The Skill is designed around one first-principles chain:
 
 ```text
-inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> exam overlay -> preparation output
+inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> public output points -> exam overlay -> preparation output
 ```
 
-It is not a topic-hotness predictor. Frequency and recency are useful signals, but they may adjust density and `Exam Use` only after source-backed knowledge coverage is locked.
+It is not a topic-hotness predictor. Frequency and recency are useful signals, but they may adjust priority, density, order, and add-ons only after source-backed knowledge coverage is locked.
 
 For any non-trivial run, the Skill uses a typed planning chain before generation:
 
@@ -85,10 +85,11 @@ benchmarks/ and tests/ -> sanitized fixtures that validate generic behaviour onl
 3. Convert source fragments into reconstructed course sections, knowledge points, and an `AtomicKnowledgeLedger`.
 4. Build a source-first baseline and run coverage-floor QA before loading past-paper evidence.
 5. When formal papers are present, extract question records and archetypes as optional evidence modules for emphasis and answer operations.
-6. Apply the exam overlay only to priority, density, ordering, examples, traps, and module-level `Exam Use`.
-7. Filter the public view to `Course Knowledge Map` plus knowledge modules only.
-8. Convert examples and feedback into `ExampleReviewLedger` records, transferable-rule synthesis, rule-promotion QA, and example-transfer linting before any production rule changes.
-9. Run DOCX style, coverage, example-transfer, student-output, and helper-file QA so unsupported claims and process helper files do not enter the final public output.
+6. Apply the exam overlay only to priority, density, ordering, examples, traps, and question-type add-ons.
+7. Filter the public view to `Course Knowledge Map`, lecture headings, and compact public output points.
+8. Select output-language and route-specific DOCX style profiles before rendering.
+9. Convert examples and feedback into `ExampleReviewLedger` records, transferable-rule synthesis, rule-promotion QA, and example-transfer linting before any production rule changes.
+10. Run public-point, output-language, DOCX style, coverage, example-transfer, student-output, and helper-file QA so unsupported claims and process helper files do not enter the final public output.
 
 ## Quick Start
 
@@ -338,7 +339,11 @@ The full policy is in [`references/student_facing_output_policy.md`](references/
 
 ## Exam Prep Notes And Knowledge Walkthrough
 
-The `exam_prep_notes_docx` route is the default for general revision. It accepts readable ordered course notes, verifies source authority, reconstructs course sections, maps lecture sessions, creates a source-first baseline plan, runs protected coverage QA, applies any exam overlay, writes Academic Exam-Ready Notes, and may append question-type add-ons after the base notes. It does not create helper files in the student-facing folder.
+The `exam_prep_notes_docx` route is the default for general revision. It accepts readable ordered course notes, verifies source authority, reconstructs course sections, maps lecture sessions, creates a source-first baseline plan, runs protected coverage QA, applies any exam overlay, converts internal cards into compact `PublicOutputPoint` blocks, writes Academic Exam-Ready Notes, and may append question-type add-ons after the base notes. It does not create helper files in the student-facing folder.
+
+Ordinary Academic Exam-Ready Notes do not expose the internal card scaffold. They render by lecture, with each lecture on a new page, visible star priority labels, compact public point titles, main explanations, and only knowledge-bearing blocks such as Definitions, Criteria, Steps, Mechanism, Equation, Calculation Logic, Graph Logic, Comparison, Example, and Limitation. Headings such as `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, and `Must Master` stay internal unless the user requests a question-type add-on or trap/checklist output.
+
+The exam-prep notes DOCX style is route-specific: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX output keeps its separate essay-submission format.
 
 The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It does not predict papers, write essays, or create practice packs by default.
 

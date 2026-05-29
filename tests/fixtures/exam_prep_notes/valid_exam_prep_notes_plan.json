@@ -24,6 +24,7 @@
       "card_id": "card_001",
       "kp_id": "kp_001",
       "section_id": "section_001",
+      "lecture_session_id": "lecture_001",
       "module_id": "module_001",
       "module_title": "Generic mechanism as a source-backed causal module",
       "source_baseline_card_id": "baseline_card_001",
@@ -42,6 +43,109 @@
       "source_anchors": ["fake_lecture.txt:1"],
       "coverage_status": "tested",
       "student_visible": true
+    }
+  ],
+  "public_output_points": [
+    {
+      "point_id": "public_point_001",
+      "lecture_session_id": "lecture_001",
+      "source_card_ids": ["card_001"],
+      "point_title": "Generic mechanism as a source-backed causal module",
+      "priority": "★★★",
+      "point_kind": "mechanism",
+      "main_text": "A source-backed mechanism links input, process, output, and limitation. The examinable knowledge is the causal link between mechanism and output, with the limitation stated explicitly.",
+      "blocks": [
+        {
+          "block_type": "definitions",
+          "label": "Definitions",
+          "content": ["A mechanism is a source-backed causal explanation from input to output."],
+          "covered_atomic_units": ["aku_definition"]
+        },
+        {
+          "block_type": "criteria",
+          "label": "Criteria",
+          "content": ["Identify input.", "Explain process.", "State output.", "State limitation."],
+          "covered_atomic_units": ["aku_steps"]
+        },
+        {
+          "block_type": "mechanism",
+          "label": "Mechanism",
+          "content": "Input changes the mechanism; the mechanism changes the readout; the limitation defines scope.",
+          "covered_atomic_units": ["aku_mechanism"]
+        },
+        {
+          "block_type": "example",
+          "label": "Example",
+          "content": "A source-backed example demonstrates the same causal chain without adding unsupported detail.",
+          "covered_atomic_units": ["aku_example"]
+        }
+      ],
+      "covered_atomic_units": ["aku_definition", "aku_steps", "aku_mechanism", "aku_example"]
+    }
+  ],
+  "output_language_profile": {
+    "requested_language": null,
+    "source_languages": ["English"],
+    "output_language_policy": ["follow_primary_source_language"],
+    "public_label_policy": ["localized_labels"],
+    "allow_mixed_language": true
+  },
+  "route_docx_style_profile": {
+    "route": "exam_prep_notes_docx",
+    "margin_cm": 2.0,
+    "line_spacing": 1.08,
+    "body_alignment": "left",
+    "body_font_pt": 10.5,
+    "heading_font_pt": 12,
+    "lecture_heading_font_pt": 14,
+    "text_color": "black",
+    "lecture_page_breaks": true
+  },
+  "render_decisions": [
+    {
+      "decision_id": "render_decision_001",
+      "source_field": "exam_specificity",
+      "decision": "hide_internal_field",
+      "public_point_id": "public_point_001",
+      "reason": "Exam specificity controls planning and priority, not ordinary note headings."
+    },
+    {
+      "decision_id": "render_decision_002",
+      "source_field": "core_exam_claim",
+      "decision": "hide_internal_field",
+      "public_point_id": "public_point_001",
+      "reason": "The claim is merged into compact public prose."
+    },
+    {
+      "decision_id": "render_decision_003",
+      "source_field": "exam_use",
+      "decision": "hide_internal_field",
+      "public_point_id": "public_point_001",
+      "reason": "Generic exam advice is not rendered in ordinary notes."
+    },
+    {
+      "decision_id": "render_decision_004",
+      "source_field": "common_error_or_trap",
+      "decision": "hide_internal_field",
+      "public_point_id": "public_point_001",
+      "reason": "Trap wording belongs in question-type add-ons unless requested."
+    },
+    {
+      "decision_id": "render_decision_005",
+      "source_field": "must_master",
+      "decision": "hide_internal_field",
+      "public_point_id": "public_point_001",
+      "reason": "Checklist content is integrated into public blocks instead of exposed as an internal heading."
+    }
+  ],
+  "point_coverage_bindings": [
+    {
+      "binding_id": "point_binding_001",
+      "point_id": "public_point_001",
+      "covered_atomic_units": ["aku_definition", "aku_steps", "aku_mechanism", "aku_example"],
+      "protected_items_preserved": true,
+      "missing_protected_items": [],
+      "qa_status": "pass"
     }
   ],
   "official_definition_records": [
@@ -92,8 +196,8 @@
       "message": "Every visible card has source support, star priority, exam specificity, protected coverage, and coverage status."
     }
   ],
-  "student_visible_structure": ["Course Knowledge Map", "Knowledge Section", "Module", "Core Exam Claim", "Canonical Example", "Exam Use"],
-  "forbidden_student_fields": ["source_anchor", "confidence", "examiner_operation"],
+  "student_visible_structure": ["Course Knowledge Map", "Lecture", "PublicOutputPoint", "Definitions", "Criteria", "Mechanism", "Example"],
+  "forbidden_student_fields": ["source_anchor", "confidence", "examiner_operation", "exam_specificity", "core_exam_claim", "exam_use", "common_error_or_trap", "must_master"],
   "qa_flags": [],
   "qa_status": "pass"
 }

@@ -46,7 +46,12 @@
           "no_mark_scheme",
           "coverage_note",
           "source_coverage",
-          "extraction_quality"
+          "extraction_quality",
+          "exam_specificity",
+          "core_exam_claim",
+          "exam_use",
+          "common_error_or_trap",
+          "must_master"
         ]
       }
     },
@@ -54,32 +59,67 @@
       "type": "object",
       "properties": {
         "course_knowledge_map": { "type": "string" },
-        "knowledge_sections": { "type": "array", "items": { "type": "string" } },
         "lecture_mapping": { "type": "array", "items": { "type": "string" } },
         "exam_ready_knowledge_notes": {
           "type": "array",
-          "items": { "$ref": "#/properties/exam_prep_knowledge_card" }
+          "items": { "$ref": "#/properties/public_output_point" }
         },
         "question_type_addons": { "type": "array", "items": { "type": "object" } },
         "optional_visual_aids": { "type": "array", "items": { "type": "string" } }
       },
       "additionalProperties": false
     },
-    "exam_prep_knowledge_card": {
+    "public_output_point": {
       "type": "object",
+      "required": ["point_title", "priority", "point_kind", "main_text", "blocks", "covered_atomic_units"],
       "properties": {
+        "point_title": { "type": "string" },
         "priority": { "enum": ["★★★", "★★", "★"] },
-        "module_title": { "type": "string" },
-        "exam_specificity": { "type": "string" },
-        "core_exam_claim": { "type": "string" },
-        "key_definitions": { "type": "array", "items": { "type": "string" } },
-        "exam_ready_knowledge_synthesis": { "type": "string" },
-        "criteria_components_steps": { "type": "array", "items": { "type": "string" } },
-        "mechanism_or_process_logic": { "type": "string" },
-        "canonical_example": { "type": "string" },
-        "exam_use": { "type": "string" },
-        "common_error_or_trap": { "type": "string" },
-        "must_master": { "type": "array", "items": { "type": "string" } }
+        "point_kind": {
+          "enum": [
+            "definition",
+            "mechanism",
+            "method_workflow",
+            "criteria_list",
+            "comparison",
+            "calculation",
+            "graph_or_data_interpretation",
+            "canonical_example",
+            "compact_background"
+          ]
+        },
+        "main_text": { "type": "string" },
+        "blocks": { "type": "array", "items": { "$ref": "#/properties/public_point_block" } },
+        "covered_atomic_units": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "public_point_block": {
+      "type": "object",
+      "required": ["block_type", "label", "content"],
+      "properties": {
+        "block_type": {
+          "enum": [
+            "definitions",
+            "key_points",
+            "criteria",
+            "steps",
+            "mechanism",
+            "equation",
+            "calculation_logic",
+            "graph_logic",
+            "comparison",
+            "example",
+            "limitation"
+          ]
+        },
+        "label": { "type": ["string", "null"] },
+        "content": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        }
       },
       "additionalProperties": false
     },

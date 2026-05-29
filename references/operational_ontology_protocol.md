@@ -3,7 +3,7 @@
 The Skill uses an operational ontology to control workflow, evidence permissions, and output generation. The ontology is not a topic taxonomy and not an embedding index. It is an object-link-action model:
 
 ```text
-SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> AtomicKnowledgeLedger -> CourseSection -> KnowledgePoint -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> ExamOverlayPass -> PrepArtifact -> QAFlag
+SkillConfig -> WorkflowPlan -> SourceDocument -> SourceFragment -> AtomicKnowledgeLedger -> CourseSection -> KnowledgePoint -> SourceBaselineNotesPlan -> KnowledgeOnlyStudentView -> PublicOutputPoint -> ExamOverlayPass -> PrepArtifact -> QAFlag
 ```
 
 ## Purpose
@@ -34,12 +34,13 @@ Validated semantic objects:
 CourseSection, LectureSession, LectureConceptModule, KnowledgePoint,
 AtomicKnowledgeLedger, SourceBaselineNotesPlan, KnowledgeOnlyStudentView,
 ExamEmphasisProfile, ExamOverlayPass, ExaminerOperation, QuestionArchetype, SlotGrammar,
-EvidenceClaim, ReadingSource, MethodBlock, QuestionTypeAddOn, VisualAidSpec,
+PublicOutputPoint, PublicPointBlock, OutputLanguageProfile, RouteDocxStyleProfile,
+RenderDecision, PointCoverageBinding, EvidenceClaim, ReadingSource, MethodBlock, QuestionTypeAddOn, VisualAidSpec,
 GeneratedVisualAid, QAFlag.
 
 Serving layer
 Student-facing artifacts:
-Academic Exam-Ready Notes DOCX, Lecture Knowledge Walkthrough DOCX, question-type DOCX reports,
+Academic Exam-Ready Notes DOCX rendered from public points, Lecture Knowledge Walkthrough DOCX, question-type DOCX reports,
 Essay Module Example Essays DOCX, direct answer, plus hidden
 diagnostics, lineage, and source audit when requested.
 ```
@@ -54,7 +55,7 @@ Core objects:
 
 - `UserExamPrepRequest`, `UserConstraint`, `SourceCoverageMap`, `GateResult`, `WorkflowPlan`, and `OutputView`: interaction-layer objects that select mode, plan actions, expose source coverage, and prevent hidden blockers.
 - `LectureModule` and `KnowledgeWalkthroughPlan`: compatibility lecture-review objects that preserve lecture order while converting slides or notes into conceptual modules.
-- `CourseSection`, `LectureSession`, `LectureConceptModule`, `AtomicKnowledgeLedger`, `SourceBaselineNotesPlan`, `KnowledgeOnlyStudentView`, `ExamEmphasisProfile`, `ExamOverlayPass`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure, decompose source blocks into atomic units, protect source-first baseline coverage, filter public output to knowledge-only content, then apply exam overlay before writing.
+- `CourseSection`, `LectureSession`, `LectureConceptModule`, `AtomicKnowledgeLedger`, `AtomicKnowledgeUnit`, `SourceBaselineNotesPlan`, `KnowledgeOnlyStudentView`, `PublicOutputPoint`, `PublicPointBlock`, `OutputLanguageProfile`, `RouteDocxStyleProfile`, `RenderDecision`, `PointCoverageBinding`, `ExamEmphasisProfile`, `ExamOverlayPass`, and `ExamPrepNotesPlan`: default Academic Exam-Ready Notes objects that reconstruct source-backed course structure, decompose source blocks into protected atomic items, protect source-first baseline coverage, filter public output to knowledge-only content, localize or suppress public labels, select compact route style, then apply exam overlay before writing.
 - `QuestionTypeAddOn`, `VisualAidSpec`, and `GeneratedVisualAid`: final-layer add-on objects that may extend notes without becoming factual authority.
 - `SourceDocument`: every uploaded or discovered file, with role, trust level, allowed evidence use, and extraction status.
 - `ExampleReviewLedger`, `TransferableRuleSet`, `NonTransferableContentBlocklist`, and `ExampleTransferQA`: internal example-learning objects that require good/bad analysis, block example-specific content, and gate rule promotion before production changes.
@@ -125,12 +126,23 @@ SourceFragment SUPPORTS_COURSE_SECTION CourseSection
 LectureSession HAS_LECTURE_CONCEPT_MODULE LectureConceptModule
 KnowledgePoint MAPS_KP_TO_EXAM_EMPHASIS ExamEmphasisProfile
 AtomicKnowledgeLedger LEDGER_DECOMPOSES_FRAGMENT SourceFragment
+AtomicKnowledgeLedger LEDGER_HAS_ATOMIC_UNIT AtomicKnowledgeUnit
 AtomicKnowledgeLedger LEDGER_BINDS_KP KnowledgePoint
 SourceBaselineNotesPlan BASELINE_USES_ATOMIC_LEDGER AtomicKnowledgeLedger
 SourceBaselineNotesPlan BASELINE_COVERS_KP KnowledgePoint
 ExamOverlayPass OVERLAY_USES_BASELINE SourceBaselineNotesPlan
 KnowledgeOnlyStudentView VIEW_FILTERS_BASELINE SourceBaselineNotesPlan
 KnowledgeOnlyStudentView VIEW_APPLIES_OVERLAY ExamOverlayPass
+KnowledgeOnlyStudentView VIEW_SELECTS_PUBLIC_POINT PublicOutputPoint
+ExamPrepNotesPlan PLAN_HAS_PUBLIC_POINT PublicOutputPoint
+PublicOutputPoint PUBLIC_POINT_HAS_BLOCK PublicPointBlock
+PublicOutputPoint PUBLIC_POINT_COVERS_ATOMIC_UNIT AtomicKnowledgeUnit
+PublicPointBlock PUBLIC_BLOCK_COVERS_ATOMIC_UNIT AtomicKnowledgeUnit
+OutputView OUTPUT_VIEW_USES_LANGUAGE_PROFILE OutputLanguageProfile
+PrepArtifact PREP_ARTIFACT_USES_DOCX_STYLE_PROFILE RouteDocxStyleProfile
+RenderDecision RENDER_DECISION_HIDES_INTERNAL_FIELD ExamPrepNotesPlan
+RenderDecision RENDER_DECISION_RENDERS_BLOCK PublicPointBlock
+PointCoverageBinding POINT_COVERAGE_BINDS_PUBLIC_POINT PublicOutputPoint
 ExamPrepNotesPlan PLAN_USES_SOURCE_BASELINE SourceBaselineNotesPlan
 ExamPrepNotesPlan PLAN_USES_EXAM_OVERLAY ExamOverlayPass
 KnowledgePoint SUPPORTS_CLAIM EvidenceClaim
@@ -191,6 +203,12 @@ BuildExamEmphasisProfile
 ApplyExamOverlayPass
 RunOverlayCoverageQA
 BuildKnowledgeOnlyStudentView
+SelectOutputLanguageProfile
+SelectRouteDocxStyleProfile
+BuildPublicOutputPoints
+BindAtomicItemsToPublicPoints
+LintPublicOutputPoints
+LintOutputLanguageNeutrality
 BuildExamPrepNotesPlan
 BuildQuestionTypeAddOns
 PlanVisualAid
@@ -246,13 +264,7 @@ internal objects + selected output mode + allowed visible fields + forbidden vis
 Academic Exam-Ready Notes query:
 
 ```text
-course knowledge map + knowledge sections + lecture mapping + atomic ledger + source baseline + knowledge-only student view + exam overlay + knowledge cards + question-type add-ons + optional visual aids + forbidden student fields
-```
-
-Academic Exam-Ready Notes query:
-
-```text
-course sections + lecture mapping + knowledge cards + exam emphasis profile + question-type add-ons + optional visual aids + forbidden student fields
+course knowledge map + lecture mapping + atomic ledger + source baseline + knowledge-only student view + output language profile + route DOCX style profile + public output points + public point blocks + point coverage bindings + render decisions + exam overlay + internal knowledge cards + question-type add-ons + optional visual aids + forbidden student fields
 ```
 
 Essay theme query:

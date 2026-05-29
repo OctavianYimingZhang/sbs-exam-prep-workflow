@@ -9,6 +9,11 @@
     "course_sections",
     "lecture_mapping",
     "knowledge_cards",
+    "public_output_points",
+    "output_language_profile",
+    "route_docx_style_profile",
+    "render_decisions",
+    "point_coverage_bindings",
     "official_definition_records",
     "atomic_knowledge_ledger_binding",
     "source_baseline_binding",
@@ -63,6 +68,7 @@
           "card_id",
           "kp_id",
           "section_id",
+          "lecture_session_id",
           "module_id",
           "module_title",
           "source_baseline_card_id",
@@ -70,7 +76,6 @@
           "exam_specificity",
           "core_exam_claim",
           "exam_ready_knowledge_synthesis",
-          "must_master",
           "protected_source_items_covered",
           "source_anchors",
           "coverage_status",
@@ -80,6 +85,7 @@
           "card_id": { "type": "string" },
           "kp_id": { "type": "string" },
           "section_id": { "type": "string" },
+          "lecture_session_id": { "type": "string", "minLength": 1 },
           "module_id": { "type": "string", "minLength": 1 },
           "module_title": { "type": "string", "minLength": 1 },
           "source_baseline_card_id": { "type": "string", "minLength": 1 },
@@ -114,6 +120,22 @@
         },
         "additionalProperties": false
       }
+    },
+    "public_output_points": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/PublicOutputPoint" }
+    },
+    "output_language_profile": { "$ref": "#/$defs/OutputLanguageProfile" },
+    "route_docx_style_profile": { "$ref": "#/$defs/RouteDocxStyleProfile" },
+    "render_decisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/RenderDecision" }
+    },
+    "point_coverage_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/PointCoverageBinding" }
     },
     "official_definition_records": {
       "type": "array",
@@ -204,6 +226,131 @@
     "forbidden_student_fields": { "type": "array", "items": { "type": "string" } },
     "qa_flags": { "type": "array", "items": { "type": "string" } },
     "qa_status": { "enum": ["pass", "warn", "block"] }
+  },
+  "$defs": {
+    "PublicPointBlock": {
+      "type": "object",
+      "required": ["block_type", "label", "content"],
+      "properties": {
+        "block_type": {
+          "enum": [
+            "definitions",
+            "key_points",
+            "criteria",
+            "steps",
+            "mechanism",
+            "equation",
+            "calculation_logic",
+            "graph_logic",
+            "comparison",
+            "example",
+            "limitation"
+          ]
+        },
+        "label": { "type": ["string", "null"] },
+        "content": {
+          "anyOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+          ]
+        },
+        "covered_atomic_units": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "PublicOutputPoint": {
+      "type": "object",
+      "required": ["point_id", "lecture_session_id", "point_title", "priority", "point_kind", "main_text", "blocks", "covered_atomic_units"],
+      "properties": {
+        "point_id": { "type": "string", "minLength": 1 },
+        "lecture_session_id": { "type": "string", "minLength": 1 },
+        "source_card_ids": { "type": "array", "items": { "type": "string" } },
+        "point_title": { "type": "string", "minLength": 1 },
+        "priority": { "enum": ["★★★", "★★", "★"] },
+        "point_kind": {
+          "enum": [
+            "definition",
+            "mechanism",
+            "method_workflow",
+            "criteria_list",
+            "comparison",
+            "calculation",
+            "graph_or_data_interpretation",
+            "canonical_example",
+            "compact_background"
+          ]
+        },
+        "main_text": { "type": "string", "minLength": 1 },
+        "blocks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/PublicPointBlock" }
+        },
+        "covered_atomic_units": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      },
+      "additionalProperties": false
+    },
+    "OutputLanguageProfile": {
+      "type": "object",
+      "required": ["requested_language", "source_languages", "output_language_policy", "public_label_policy", "allow_mixed_language"],
+      "properties": {
+        "requested_language": { "type": ["string", "null"] },
+        "source_languages": { "type": "array", "items": { "type": "string" } },
+        "output_language_policy": {
+          "type": "array",
+          "items": { "enum": ["follow_user_request", "follow_primary_source_language", "preserve_mixed_language"] },
+          "minItems": 1
+        },
+        "public_label_policy": {
+          "type": "array",
+          "items": { "enum": ["localized_labels", "suppress_nonessential_labels", "source_language_labels"] },
+          "minItems": 1
+        },
+        "allow_mixed_language": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "RouteDocxStyleProfile": {
+      "type": "object",
+      "required": ["route", "margin_cm", "line_spacing", "body_alignment", "body_font_pt", "heading_font_pt", "lecture_heading_font_pt", "lecture_page_breaks"],
+      "properties": {
+        "route": { "enum": ["exam_prep_notes_docx"] },
+        "margin_cm": { "type": "number", "minimum": 1.8, "maximum": 2.2 },
+        "line_spacing": { "type": "number", "minimum": 1.0, "maximum": 1.2 },
+        "body_alignment": { "const": "left" },
+        "body_font_pt": { "type": "number", "minimum": 9.0, "maximum": 11.5 },
+        "heading_font_pt": { "type": "number", "minimum": 11.0, "maximum": 13.0 },
+        "lecture_heading_font_pt": { "type": "number", "minimum": 13.0, "maximum": 15.0 },
+        "text_color": { "const": "black" },
+        "lecture_page_breaks": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "RenderDecision": {
+      "type": "object",
+      "required": ["decision_id", "source_field", "decision", "reason"],
+      "properties": {
+        "decision_id": { "type": "string" },
+        "source_field": { "type": "string" },
+        "decision": { "enum": ["hide_internal_field", "render_as_public_block", "suppress_nonessential_label"] },
+        "public_point_id": { "type": "string" },
+        "block_type": { "type": "string" },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "PointCoverageBinding": {
+      "type": "object",
+      "required": ["binding_id", "point_id", "covered_atomic_units", "protected_items_preserved", "qa_status"],
+      "properties": {
+        "binding_id": { "type": "string" },
+        "point_id": { "type": "string" },
+        "covered_atomic_units": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "protected_items_preserved": { "type": "boolean" },
+        "missing_protected_items": { "type": "array", "items": { "type": "string" } },
+        "qa_status": { "enum": ["pass", "warn", "block"] }
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": true
 }
