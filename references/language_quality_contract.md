@@ -80,6 +80,7 @@ Do not solve weak analysis by adding a decorative sentence at the end. Integrate
 - Use citations only for non-obvious facts, theories, mechanisms, methods, evidence, data, or broad generalisations.
 - Calibrate citation strength. Use `supports`, `implicates`, `is consistent with`, or `contributes to` unless the verified source directly proves causality.
 - Avoid citation stacking; one precise citation is usually better than several weakly connected citations.
+- Keep academic paper author names inside parenthetical in-text citations. Do not make a paper's authors the subject of an ordinary explanatory sentence unless the user explicitly requests literature-history narration.
 - Do not invent statistics, dates, mechanisms, source names, quotations, or citations.
 - If the user supplies no Example Essay citations, cite only sources found by slide-citation mining or verified classic-experiment fallback; never cite from memory.
 - Conclude by synthesis. Do not add new evidence in the conclusion.
@@ -103,6 +104,7 @@ Reject or rewrite paragraphs that:
 - hide uncertainty behind confident language;
 - turn supporting or associative evidence into a single-cause claim;
 - use a citation copied from lecture slides without verifying the original source when source-derived content is included.
+- turn academic-paper attribution into author-led prose when a parenthetical author-year citation would support the same content more cleanly;
 - include a list of named channels, receptors, genes, cell classes, methods, examples, firms, or pathways without explaining what the list proves or distinguishes;
 - use true but unneeded detail that makes the answer more encyclopedic but less exam-efficient;
 - compress wording so that a modulating, gating, entraining, stabilising, supporting, or associative mechanism becomes the primary generator or proof.

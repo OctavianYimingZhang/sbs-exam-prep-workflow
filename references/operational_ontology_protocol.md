@@ -68,7 +68,7 @@ Core objects:
 - `QuestionArchetype`: recurrent question-family skeleton with slot grammar.
 - `EvidenceClaim`: answer claim with source anchors and support strength.
 - `ReadingSource`: recommended book, paper, DOI/PubMed/publisher record, or verified academic source.
-- `PracticalOperation`, `MethodBlock`, `MCQScoringPolicy`, `ShortAnswerVariant`, and `EssayCoveragePlan`: type-specific preparation objects.
+- `PracticalOperation`, `MethodBlock`, `MCQScoringPolicy`, `ShortAnswerVariant`, and `EssayCoveragePlan`: type-specific preparation objects. Essay outputs that use academic paper evidence must run citation rendering QA so author-year attribution stays parenthetical in normal public prose.
 - `PrepArtifact`: student-facing or internal output.
 - `QAFlag`: blocking or warning condition.
 - `WorkflowRun`: modules run, modules skipped, outputs created, and QA summary.
@@ -226,6 +226,7 @@ GenerateShortAnswerVariants
 BuildEssayCoveragePlan
 MapKPToArchetype
 VerifyReadingSource
+RunCitationRenderingGate
 GeneratePrepArtifact
 GenerateExamPrepNotesDocx
 LintExamPrepNotes

@@ -5,6 +5,14 @@
   "type": "object",
   "required": ["essays"],
   "properties": {
+    "citation_rendering_policy": {
+      "type": "object",
+      "properties": {
+        "academic_paper_author_display": { "enum": ["parenthetical_author_year_only"] },
+        "author_led_prose_allowed": { "const": false }
+      },
+      "additionalProperties": true
+    },
     "essays": {
       "type": "array",
       "items": {
@@ -16,6 +24,14 @@
           "title": { "type": "string" },
           "subtitle": { "type": ["string", "null"] },
           "target_group_key": { "type": ["string", "null"] },
+          "citation_rendering_policy": {
+            "type": ["object", "null"],
+            "properties": {
+              "academic_paper_author_display": { "enum": ["parenthetical_author_year_only"] },
+              "author_led_prose_allowed": { "const": false }
+            },
+            "additionalProperties": true
+          },
           "lecture_anchors": { "type": "array" },
           "compression_budget": {
             "type": ["object", "null"],

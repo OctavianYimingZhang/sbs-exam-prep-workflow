@@ -39,6 +39,12 @@
       "text": "The review supports inflammation as the single cause of the syndrome, so all other mechanisms can be treated as secondary. This overstates source strength and collapses a multi-hit mechanism into one cause."
     },
     {
+      "id": "author_led_citation_prose_bad",
+      "expected": "fail",
+      "has_lecture_anchor": true,
+      "text": "Martinez et al. identified a pathway regulator that changes the interpretation of the mechanism. The content may be relevant, but the author name has become the sentence subject instead of staying inside a parenthetical citation."
+    },
+    {
       "id": "channel_catalogue_bad",
       "expected": "fail",
       "has_lecture_anchor": true,
@@ -116,6 +122,12 @@
       "expected": "pass",
       "has_lecture_anchor": true,
       "text": "The strongest evidence for spinal CPGs is that rhythmic flexor-extensor alternation persists when limb-derived sensory reafference is removed. In Graham Brown's decerebrate cat experiments, descending influence was reduced, the limb was fixed, and dorsal roots were cut, yet alternating activity still emerged between flexor tibialis anterior and extensor gastrocnemius. The result separates rhythm generation from rhythm adjustment because the core timing survives without the sensory events that normally tune phase and load."
+    },
+    {
+      "id": "parenthetical_citation_good",
+      "expected": "pass",
+      "has_lecture_anchor": true,
+      "text": "The extra source should sharpen the mechanism without making the paper itself the topic. A pathway regulator changes the interpretation because it separates the upstream trigger from the downstream response, so the sentence stays focused on the biological claim and places source attribution at the end (Martinez et al., 2021)."
     },
     {
       "id": "direct_positive_claim_good",

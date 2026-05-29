@@ -86,6 +86,7 @@ def main() -> int:
         tmp_dir = Path(tmp)
         positive_dir = tmp_dir / "positive_docx"
         negative_dir = tmp_dir / "negative_docx"
+        author_led_citation_dir = tmp_dir / "author_led_citation_docx"
         deliverable_dir = tmp_dir / "deliverable_docx"
         deliverable_qa_dir = tmp_dir / "deliverable_docx_internal_qa"
         knowledge_walkthrough_dir = tmp_dir / "knowledge_walkthrough_docx"
@@ -621,6 +622,22 @@ def main() -> int:
                     "tests/fixtures/example_essay_docx/negative_source_plan.json",
                     "--output-dir",
                     str(negative_dir),
+                    "--clean",
+                    "--strict",
+                ],
+                expect_failure=True,
+            )
+        )
+        checks.append(
+            run_command(
+                "negative_docx_strict_rejects_author_led_citation_prose",
+                [
+                    py,
+                    "scripts/generate_example_essay_docx.py",
+                    "--plan",
+                    "tests/fixtures/example_essay_docx/author_led_citation_plan.json",
+                    "--output-dir",
+                    str(author_led_citation_dir),
                     "--clean",
                     "--strict",
                 ],

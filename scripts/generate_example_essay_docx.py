@@ -25,6 +25,8 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
+from citation_rendering_rules import author_led_citation_hits, is_parenthetical_author_year, parenthetical_author_year_hits
+
 
 BODY_KIND = {"body", "paragraph", "conclusion", "intro", "introduction", "mechanism", "evidence", "evaluation", "synthesis"}
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
@@ -138,13 +140,21 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
         kind = paragraph_kind(paragraph)
         if kind == "body" and not paragraph.get("lecture_anchors"):
             errors.append(f"paragraph_{idx}_missing_lecture_anchor")
+        paragraph_text = "".join(str(run.get("text", "")) for run in paragraph.get("text_runs", []))
+        if kind == "body":
+            for hit in author_led_citation_hits(paragraph_text):
+                errors.append(f"paragraph_{idx}_author_led_citation_prose:{hit}")
         for run_idx, run in enumerate(paragraph.get("text_runs", []), start=1):
             source_type = run.get("source_type")
             highlight = run.get("highlight", "none")
+            run_text = str(run.get("text", ""))
+            in_text_citation = run.get("in_text_citation")
+            if in_text_citation and not is_parenthetical_author_year(in_text_citation):
+                errors.append(f"paragraph_{idx}_run_{run_idx}_citation_must_be_parenthetical_author_year")
             if source_type in {"citation_original_source", "classic_experiment_source"}:
                 if highlight != "green":
                     errors.append(f"paragraph_{idx}_run_{run_idx}_{source_type}_requires_green")
-                if not run.get("in_text_citation") and not AUTHOR_YEAR_RE.search(str(run.get("text", ""))):
+                if not parenthetical_author_year_hits(run_text):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_green_run_missing_author_year")
                 if run.get("citation_original_read") is not True:
                     errors.append(f"paragraph_{idx}_run_{run_idx}_{source_type}_not_read")

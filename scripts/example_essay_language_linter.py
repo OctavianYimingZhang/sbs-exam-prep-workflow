@@ -16,6 +16,8 @@ try:
 except Exception:  # pragma: no cover
     Document = None
 
+from citation_rendering_rules import author_led_citation_hits
+
 
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?")
 SENTENCE_RE = re.compile(r"[^.!?]+[.!?]?")
@@ -358,6 +360,8 @@ def lint_paragraph(record: ParagraphRecord, min_words: int, max_words: int) -> t
 
     for hit in hit_patterns(text, SOURCE_TRACE + HOW_TO_WRITE):
         failures.append({"type": hit["type"], "phrase": hit["phrase"]})
+    for phrase in author_led_citation_hits(text):
+        failures.append({"type": "author_led_citation_prose", "phrase": phrase})
     if META_OPENERS.search(first):
         failures.append({"type": "generic_metacommentary_opener", "phrase": first[:120]})
     if record.has_lecture_anchor is False:

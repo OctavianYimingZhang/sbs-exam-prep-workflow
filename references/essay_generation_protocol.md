@@ -689,6 +689,8 @@ Avoid citation stacking. If several sources support the same general claim, keep
 
 Match claim strength to source strength. A study, review, or textbook section may support, implicate, refine, or constrain a mechanism without proving it as the sole cause. Do not write causal certainty unless the resolved source directly supports that level of certainty.
 
+Use parenthetical-only academic attribution in normal essay prose. Do not write the paper's authors as the sentence subject when the paragraph's purpose is to explain course content. Render the mechanism, evidence, limitation, or comparison first, then place the verified author-year citation in parentheses. Author-led narration is allowed only when the user explicitly asks for literature history, discovery chronology, or named-author attribution.
+
 ### Citation Fallback When The User Supplies No Citation List
 
 When the user asks for a complete Example Essay but does not provide citations:
@@ -733,6 +735,7 @@ For DOCX output:
 - uploaded extra-reading book content is yellow-highlighted;
 - read original sources cited by lecture material are green-highlighted and include author-year citations;
 - every highlighted run must map to a source anchor in the source map JSON.
+- academic paper attribution is parenthetical author-year only in public prose unless an explicit literature-history request makes author-led narration necessary.
 
 Do not highlight content whose source has not been verified.
 

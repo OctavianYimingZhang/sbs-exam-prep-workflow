@@ -98,6 +98,7 @@ Language rules:
 - Keep citations minimal and sufficient; support theory, mechanisms, data, experiments, or non-obvious generalisations.
 - Calibrate citation strength; do not write support, association, or mechanistic plausibility as sole-cause proof.
 - Do not cite-stack.
+- Keep academic paper author names inside parenthetical in-text citations in normal explanatory prose. Write the content claim first; do not make authors the sentence subject unless the user explicitly asks for literature-history narration.
 - Omit unsupported claims rather than inventing citations.
 - Conclude by synthesis, not by adding new content or listing every body-part conclusion.
 
@@ -121,6 +122,7 @@ Rules:
 - Yellow highlight is applied only to content derived from Extra Reading Books or chapters uploaded by the user.
 - Green highlight is applied only to content derived from original citation sources identified from lecture slides and then read or verified, or from verified classic-experiment fallback sources used because lecture slides contained no usable citations.
 - If a sentence uses a lecture-slide cited original source, include an author-year in-text citation and highlight the full cited-source-derived clause or sentence green, including the citation.
+- Citation-source clauses must use parenthetical author-year attribution. Do not render author-led prose such as `Author et al. showed...` as the public sentence shape unless the user explicitly requests discovery history or literature attribution.
 - If a sentence uses Extra Reading Books, highlight the extra-reading-derived phrase or sentence yellow.
 - If a paragraph contains both lecture content and extra-reading content, highlight only the extra-reading portion yellow.
 - If a paragraph contains both lecture content and cited-original-paper content, highlight only the cited-original-paper portion green.

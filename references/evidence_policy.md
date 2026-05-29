@@ -50,6 +50,7 @@ Lecture slides control the answer logic.
 Extra Reading Books may refine the answer but must not displace the lecture sequence.
 A citation printed on a slide is not enough. The cited original source must be resolved and read before any content from that source is inserted into the essay.
 Do not copy author-year citations from slides into the essay unless the cited source has been resolved and the relevant claim verified.
+In public essay prose, academic paper author names belong in parenthetical author-year citations, not as the subject of the explanatory sentence, unless the user explicitly requests literature-history narration.
 If a cited source cannot be read, omit source-derived details and flag the unresolved citation.
 If the user supplies no citations for an Example Essay, actively mine lecture slides for citations before searching externally.
 If relevant lecture slides contain no usable citations, find several verified classic experiments or landmark primary studies through academic search. Use them only when they directly support the lecture-grounded paragraph claim.

@@ -345,6 +345,8 @@ Ordinary Academic Exam-Ready Notes do not expose the internal card scaffold. The
 
 A knowledge-only rendering gate blocks generic advice in ordinary notes and compatibility walkthroughs. Public DOCX output should not contain `How To Answer`, `How To Use`, `Integrated reasoning`, `Integrated practical reasoning`, `Answer Logic`, `Exam Strategy`, `Recommended Approach`, `A strong answer should`, `Use this module`, or question-type reliability commentary; any real content inside those drafts must be rewritten as source-backed knowledge points or knowledge-bearing blocks.
 
+For Example Essay and Extra Reading citation-source prose, academic author names stay inside parenthetical author-year citations in normal public output. The sentence should state the content claim, mechanism, evidence, limitation, or comparison directly; author-led literature narration is reserved for explicit literature-history requests.
+
 The exam-prep notes DOCX style is route-specific: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX output keeps its separate essay-submission format.
 
 The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It uses the same compact lecture-note DOCX style as ordinary notes: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, stable headings, and lecture page breaks. It does not predict papers, write essays, or create practice packs by default.

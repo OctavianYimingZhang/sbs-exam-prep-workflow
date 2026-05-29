@@ -231,6 +231,7 @@ PRESET_MODULES = {
         "exam_prep_notes_linter",
         "essay_coverage_plan",
         "citation_resolution",
+        "citation_rendering_gate",
         "essay_module_example_essays_docx",
         "deliverable_qa",
     ],
@@ -626,6 +627,16 @@ MODULE_DEFS = {
         "minimum_inputs": ["lecture_or_official_notes"],
         "expected_outputs": ["ReadingSource", "EvidenceClaim"],
         "qa_checks": ["citation verified", "classic-study fallback if needed"],
+    },
+    "citation_rendering_gate": {
+        "action_type": "RunCitationRenderingGate",
+        "minimum_inputs": ["EvidenceClaim", "EssayCoveragePlan"],
+        "expected_outputs": ["QAFlag"],
+        "qa_checks": [
+            "academic paper attribution parenthetical only",
+            "author-led citation prose absent unless literature history explicitly requested",
+            "citation source claims remain content-first",
+        ],
     },
     "docx_generation": {
         "action_type": "GeneratePrepArtifact",

@@ -195,6 +195,7 @@ def validate(root: Path) -> dict[str, Any]:
         "transferable_rule_synthesis",
         "rule_promotion_gate",
         "example_transfer_linter",
+        "citation_rendering_gate",
     ]:
         if optional_module not in plan_text:
             failures.append({"type": "planner_missing_optional_module", "module": optional_module})
@@ -260,6 +261,18 @@ def validate(root: Path) -> dict[str, Any]:
             failures.append({"type": "knowledge_walkthrough_knowledge_only_gate_after_generation"})
         if walkthrough_order.get("knowledge_walkthrough_docx_style_linter", 999) < walkthrough_order.get("knowledge_walkthrough_docx_generation", 0):
             failures.append({"type": "knowledge_walkthrough_style_linter_before_generation"})
+        essay_modules = planner.modules_for_preset(
+            "essay_exam_prep",
+            {"any_source", "lecture_or_official_notes", "readable_course_notes"},
+            {"source_inputs": {"lecture_slides": ["fixture"]}},
+        )
+        essay_order = {module: index for index, module in enumerate(essay_modules)}
+        if "citation_rendering_gate" not in essay_order:
+            failures.append({"type": "essay_missing_citation_rendering_gate"})
+        if essay_order.get("citation_rendering_gate", 999) < essay_order.get("citation_resolution", 0):
+            failures.append({"type": "essay_citation_rendering_gate_before_citation_resolution"})
+        if essay_order.get("citation_rendering_gate", 999) > essay_order.get("essay_module_example_essays_docx", -1):
+            failures.append({"type": "essay_citation_rendering_gate_after_docx_generation"})
         walkthrough_style_modules = planner.modules_for_preset(
             "knowledge_walkthrough_docx",
             {"any_source", "lecture_or_official_notes", "readable_course_notes", "style_or_example_evidence"},
