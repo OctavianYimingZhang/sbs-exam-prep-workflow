@@ -108,7 +108,7 @@ AnalysisContext:
   style_exemplar:
     meaning: exemplar answer/image; style/structure/density only unless factual claims are verified
   layout_exemplar:
-    meaning: visual formatting example only
+    meaning: visual formatting example only; may update route style profile and DOCX style lint rules, never factual content
   benchmark_fixture:
     meaning: regression test case only
   unsupported_or_unreadable:
@@ -216,7 +216,7 @@ Old-regime papers may support concept coverage and possible slot fillers, but th
 - A PDF or paper resolved from a citation on a lecture slide must be classified as `citation_original_source`.
 - A classic or landmark primary experiment found because relevant lecture slides contain no usable citations must be classified as `classic_experiment_source` after verification and reading.
 - A bibliography/reference-list file supplied to resolve slide citations may be classified as `citation_reference_list`.
-- A user-uploaded formatting PDF or screenshot must be classified as `docx_format_reference` and used only for layout/style, not factual content.
+- A user-uploaded formatting PDF, screenshot, or previously generated DOCX supplied as a formatting reference must be classified as `docx_format_reference` or `layout_exemplar`. Use it only to derive transferable layout rules such as margin density, spacing, alignment, heading hierarchy, page-break policy, and label discipline; never use it as factual or prediction evidence.
 - A reasoned answer key must be classified by provenance where possible: official/lecturer, paper-with-answer, student, generated, or unknown. Use it for answer schema, rationale, distractor traps, and marking expectations, not direct prediction.
 - A practical protocol must be routed to practical/data/problem logic: aim, method principle, steps, readout, interpretation, control, limitation.
 - A reading list, course handbook, programme/advisement document, or suggestions file may identify reading recommendations or administrative constraints; it must not replace lecture content.

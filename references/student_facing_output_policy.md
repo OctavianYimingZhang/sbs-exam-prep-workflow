@@ -102,6 +102,7 @@ Compact Public Notes Rule:
 - Each lecture starts on a new page.
 - Group protected atomic items into readable public points using concise paragraphs, bullets, equations, examples, comparisons, and mechanism chains.
 - Coverage must be complete; formatting must be compact.
+- Compact lecture notes and compatibility walkthroughs use Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, and lecture page breaks. Essay-style 2.5 cm margins, 1.5 spacing, and justified body text are reserved for Example Essay outputs.
 
 Visible public point:
 

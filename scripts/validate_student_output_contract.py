@@ -93,6 +93,8 @@ def validate(root: Path) -> dict[str, Any]:
         "Canonical Example",
         "Exam Use",
         "★★★",
+        "RouteDocxStyleProfile",
+        "compact lecture-note formatting contract",
     ]:
         if term not in combined:
             failures.append({"type": "student_policy_missing_term", "term": term})
@@ -101,6 +103,14 @@ def validate(root: Path) -> dict[str, Any]:
             failures.append({"type": "student_policy_missing_forbidden_field", "field": field})
 
     contract = load_json(root / "schemas/student_output_contract.schema.json")
+    walkthrough_schema = load_json(root / "schemas/knowledge_walkthrough_plan.schema.json")
+    if "route_docx_style_profile" not in walkthrough_schema.get("required", []):
+        failures.append({"type": "knowledge_walkthrough_schema_missing_route_style_profile"})
+    style_profile = walkthrough_schema.get("properties", {}).get("route_docx_style_profile", {})
+    if style_profile.get("properties", {}).get("route", {}).get("const") != "knowledge_walkthrough_docx":
+        failures.append({"type": "knowledge_walkthrough_schema_bad_style_route"})
+    if style_profile.get("properties", {}).get("body_alignment", {}).get("const") != "left":
+        failures.append({"type": "knowledge_walkthrough_schema_body_not_left"})
     contract_text = json.dumps(contract, ensure_ascii=False)
     for legacy in ["必备", "重点", "补充"]:
         if legacy in policy + exam_prep_notes + contract_text:

@@ -24,7 +24,7 @@ Trigger this Skill for:
 Default behaviour:
 
 - If the user provides materials and asks to revise, make notes, go through the material, or prepare generally without naming a narrower artifact, select `exam_prep_notes_docx`. This route emits the compatible `Lecture_Knowledge_Walkthrough.docx` public artifact by building source-first baseline notes, running protected coverage QA, then applying an exam overlay.
-- Keep `knowledge_walkthrough_docx` as a compatibility route when the user explicitly asks for a lecture-first walkthrough in source order.
+- Keep `knowledge_walkthrough_docx` as a compatibility route when the user explicitly asks for a lecture-first walkthrough in source order; it must use the compact revision-note DOCX style, not the essay-submission style.
 - If the user asks for MCQ, Short Answer, Long Answer/Project/Scenario, Practical/Data, or Essay preparation, generate the Academic Exam-Ready Notes foundation unless the user explicitly opts out, then add the matching DOCX report.
 - If the user asks only for past-paper analysis, exam format, or likely emphasis before generation, produce a chat-only `exam_analysis_brief`; do not create a public prediction file.
 - For essay/problem-essay prediction language, use `Predicted essay theme` as the default label, not predicted question wording.
@@ -85,7 +85,7 @@ Evidence hierarchy:
 - Formal past papers define exam format, answer rules, question families, and current pattern evidence.
 - Practical materials, mocks, quizzes, answer keys, rubrics, and exemplars support operations, answer style, and practice planning only within their evidence limits.
 - Extra Reading recommendations, recommended books, lecture-cited originals, classic studies, and academic search results may enrich claims only after the relevant chapter, section, paper, DOI, PubMed record, publisher page, or textbook source is verified.
-- Student annotations, images, external examples, and benchmark fixtures may shape style, density, or workflow rules only; they are not factual authority for a new source set unless independently verified.
+- Student annotations, images, external examples, formatting references, and benchmark fixtures may shape style, density, layout, or workflow rules only; they are not factual authority for a new source set unless independently verified.
 
 Use the operational ontology in `ontology/ontology.json` and `references/operational_ontology_protocol.md` when multiple source roles, past-paper prediction, Example Essay source audits, or public artifacts require support-link validation.
 
@@ -99,7 +99,7 @@ Student-facing output filter:
 - Ordinary Academic Exam-Ready Notes render compact `PublicOutputPoint` blocks by lecture. Do not expose internal headings named `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, or `Must Master`.
 - Skill package files, fixtures, and protocol text are authored in English. This is a package-authoring convention, not a restriction on user-requested outputs.
 - Select an `OutputLanguageProfile` only to honor an explicit user language request or to keep default English labels. Do not infer or force multilingual output from mixed-language sources; if the user wants multilingual output, they must request it.
-- Select a route-specific DOCX style: `exam_prep_notes_docx` uses Arial, 2.0 cm margins, compact line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX formatting remains separate.
+- Select a route-specific DOCX style: `exam_prep_notes_docx` and `knowledge_walkthrough_docx` use Arial, 2.0 cm margins, compact line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX formatting remains separate.
 - Internal helper artifacts may be generated for validation, but they must stay outside ordinary student-facing output folders.
 
 Public output contract:

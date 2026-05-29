@@ -4,6 +4,21 @@
   "title": "Lecture Knowledge Walkthrough",
   "target_group_key": "generic_current",
   "lecture_order": ["lecture_1"],
+  "route_docx_style_profile": {
+    "style_profile_id": "kw_style_fixture_001",
+    "route": "knowledge_walkthrough_docx",
+    "margin_cm": 2.0,
+    "line_spacing": 1.08,
+    "body_alignment": "left",
+    "title_alignment": "center",
+    "heading_alignment": "left",
+    "body_font_pt": 10.5,
+    "heading_font_pt": 12.0,
+    "lecture_heading_font_pt": 14.0,
+    "text_color": "black",
+    "lecture_page_breaks": true,
+    "essay_style_spacing_forbidden": true
+  },
   "student_visible_structure": [
     "lecture_title",
     "lecture_overview",

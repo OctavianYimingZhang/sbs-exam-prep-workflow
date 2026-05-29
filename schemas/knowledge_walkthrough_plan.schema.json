@@ -3,13 +3,45 @@
   "$id": "https://example.invalid/everything-exam-preparation/knowledge_walkthrough_plan.schema.json",
   "title": "KnowledgeWalkthroughPlan",
   "type": "object",
-  "required": ["walkthrough_id", "title", "target_group_key", "lecture_order", "lectures"],
+  "required": ["walkthrough_id", "title", "target_group_key", "lecture_order", "route_docx_style_profile", "lectures"],
   "properties": {
     "object_type": { "const": "KnowledgeWalkthroughPlan" },
     "walkthrough_id": { "type": "string" },
     "title": { "type": "string" },
     "target_group_key": { "type": "string" },
     "lecture_order": { "type": "array", "items": { "type": "string" } },
+    "route_docx_style_profile": {
+      "type": "object",
+      "required": [
+        "style_profile_id",
+        "route",
+        "margin_cm",
+        "line_spacing",
+        "body_alignment",
+        "body_font_pt",
+        "heading_font_pt",
+        "lecture_heading_font_pt",
+        "text_color",
+        "lecture_page_breaks"
+      ],
+      "properties": {
+        "style_profile_id": { "type": "string" },
+        "route": { "const": "knowledge_walkthrough_docx" },
+        "margin_cm": { "type": "number", "minimum": 1.8, "maximum": 2.2 },
+        "line_spacing": { "type": "number", "minimum": 1.0, "maximum": 1.2 },
+        "body_alignment": { "const": "left" },
+        "title_alignment": { "const": "center" },
+        "heading_alignment": { "const": "left" },
+        "body_font_pt": { "type": "number", "minimum": 9.5, "maximum": 11.5 },
+        "title_font_pt": { "type": "number", "minimum": 13.0, "maximum": 16.0 },
+        "heading_font_pt": { "type": "number", "minimum": 11.0, "maximum": 13.0 },
+        "lecture_heading_font_pt": { "type": "number", "minimum": 13.0, "maximum": 15.0 },
+        "text_color": { "const": "black" },
+        "lecture_page_breaks": { "const": true },
+        "essay_style_spacing_forbidden": { "const": true }
+      },
+      "additionalProperties": false
+    },
     "forbidden_student_fields": { "type": "array", "items": { "type": "string" } },
     "student_visible_structure": { "type": "array", "items": { "type": "string" } },
     "lectures": {

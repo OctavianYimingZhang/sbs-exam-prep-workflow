@@ -179,6 +179,7 @@ REQUIRED_ACTION_TYPES = {
     "WriteRunManifest",
     "RunDeliverableQA",
     "ApproveStudentOutput",
+    "LintKnowledgeWalkthroughDocxStyle",
 }
 
 REQUIRED_VALIDATION_RULES = {
@@ -205,6 +206,7 @@ REQUIRED_VALIDATION_RULES = {
     "output_language_profile_required_for_public_output",
     "route_specific_docx_style_profile_required",
     "exam_prep_notes_compact_style_not_essay_style",
+    "knowledge_walkthrough_compact_style_not_essay_style",
     "protected_atomic_item_bound_to_public_point",
     "ordinary_notes_hide_exam_use_trap_and_must_master_headings",
     "example_review_required_before_rule_promotion",

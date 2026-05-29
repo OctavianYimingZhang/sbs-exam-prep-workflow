@@ -38,9 +38,9 @@ EvidenceUse:
     allowed_use: brief experimental evidence directly supporting the lecture mechanism, with author-year in-text citation
 
   docx_format_reference:
-    meaning: user-supplied PDF/image showing desired Word layout, highlighting, captions, or citation style
+    meaning: user-supplied PDF, image, screenshot, or previously generated DOCX showing desired Word layout, highlighting, captions, or citation style
     highlight: none
-    allowed_use: formatting and style only, not biological content
+    allowed_use: transferable formatting and style rules only, not biological content, target facts, or prediction evidence
 ```
 
 Hard rules:

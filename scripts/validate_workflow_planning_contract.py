@@ -140,6 +140,7 @@ def validate(root: Path) -> dict[str, Any]:
         "GenerateExamPrepNotesDocx",
         "LintExamPrepDocxStyle",
         "LintExamPrepNotes",
+        "LintKnowledgeWalkthroughDocxStyle",
     ]:
         if action not in action_types:
             failures.append({"type": "missing_baseline_overlay_action", "action_type": action})
@@ -211,6 +212,7 @@ def validate(root: Path) -> dict[str, Any]:
         "output_language_request_linter",
         "exam_prep_docx_style_linter",
         "exam_prep_notes_linter",
+        "knowledge_walkthrough_docx_style_linter",
     ]:
         if baseline_module not in plan_text:
             failures.append({"type": "planner_missing_baseline_overlay_module", "module": baseline_module})
@@ -233,6 +235,28 @@ def validate(root: Path) -> dict[str, Any]:
         for left, right in zip(expected_chain, expected_chain[1:]):
             if example_order.get(left, 999) > example_order.get(right, -1):
                 failures.append({"type": "example_learning_chain_order_invalid", "left": left, "right": right})
+        walkthrough_modules = planner.modules_for_preset(
+            "knowledge_walkthrough_docx",
+            {"any_source", "lecture_or_official_notes", "readable_course_notes"},
+            {"source_inputs": {"lecture_slides": ["fixture"]}},
+        )
+        walkthrough_order = {module: index for index, module in enumerate(walkthrough_modules)}
+        for required_module in ["route_docx_style_profile", "knowledge_walkthrough_docx_style_linter"]:
+            if required_module not in walkthrough_order:
+                failures.append({"type": "knowledge_walkthrough_missing_style_module", "module": required_module})
+        if walkthrough_order.get("route_docx_style_profile", 999) > walkthrough_order.get("knowledge_walkthrough_plan", -1):
+            failures.append({"type": "knowledge_walkthrough_style_profile_after_plan"})
+        if walkthrough_order.get("knowledge_walkthrough_docx_style_linter", 999) < walkthrough_order.get("knowledge_walkthrough_docx_generation", 0):
+            failures.append({"type": "knowledge_walkthrough_style_linter_before_generation"})
+        walkthrough_style_modules = planner.modules_for_preset(
+            "knowledge_walkthrough_docx",
+            {"any_source", "lecture_or_official_notes", "readable_course_notes", "style_or_example_evidence"},
+            {"source_inputs": {"lecture_slides": ["fixture"], "exemplars_or_feedback": ["format_reference"]}},
+        )
+        walkthrough_style_order = {module: index for index, module in enumerate(walkthrough_style_modules)}
+        for module in ["example_learning", "transferable_rule_synthesis", "rule_promotion_gate", "example_transfer_linter"]:
+            if module not in walkthrough_style_order:
+                failures.append({"type": "knowledge_walkthrough_style_reference_missing_example_chain", "module": module})
     except Exception as exc:
         failures.append({"type": "planner_order_check_error", "error": str(exc)})
 

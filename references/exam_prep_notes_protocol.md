@@ -313,7 +313,7 @@ RouteDocxStyleProfile:
   lecture_page_breaks: true
 ```
 
-Every lecture starts on a new page. Body text is left-aligned. The 2.5 cm margin, 1.5 line spacing, and justified-body format belongs to `example_essay_docx`, not ordinary Academic Exam-Ready Notes.
+Every lecture starts on a new page. Body text is left-aligned. The 2.5 cm margin, 1.5 line spacing, and justified-body format belongs to `example_essay_docx`, not ordinary Academic Exam-Ready Notes or compatibility lecture walkthroughs.
 
 For ordinary Academic Exam-Ready Notes, the public DOCX is a knowledge document, not an exam-format audit. The Skill must first decompose all official source material into an `AtomicKnowledgeLedger`, exclude administrative items from student output, preserve every source-backed knowledge item in a baseline module or named submodule, and only then apply exam evidence as priority, density, ordering, and add-on guidance. Past papers may change emphasis; they must not define the factual boundary of the notes.
 

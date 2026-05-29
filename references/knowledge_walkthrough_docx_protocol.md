@@ -101,9 +101,13 @@ Step 2: Module extraction. Split by conceptual function, not by slide number:
 
 Step 3: Knowledge compression. Merge repeated content and convert pathways into mechanism chains only after checking protected KnowledgePoints. Official definitions, contrast pairs, criteria/features/stages lists, named examples, `Why X?` blocks, diagrams, tables, equations, calculations, workflows, and past-paper terms must remain visible as named module content. Demote or omit only genuinely unsupported or repetitive detail, not protected source-backed items.
 
-Step 4: Student-facing rewrite. Use direct explanatory prose, mixed English terms where useful, and bold required terms. Do not write `slides say`, `according to page`, or source-tracing narration.
+Step 4: Student-facing rewrite. Use direct explanatory prose and bold required terms. Keep default English labels unless the user explicitly requests another language or mixed-language output. Do not write `slides say`, `according to page`, or source-tracing narration.
 
 Step 5: Lecture recap. End each lecture with a compact recap, normally 6-10 lines.
+
+Step 6: Select `RouteDocxStyleProfile` before DOCX writing. If the user supplies a formatting screenshot, old generated DOCX, or visual layout example, analyse it only as transferable layout evidence: density, spacing, alignment, heading hierarchy, page-break policy, and label discipline. Do not copy source-specific wording, course titles, or factual content from the example.
+
+Step 7: Run the Knowledge Walkthrough DOCX style linter before publish. A walkthrough that falls back to essay-style margins, essay-style 1.5 spacing, justified body text, inconsistent fonts, or excessive whitespace must be regenerated.
 
 ## Forbidden Student Fields
 
@@ -126,15 +130,34 @@ The DOCX must not show:
 
 ## DOCX Formatting
 
-Use the Word formatting contract:
+Use the compact lecture-note formatting contract:
 
 - Arial;
-- 2.5 cm margins;
-- body text justified;
+- 2.0 cm margins;
+- compact 1.05-1.15 line spacing;
+- body text left-aligned;
 - subheadings left-aligned;
 - main title centered;
-- 1.5 line spacing;
-- all other settings default unless the user specifies otherwise.
+- black text;
+- stable heading hierarchy;
+- lecture page breaks;
+- no essay-style 2.5 cm margins, 1.5 spacing, or justified body text unless the user explicitly asks for essay-style formatting.
+
+Required style profile:
+
+```yaml
+RouteDocxStyleProfile:
+  route: knowledge_walkthrough_docx
+  margin_cm: 2.0
+  line_spacing: 1.05-1.15
+  body_alignment: left
+  body_font_pt: 10.5
+  heading_font_pt: 12
+  lecture_heading_font_pt: 14
+  text_color: black
+  lecture_page_breaks: true
+  essay_style_spacing_forbidden: true
+```
 
 ## Output Boundary
 

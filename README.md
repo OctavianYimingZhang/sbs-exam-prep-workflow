@@ -345,7 +345,7 @@ Ordinary Academic Exam-Ready Notes do not expose the internal card scaffold. The
 
 The exam-prep notes DOCX style is route-specific: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, and lecture page breaks. Example Essay DOCX output keeps its separate essay-submission format.
 
-The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It does not predict papers, write essays, or create practice packs by default.
+The `knowledge_walkthrough_docx` route remains available for explicitly lecture-first walkthroughs. It uses the same compact lecture-note DOCX style as ordinary notes: Arial, 2.0 cm margins, compact 1.05-1.15 line spacing, left-aligned body text, black text, stable headings, and lecture page breaks. It does not predict papers, write essays, or create practice packs by default.
 
 Each lecture becomes:
 

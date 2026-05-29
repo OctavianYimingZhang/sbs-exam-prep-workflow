@@ -97,8 +97,10 @@ PRESET_MODULES = {
         "source_inventory",
         "fragment_index",
         "lecture_module_extraction",
+        "route_docx_style_profile",
         "knowledge_walkthrough_plan",
         "knowledge_walkthrough_docx_generation",
+        "knowledge_walkthrough_docx_style_linter",
         "deliverable_qa",
     ],
     "mcq_exam_prep": [
@@ -240,6 +242,7 @@ PAST_PAPER_AWARE_PRESETS = {
 
 STYLE_AWARE_PRESETS = {
     "exam_prep_notes_docx",
+    "knowledge_walkthrough_docx",
     "mcq_exam_prep",
     "short_answer_exam_prep",
     "long_answer_project_scenario_prep",
@@ -338,15 +341,21 @@ MODULE_DEFS = {
     },
     "knowledge_walkthrough_plan": {
         "action_type": "BuildKnowledgeWalkthroughPlan",
-        "minimum_inputs": ["LectureModule"],
+        "minimum_inputs": ["LectureModule", "RouteDocxStyleProfile"],
         "expected_outputs": ["KnowledgeWalkthroughPlan"],
-        "qa_checks": ["module map", "lecture recap", "forbidden student fields"],
+        "qa_checks": ["module map", "lecture recap", "route style profile", "forbidden student fields"],
     },
     "knowledge_walkthrough_docx_generation": {
         "action_type": "GeneratePrepArtifact",
-        "minimum_inputs": ["KnowledgeWalkthroughPlan"],
+        "minimum_inputs": ["KnowledgeWalkthroughPlan", "RouteDocxStyleProfile"],
         "expected_outputs": ["PrepArtifact"],
-        "qa_checks": ["DOCX format", "knowledge walkthrough linter", "public output boundary"],
+        "qa_checks": ["compact walkthrough DOCX format", "2.0 cm margins", "left-aligned compact body text", "knowledge walkthrough linter", "public output boundary"],
+    },
+    "knowledge_walkthrough_docx_style_linter": {
+        "action_type": "LintKnowledgeWalkthroughDocxStyle",
+        "minimum_inputs": ["PrepArtifact", "RouteDocxStyleProfile"],
+        "expected_outputs": ["QAFlag"],
+        "qa_checks": ["black text", "Arial", "2.0 cm margins", "compact line spacing", "left body alignment", "lecture page breaks", "essay-style spacing absent"],
     },
     "exam_regime": {
         "action_type": "SplitExamRegime",
@@ -471,6 +480,7 @@ MODULE_DEFS = {
         "expected_outputs": ["RouteDocxStyleProfile"],
         "qa_checks": [
             "exam prep notes use compact revision style",
+            "knowledge walkthrough uses compact lecture-note style",
             "example essays keep essay submission style",
             "lecture page break policy explicit",
         ],
@@ -731,11 +741,11 @@ def scan_has_style_evidence(source_scan: dict[str, Any] | None) -> bool:
             continue
         role = str(item.get("role", "")).lower()
         analysis_context = str(item.get("analysis_context", "")).lower()
-        if item.get("allowed_style_use") or item.get("allowed_transferable_example_use"):
+        if item.get("allowed_style_use") or item.get("allowed_layout_use") or item.get("allowed_transferable_example_use"):
             return True
-        if analysis_context in {"style_exemplar", "cross_target_example"}:
+        if analysis_context in {"style_exemplar", "cross_target_example", "docx_format_reference", "layout_exemplar"}:
             return True
-        if role in {"exemplar_answer", "exemplar_image", "essay_guidance"}:
+        if role in {"exemplar_answer", "exemplar_image", "essay_guidance", "docx_format_reference"}:
             return True
     return False
 
