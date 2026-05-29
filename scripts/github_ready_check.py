@@ -103,6 +103,7 @@ def main() -> int:
         default_no_paper_plan_path = planner_dir / "default_no_paper_plan.json"
         default_with_paper_plan_path = planner_dir / "default_with_paper_plan.json"
         style_plan_path = planner_dir / "style_plan.json"
+        bad_exam_prep_mapping_path = planner_dir / "bad_exam_prep_public_mapping.json"
         input_readiness_path = planner_dir / "input_readiness.json"
         visual_readiness_path = planner_dir / "visual_input_readiness.json"
         workflow_plan_preview_path = planner_dir / "workflow_plan.md"
@@ -112,6 +113,14 @@ def main() -> int:
         (bad_public_dir / "example_essay_manifest.json").write_text("{}", encoding="utf-8")
         bad_workbook_dir.mkdir(parents=True, exist_ok=True)
         (bad_workbook_dir / "legacy_output.xlsx").write_bytes(b"placeholder")
+        bad_exam_prep_mapping = json.loads((ROOT / "tests/fixtures/exam_prep_notes/valid_exam_prep_notes_plan.json").read_text(encoding="utf-8"))
+        bad_exam_prep_mapping["public_output_points"][0]["source_card_ids"] = ["missing_card"]
+        bad_exam_prep_mapping["public_output_points"][0]["covered_atomic_units"].append("aku_unmapped")
+        bad_exam_prep_mapping["public_output_points"][0]["blocks"][0]["covered_atomic_units"].append("aku_not_in_point")
+        bad_exam_prep_mapping["point_coverage_bindings"][0]["covered_atomic_units"] = ["aku_definition"]
+        bad_exam_prep_mapping["point_coverage_bindings"][0]["missing_protected_items"] = ["aku_mechanism"]
+        bad_exam_prep_mapping_path.parent.mkdir(parents=True, exist_ok=True)
+        bad_exam_prep_mapping_path.write_text(json.dumps(bad_exam_prep_mapping, indent=2), encoding="utf-8")
         checks.extend(
             [
                 run_command("compile_scripts", [py, "-m", "compileall", "-q", "scripts"]),
@@ -306,6 +315,15 @@ def main() -> int:
                         py,
                         "scripts/validate_exam_prep_notes_plan.py",
                         "tests/fixtures/exam_prep_notes/invalid_knowledge_card_plan.json",
+                    ],
+                    expect_failure=True,
+                ),
+                run_command(
+                    "exam_prep_notes_plan_rejects_public_mapping_gaps",
+                    [
+                        py,
+                        "scripts/validate_exam_prep_notes_plan.py",
+                        str(bad_exam_prep_mapping_path),
                     ],
                     expect_failure=True,
                 ),

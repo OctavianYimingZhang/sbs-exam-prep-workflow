@@ -168,6 +168,8 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             failures.append({"type": "lecture_mapping_missing_source_anchors", "lecture_session_id": lecture.get("lecture_session_id")})
 
     cards = plan.get("knowledge_cards", [])
+    card_ids: set[str] = set()
+    visible_card_ids: set[str] = set()
     if not isinstance(cards, list) or not cards:
         failures.append({"type": "knowledge_cards_empty"})
         cards = []
@@ -175,11 +177,16 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(card, dict):
             failures.append({"type": "knowledge_card_not_object", "index": index})
             continue
+        card_id = str(card.get("card_id") or "")
+        if card_id:
+            card_ids.add(card_id)
         for field in sorted(REQUIRED_CARD_FIELDS - set(card)):
             failures.append({"type": "knowledge_card_missing_field", "card_id": card.get("card_id"), "field": field})
         for field in sorted(FORBIDDEN_CARD_FIELDS & set(card)):
             failures.append({"type": "knowledge_card_forbidden_legacy_field", "card_id": card.get("card_id"), "field": field})
         if card.get("student_visible") is True:
+            if card_id:
+                visible_card_ids.add(card_id)
             if card.get("priority") not in ALLOWED_PRIORITY:
                 failures.append({"type": "student_visible_card_invalid_priority", "card_id": card.get("card_id"), "priority": card.get("priority")})
             if card.get("exam_specificity") not in ALLOWED_EXAM_SPECIFICITY:
@@ -200,6 +207,8 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
         failures.append({"type": "public_output_points_empty"})
         points = []
     point_ids: set[str] = set()
+    point_units_by_id: dict[str, set[str]] = {}
+    rendered_card_ids: set[str] = set()
     covered_atomic_items: set[str] = set()
     for index, point in enumerate(points, start=1):
         if not isinstance(point, dict):
@@ -213,6 +222,14 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
         for field in ["lecture_session_id", "point_title", "priority", "point_kind", "main_text", "blocks", "covered_atomic_units"]:
             if field not in point:
                 failures.append({"type": "public_output_point_missing_field", "point_id": point_id, "field": field})
+        source_card_ids = [str(item) for item in point.get("source_card_ids", []) if str(item).strip()] if isinstance(point.get("source_card_ids"), list) else []
+        if not source_card_ids:
+            failures.append({"type": "public_output_point_missing_source_card_ids", "point_id": point_id})
+        for source_card_id in source_card_ids:
+            if source_card_id not in card_ids:
+                failures.append({"type": "public_output_point_unknown_source_card", "point_id": point_id, "card_id": source_card_id})
+            else:
+                rendered_card_ids.add(source_card_id)
         if point.get("priority") not in ALLOWED_PRIORITY:
             failures.append({"type": "public_output_point_invalid_priority", "point_id": point_id, "priority": point.get("priority")})
         if point.get("point_kind") not in ALLOWED_POINT_KINDS:
@@ -226,11 +243,14 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
         if not non_empty_list(point.get("covered_atomic_units")):
             failures.append({"type": "public_output_point_missing_atomic_coverage", "point_id": point_id})
         else:
-            covered_atomic_items.update(str(item) for item in point.get("covered_atomic_units", []) if str(item).strip())
+            point_units = {str(item) for item in point.get("covered_atomic_units", []) if str(item).strip()}
+            point_units_by_id[point_id] = point_units
+            covered_atomic_items.update(point_units)
         blocks = point.get("blocks", [])
         if not isinstance(blocks, list):
             failures.append({"type": "public_output_point_blocks_not_list", "point_id": point_id})
             blocks = []
+        block_covered_units: set[str] = set()
         for block_index, block in enumerate(blocks, start=1):
             if not isinstance(block, dict):
                 failures.append({"type": "public_point_block_not_object", "point_id": point_id, "index": block_index})
@@ -247,6 +267,22 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
                     failures.append({"type": "public_point_block_empty_content", "point_id": point_id, "block_type": block.get("block_type")})
             elif not str(content or "").strip():
                 failures.append({"type": "public_point_block_empty_content", "point_id": point_id, "block_type": block.get("block_type")})
+            block_units = block.get("covered_atomic_units", [])
+            if not non_empty_list(block_units):
+                failures.append({"type": "public_point_block_missing_atomic_coverage", "point_id": point_id, "block_type": block.get("block_type")})
+            else:
+                block_unit_set = {str(item) for item in block_units if str(item).strip()}
+                block_covered_units.update(block_unit_set)
+                unknown_block_units = sorted(block_unit_set - point_units_by_id.get(point_id, set()))
+                if unknown_block_units:
+                    failures.append({"type": "public_point_block_coverage_not_in_point", "point_id": point_id, "units": unknown_block_units})
+        if blocks:
+            missing_block_units = sorted(point_units_by_id.get(point_id, set()) - block_covered_units)
+            if missing_block_units:
+                failures.append({"type": "public_output_point_atomic_unit_missing_from_blocks", "point_id": point_id, "units": missing_block_units})
+
+    for card_id in sorted(visible_card_ids - rendered_card_ids):
+        failures.append({"type": "student_visible_card_missing_public_output_point", "card_id": card_id})
 
     language_profile = plan.get("output_language_profile", {})
     if not isinstance(language_profile, dict):
@@ -303,8 +339,20 @@ def validate(plan: dict[str, Any]) -> dict[str, Any]:
             failures.append({"type": "point_coverage_binding_unknown_point", "point_id": binding.get("point_id")})
         if not non_empty_list(binding.get("covered_atomic_units")):
             failures.append({"type": "point_coverage_binding_missing_atomic_coverage", "point_id": binding.get("point_id")})
+        else:
+            binding_units = {str(item) for item in binding.get("covered_atomic_units", []) if str(item).strip()}
+            point_units = point_units_by_id.get(str(binding.get("point_id") or ""), set())
+            if point_units and binding_units != point_units:
+                failures.append({
+                    "type": "point_coverage_binding_atomic_units_mismatch",
+                    "point_id": binding.get("point_id"),
+                    "binding_only": sorted(binding_units - point_units),
+                    "point_only": sorted(point_units - binding_units),
+                })
         if binding.get("protected_items_preserved") is not True:
             failures.append({"type": "point_coverage_binding_protected_items_not_preserved", "point_id": binding.get("point_id")})
+        if non_empty_list(binding.get("missing_protected_items")):
+            failures.append({"type": "point_coverage_binding_missing_protected_items", "point_id": binding.get("point_id"), "missing": binding.get("missing_protected_items")})
         if binding.get("qa_status") not in ALLOWED_QA_STATUS:
             failures.append({"type": "point_coverage_binding_invalid_qa_status", "point_id": binding.get("point_id"), "qa_status": binding.get("qa_status")})
 

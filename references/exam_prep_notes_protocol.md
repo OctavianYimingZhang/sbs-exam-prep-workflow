@@ -61,10 +61,11 @@ Run the route in this order:
 16. Build `PublicOutputPoint` and `PublicPointBlock` objects from the internal cards.
 17. Bind protected atomic items to public points with `PointCoverageBinding`.
 18. Run the `KnowledgeOnlyRenderingGate`.
-19. Generate Academic Exam-Ready Notes from public points only.
-20. Append a question-type add-on layer only when useful or requested.
-21. Add optional visual aids only after the text is source-backed.
-22. Run public-point, knowledge-only rendering, output-language, route-style, exam-prep-notes, student-output, evidence, DOCX, and helper-file boundary QA.
+19. Run the `PublicPointConsistencyGate`.
+20. Generate Academic Exam-Ready Notes from public points only.
+21. Append a question-type add-on layer only when useful or requested.
+22. Add optional visual aids only after the text is source-backed.
+23. Run public-point, knowledge-only rendering, output-language, route-style, exam-prep-notes, student-output, evidence, DOCX, and helper-file boundary QA.
 
 Exam evidence may add, split, reorder, prioritise, densify, and enrich. Exam evidence must not delete, hide, or over-compress protected source-backed modules.
 
@@ -268,6 +269,27 @@ Do not merge the following into one dense paragraph:
 If a source section contains a list, preserve it as a numbered or bulleted list when the list itself is examinable.
 
 If a source gives a named example, include it as an `Example` block unless the example is clearly decorative.
+
+## KnowledgePoint Analysis And Public Mapping Gate
+
+Before rendering ordinary notes, convert each internal KnowledgePoint into public revision content through an explicit consistency gate:
+
+```text
+KnowledgeCard -> PublicOutputPoint -> PublicPointBlock -> PointCoverageBinding
+```
+
+Rules:
+
+- every student-visible KnowledgeCard must be referenced by at least one `PublicOutputPoint.source_card_ids` entry;
+- every public source-card reference must point to an existing internal KnowledgeCard;
+- every public point must state its `covered_atomic_units`;
+- every knowledge-bearing public block must state the atomic units it covers;
+- block-level covered atomic units must be a subset of the parent public point's covered atomic units;
+- every parent public point atomic unit must appear in at least one public block unless the point is explicitly marked as main-text-only by a future schema revision;
+- every `PointCoverageBinding.covered_atomic_units` set must match the corresponding public point's `covered_atomic_units`;
+- `missing_protected_items` must be empty when `protected_items_preserved` is true.
+
+This gate prevents a common failure mode where an internal card survives planning but disappears from the public notes, or where a public point claims coverage that is not visible in its definitions, criteria, mechanism, example, comparison, calculation, graph, or limitation blocks.
 
 ## Module Density Floor
 
