@@ -255,6 +255,7 @@ python3 scripts/validate_workflow_planning_contract.py
 python3 scripts/validate_interaction_contract.py
 python3 scripts/validate_student_output_contract.py
 python3 scripts/skill_architecture_linter.py --self-test
+python3 scripts/zero_mention_lint.py --self-test
 python3 scripts/knowledge_surface_linter.py --self-test
 python3 scripts/scientific_precision_linter.py --self-test
 python3 scripts/example_transfer_linter.py tests/fixtures/example_learning/valid_example_review_ledger.json
