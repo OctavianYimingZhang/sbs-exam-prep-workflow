@@ -1,0 +1,151 @@
+der:
+ 3. Formal exam question wording or predicted practice question prompt.
+ 4. Lecture-slide cited original sources, only after reading them.
+ 5. Verified classic experiments found because no usable lecture-slide citation exists.
+-6. Uploaded Extra Reading Books, only relevant chapters/sections.
+-7. Other peer-reviewed or textbook sources only if explicitly allowed or needed for citation resolution.
++6. Citation / Extra Reading Papers, only after metadata and relevant claims are verified.
++7. Uploaded Extra Reading Books, only relevant chapters/sections.
++8. Other peer-reviewed or textbook sources only if explicitly allowed or needed for citation resolution.
+ 
+ Extra Reading and citation-source content must enrich the lecture answer, not replace it.
+ 
+@@ -311,8 +332,10 @@ Fail DOCX generation or mark the essay as non-compliant if:
+ 
+ - no relevant lecture slides were read;
+ - a body paragraph has no lecture-slide or official course anchor;
++- public preamble, source-basis disclaimers, `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, `Question:`, `Essay Topic:`, or standalone `Example essay` labels appear in the visible DOCX;
+ - Extra Reading content exceeds 15% without user instruction;
+ - yellow-highlighted content lacks an Extra Reading source anchor;
++- an academic paper or Citation / Extra Reading Paper is yellow-highlighted instead of green-highlighted;
+ - green-highlighted content lacks an in-text citation;
+ - green-highlighted content is not linked to a read original citation source;
+ - classic-experiment fallback content was used without verification or without direct relevance to the paragraph claim;
+diff --git a/references/input_processing_protocol.md b/references/input_processing_protocol.md
+index 6d2e66f..bbb2adc 100644
+--- a/references/input_processing_protocol.md
++++ b/references/input_processing_protocol.md
+@@ -252,6 +252,17 @@ For Extra Reading Books:
+ - map chapters to lecture KPs using lecture terms, pathway names, diseases, methods, model systems, and essay question terms;
+ - read only relevant chapters/sections before inserting yellow-highlighted content into Example Essays.
+ 
++### Extra Reading Paper Extraction
++
++For Extra Reading Papers:
++
++- extract title, authors, year, DOI, PMID, journal or publisher record where available;
++- verify the paper from DOI, PubMed, publisher, Google Scholar, or another reliable academic locator before using it;
++- map the paper to the exact lecture mechanism, method, model, evidence point, limitation, comparison, or essay question function it can sharpen;
++- classify verified/read paper-derived content as `extra_reading_paper`;
++- insert paper-derived content only with parenthetical author-year citation and green highlight;
++- do not treat papers as Extra Reading Books and do not yellow-highlight them.
++
+ ### Lecture-Slide Citation Extraction
+ 
+ For lecture-slide citations:
+diff --git a/references/language_quality_contract.md b/references/language_quality_contract.md
+index 05987bf..1a92f7d 100644
+--- a/references/language_quality_contract.md
++++ b/references/language_quality_contract.md
+@@ -197,9 +197,12 @@ Use citations for:
+ 
+ - original papers cited by lecture slides and actually read;
+ - verified classic experiments or landmark primary studies found because relevant lecture slides contain no usable citations;
+-- extra-reading material matched to a chapter or section;
++- Citation / Extra Reading Papers with verified metadata and relevant claim support;
++- Extra Reading Books matched to a chapter or section;
+ - online academic sources verified by DOI, PubMed, publisher page, textbook, or equivalent academic source.
+ 
++Academic paper details require parenthetical author-year citation and green highlight in Example Essay DOCX output. Uploaded Extra Reading Book details require chapter/section anchoring and yellow highlight. Public source-basis preambles, prediction disclaimers, and decorative question labels are not essay prose and must be removed from final Word output.
++
+ ## Completion Standard
+ 
+ Language quality is acceptable only when:
+diff --git a/references/student_facing_output_policy.md b/references/student_facing_output_policy.md
+index bd1cc8a..7af456f 100644
+--- a/references/student_facing_output_policy.md
++++ b/references/student_facing_output_policy.md
+@@ -62,6 +62,14 @@ must_master
+ 
+ These may appear only in internal QA or an explicit audit package requested by the user.
+ 
++## Example Essay Visible Boundary
++
++Final Example Essay DOCX files are student-facing essay documents, not audit reports. They must not contain public preambles, source-basis disclaimers, prediction disclaimers, confidence notes, or diagnostic task labels.
++
++Forbidden visible text in final Example Essay DOCX output includes `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` subtitle labels, and standalone `Example essay` labels. The document may have a centered title and an optional subtitle containing only the exact essay question or user-approved topic wording.
++
++If source-basis, prediction status, or evidence limitations need to be stated, put them in the chat response or internal QA artefact, not in the Word document.
++
+ ## Allowed Priority Labels
+ 
+ Use only these visible priority labels when priority is useful:
+diff --git a/schemas/example_essay_plan.schema.json b/schemas/example_essay_plan.schema.json
+index aa93bed..0cee804 100644
+--- a/schemas/example_essay_plan.schema.json
++++ b/schemas/example_essay_plan.schema.json
+@@ -72,6 +72,7 @@
+                       "highlight": { "enum": ["none", "yellow", "green"] },
+                       "in_text_citation": { "type": ["string", "null"] },
+                       "citation_original_read": { "type": ["boolean", "null"] },
++                      "source_read": { "type": ["boolean", "null"] },
+                       "micro_detail_insert": { "type": "boolean" },
+                       "original_phrase": { "type": ["string", "null"] },
+                       "inserted_phrase": { "type": ["string", "null"] },
+diff --git a/scripts/docx_format_linter.py b/scripts/docx_format_linter.py
+index 487b886..2b2a273 100755
+--- a/scripts/docx_format_linter.py
++++ b/scripts/docx_format_linter.py
+@@ -33,6 +33,15 @@ except Exception:  # pragma: no cover
+ AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
+ WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?")
+ QUESTION_SUBTITLE_RE = re.compile(r"^\s*(explain|discuss|compare|evaluate|describe|how|why|what|to what extent)\b", re.I)
++GREEN_SOURCE_TYPES = {"citation_original_source", "classic_experiment_source", "extra_reading_paper"}
++PUBLIC_PREAMBLE_PATTERNS = [
++    ("model_answer_built_from", re.compile(r"\bModel answer built from\b", re.I)),
++    ("not_predicted_exam_question", re.compile(r"\bThis is not a predicted exam question\b", re.I)),
++    ("exam_style_question", re.compile(r"\bExam[- ]style question\b", re.I)),
++    ("decorative_question_label", re.compile(r"^\s*Question\s*:", re.I)),
++    ("decorative_essay_topic_label", re.compile(r"^\s*Essay Topic\s*:", re.I)),
++    ("standalone_example_essay_label", re.compile(r"^\s*Example\s+essay\s*:?\s*$", re.I)),
++]
+ CM_TOL = 0.08
+ PT_TOL = 0.25
+ 
+@@ -41,6 +50,14 @@ def words(text: str) -> list[str]:
+     return WORD_RE.findall(text)
+ 
+ 
++def public_preamble_hits(text: str) -> list[str]:
++    return [name for name, pattern in PUBLIC_PREAMBLE_PATTERNS if pattern.search(text)]
++
++
++def source_was_read(source_run: dict[str, Any]) -> bool:
++    return source_run.get("citation_original_read") is True or source_run.get("source_read") is True
++
++
+ def emu_to_cm(value) -> float:
+     return float(value.cm)
+ 
+@@ -116,6 +133,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
+         "subtitles_left": True,
+         "question_subtitle_plain": True,
+         "no_empty_spacer_paragraphs": True,
++        "no_public_preamble": True,
+     }
+     if not format_checks["margins_2_5_cm"]:
+         failures.append({"type": "margins_not_2_5_cm"})
+@@ -129,6 +147,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
+     yellow_runs_missing_extra_reading_anchor = []
+     unexpected_highlights = []
+     micro_detail_failures = []
++    public_preamble_leaks = []
+ 
+     source_paragraphs = source_map.get("paragraphs", []) if source_map else []
+     allowed_author_years = set()
+@@ -148,6 +167,10 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
+         visible_paragraph_index += 1
+         kind = paragraph_kind_from_map(source_map, visible_paragraph_index, paragraph.text)
+         source_para = source_paragraphs[visible_paragraph_index - 1] if visible_paragraph_index - 1 < len(source_paragraphs) else {}
++        preamble_hits = public_preamble_hits(paragraph.text)
++
