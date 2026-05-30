@@ -23,6 +23,7 @@ REQUIRED_FILES = [
     "schemas/unit_example_contribution.schema.json",
     "schemas/knowledge_surface_contract.schema.json",
     "governance/skill_improvement_ledger.json",
+    "scripts/zero_mention_lint.py",
     "scripts/knowledge_surface_linter.py",
     "scripts/scientific_precision_linter.py",
     "scripts/skill_architecture_linter.py",
@@ -43,6 +44,7 @@ REQUIRED_ARCHITECTURE_TERMS = [
 
 REQUIRED_HEALTH_COMMANDS = [
     "python3 scripts/skill_architecture_linter.py --self-test",
+    "python3 scripts/zero_mention_lint.py --self-test",
     "python3 scripts/knowledge_surface_linter.py --self-test",
     "python3 scripts/scientific_precision_linter.py --self-test",
 ]
