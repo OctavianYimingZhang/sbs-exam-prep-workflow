@@ -1,0 +1,116 @@
+diff --git a/README.md b/README.md
+index 7464c44..cfcda0f 100644
+--- a/README.md
++++ b/README.md
+@@ -14,6 +14,10 @@ Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report,
+ 
+ The invariant is that process helper files stay separate. Public outputs may include any requested student-facing artifact, but run manifests, source maps, QA JSON, lineage files, citation logs, rendered previews, and other internal validation files must not be mixed into the student-facing folder unless the user explicitly requests an audit package.
+ 
++## Custom GPT Knowledge Bundle
++
++`custom_gpt_knowledge/Everything-Exam-Preparation-Knowledge-Combined.md` is the single-file Custom GPT upload bundle. It preserves the ChatGPT website adapter layer and combines the public Skill knowledge files so the GPT builder can upload one file instead of a folder.
++
+ ## Evidence, Output, And Quality Boundaries
+ 
+ The workflow is course-agnostic and evidence-bound. It routes from the uploaded source pack, verified reading, and requested exam format rather than hard-coded course, lecture, or example names. It can identify examinable themes, question archetypes, and likely emphasis, but prediction language stays probabilistic and source-qualified.
+@@ -500,14 +504,18 @@ Essay language is controlled by the shared language contract:
+ 
+ DOCX output uses Arial, 2.5 cm margins, justified body text, centered title, left-aligned headings, 1.5 line spacing, and 0 pt paragraph spacing. The essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
+ 
++Final Essay DOCX files must not contain public preambles or diagnostic labels such as `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` labels, or standalone `Example essay` labels. Source-basis notes belong in the short chat response or internal audit artefacts, not in the student-facing Word document.
++
+ Highlighting rules:
+ 
+ | Highlight | Meaning |
+ | --- | --- |
+-| Green | Original citation source or verified classic experiment, after it has been resolved and read. |
++| Green | Verified Citation / Extra Reading Paper, original citation source, or verified classic experiment, after it has been resolved and read. |
+ | Yellow | Uploaded Extra Reading Book content matched to the relevant chapter or section. |
+ | No highlight | Ordinary lecture-slide or official-source content. |
+ 
++Academic papers are citation sources even when the user calls them extra reading: they require parenthetical author-year citation and green highlight. Yellow is reserved for uploaded Extra Reading Books with chapter/section anchors.
++
+ ## Academic Integrity Boundary
+ 
+ This Skill is for preparation, revision, source organization, Word-first report generation, and practice-route planning. The same high prose standard used for assessed work is a quality benchmark for revision exemplars, while the permitted-use boundary remains strict.
+diff --git a/SKILL.md b/SKILL.md
+index 3e5d1ba..aa22708 100644
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -123,6 +123,8 @@ Example Essay hard gates:
+ - Add molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent source mechanism slot and preserves claim level, scope, and exam function.
+ - Run citation/Extra Reading integration before final compression; estimate a safe compression budget and preserve protected source skeleton, evidence, named academic details, and analytic limitations.
+ - Example Essay DOCX output must use 0 pt paragraph spacing; the main title is centered, while the essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
++- Final Example Essay DOCX output must not include public preambles, source-basis disclaimers, `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` labels, or standalone `Example essay` labels.
++- Distinguish Citation / Extra Reading Papers from Extra Reading Books: verified paper-derived content is green with parenthetical author-year citation; uploaded book/chapter content is yellow with chapter/section anchoring. Do not yellow-highlight papers.
+ - Run language lint, DOCX formatting lint, source audit, and render/structural QA where scripts exist.
+ 
+ ## Reference Map
+diff --git a/references/essay_generation_protocol.md b/references/essay_generation_protocol.md
+index d8175c9..08bd34c 100644
+--- a/references/essay_generation_protocol.md
++++ b/references/essay_generation_protocol.md
+@@ -180,7 +180,7 @@ Slide/source order informs the storyline, but paragraph order is determined by q
+ 
+ ## PPT-Anchored Detail Control
+ 
+-Example Essays must be lecture-first and PPT/source-anchored. Extra Reading, recommended books, lecture-cited originals, and academic papers may sharpen only a mechanism, evidence point, comparison, limitation, or interpretation slot that is already present in the relevant lecture/source logic.
++Example Essays must be lecture-first and PPT/source-anchored. Citation / Extra Reading Papers, recommended books, lecture-cited originals, and academic papers may sharpen only a mechanism, evidence point, comparison, limitation, or interpretation slot that is already present in the relevant lecture/source logic.
+ 
+ Do not add a named molecular, cellular, channel, receptor, pathway, assay, circuit, gene, material, equation, or method detail merely because it is true or academically impressive. A detail is admissible only if it passes all five tests:
+ 
+@@ -216,6 +216,7 @@ DetailAdmissionMatrix:
+   source_class:
+     - lecture
+     - recommended_book
++    - extra_reading_paper
+     - lecture_cited_original_paper
+     - verified_classic_source
+     - rejected
+@@ -502,7 +503,7 @@ MicroExtraReadingInsertion:
+   inserted_phrase:
+   parent_ppt_or_source_slot:
+   question_function:
+-  source_class: recommended_book | citation_original_source | classic_experiment_source
++  source_class: recommended_book | extra_reading_paper | citation_original_source | classic_experiment_source
+   source_anchor:
+   highlight_colour: yellow | green
+   word_count_delta:
+@@ -534,6 +535,7 @@ generic readout -> named assay marker, flux, compartment, or experimental endpoi
+ Highlight and source mapping are mechanical:
+ 
+ - uploaded recommended book or textbook chapter = yellow;
++- verified Citation / Extra Reading Paper = green;
+ - verified lecture-cited original paper or verified classic source = green;
+ - ordinary lecture or official-source material = no highlight;
+ - exemplar-only or remembered detail = reject.
+@@ -699,6 +701,8 @@ Match claim strength to source strength. A study, review, or textbook section ma
+ 
+ Use parenthetical-only academic attribution in normal essay prose. Do not write the paper's authors as the sentence subject when the paragraph's purpose is to explain course content. Render the mechanism, evidence, limitation, or comparison first, then place the verified author-year citation in parentheses. Author-led narration is allowed only when the user explicitly asks for literature history, discovery chronology, or named-author attribution.
+ 
++Keep public source-basis notes out of the essay body. Any phrase explaining that the answer is a model answer, not a predicted question, built from supplied documents, or based on a particular source set belongs in the chat response or internal QA, not in the final Essay DOCX.
++
+ ### Citation Fallback When The User Supplies No Citation List
+ 
+ When the user asks for a complete Example Essay but does not provide citations:
+@@ -717,6 +721,12 @@ Never cite a source just because it is famous. It must support the exact paragra
+ 
+ Use extra reading only if it directly improves the answer to this exact question.
+ 
++Separate Extra Reading Papers from Extra Reading Books:
++
++- Citation / Extra Reading Papers are citation-bearing academic sources. Use parenthetical author-year attribution, green highlight, and a verified read/source anchor.
++- Extra Reading Books are uploaded recommended books or textbook chapters. Use yellow highlight only for the book-derived phrase or clause, with chapter/section anchoring.
++- Do not yellow-highlight papers. Do not green-highlight book material unless it is being used as a verified citation source with explicit citation metadata and claim verification.
++
+ Allowed use:
+ 
+ - one mechanism deepener;
+@@ -742,7 +752,7 @@ For DOCX output:
+ 
+ - ordinary lecture/source content is not highlighted;
+ - uploaded extra-reading book content is yellow-highlighted;
+-- read original sources cited by lecture material are green-highlighted and include author-year citations;
++- verified Citation / Extra Reading Papers and read original sources cited by lecture material are green-highlighted and include author-year citations;
+ - every highlighted run must map to a source anchor in the source map JSON.
+ - academic paper attribution is parentheti
