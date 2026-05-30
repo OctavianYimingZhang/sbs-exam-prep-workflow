@@ -1,0 +1,135 @@
+636283..c515cd0 100644
+--- a/scripts/github_ready_check.py
++++ b/scripts/github_ready_check.py
+@@ -87,6 +87,7 @@ def main() -> int:
+         positive_dir = tmp_dir / "positive_docx"
+         negative_dir = tmp_dir / "negative_docx"
+         author_led_citation_dir = tmp_dir / "author_led_citation_docx"
++        public_preamble_dir = tmp_dir / "public_preamble_docx"
+         deliverable_dir = tmp_dir / "deliverable_docx"
+         deliverable_qa_dir = tmp_dir / "deliverable_docx_internal_qa"
+         knowledge_walkthrough_dir = tmp_dir / "knowledge_walkthrough_docx"
+@@ -670,6 +671,22 @@ def main() -> int:
+                 expect_failure=True,
+             )
+         )
++        checks.append(
++            run_command(
++                "negative_docx_strict_rejects_public_preamble_leaks",
++                [
++                    py,
++                    "scripts/generate_example_essay_docx.py",
++                    "--plan",
++                    "tests/fixtures/example_essay_docx/public_preamble_plan.json",
++                    "--output-dir",
++                    str(public_preamble_dir),
++                    "--clean",
++                    "--strict",
++                ],
++                expect_failure=True,
++            )
++        )
+ 
+     checks.append(public_safety_scan())
+     checks.append(git_status_check(require_clean=args.require_clean))
+diff --git a/tests/fixtures/example_essay_docx/positive_docx_plan.json b/tests/fixtures/example_essay_docx/positive_docx_plan.json
+index c78e38f..46b6f9a 100644
+--- a/tests/fixtures/example_essay_docx/positive_docx_plan.json
++++ b/tests/fixtures/example_essay_docx/positive_docx_plan.json
+@@ -116,6 +116,14 @@
+               "highlight": "yellow",
+               "in_text_citation": null
+             },
++            {
++              "text": "A verified paper refines the same lecture slot by linking response thresholds to pathway occupancy kinetics (Reader et al., 2025). ",
++              "source_type": "extra_reading_paper",
++              "source_anchor": "Reader et al. 2025 extra reading paper, read Results section",
++              "highlight": "green",
++              "in_text_citation": "(Reader et al., 2025)",
++              "source_read": true
++            },
+             {
+               "text": "Control is therefore best explained as a sequence from detection to mechanism to consequence.",
+               "source_type": "lecture_slide_core",
+diff --git a/tests/fixtures/example_essay_docx/public_preamble_plan.json b/tests/fixtures/example_essay_docx/public_preamble_plan.json
+new file mode 100644
+index 0000000..558273a
+--- /dev/null
++++ b/tests/fixtures/example_essay_docx/public_preamble_plan.json
+@@ -0,0 +1,76 @@
++{
++  "essays": [
++    {
++      "essay_id": "EE01",
++      "question": "Explain how a lecture-defined signal controls a physiological response.",
++      "title": "Signal Control of Physiological Response",
++      "target_group_key": "fixture_target_group",
++      "lecture_anchors": [
++        {
++          "file": "fixture_lecture_slides.pdf",
++          "slide_or_page_range": "slides 10-14",
++          "lecture_id": "L1",
++          "kp_id": "KP01",
++          "claim_supported": "lecture-defined signal-response mechanism"
++        }
++      ],
++      "paragraphs": [
++        {
++          "paragraph_id": "TITLE",
++          "function": "title",
++          "is_title": true,
++          "lecture_anchors": [],
++          "text_runs": [
++            {
++              "text": "Signal Control of Physiological Response",
++              "source_type": "question_framing",
++              "source_anchor": null,
++              "highlight": "none"
++            }
++          ]
++        },
++        {
++          "paragraph_id": "SUBTITLE",
++          "function": "subtitle",
++          "is_subtitle": true,
++          "lecture_anchors": [],
++          "text_runs": [
++            {
++              "text": "Essay Topic: Explain how a lecture-defined signal controls a physiological response.",
++              "source_type": "question_framing",
++              "source_anchor": null,
++              "highlight": "none"
++            }
++          ]
++        },
++        {
++          "paragraph_id": "P1",
++          "function": "introduction",
++          "lecture_anchors": [
++            {
++              "file": "fixture_lecture_slides.pdf",
++              "slide_or_page_range": "slides 10-11",
++              "lecture_id": "L1",
++              "kp_id": "KP01",
++              "claim_supported": "biological problem and signal-response framework"
++            }
++          ],
++          "text_runs": [
++            {
++              "text": "Model answer built from supplied lecture materials. ",
++              "source_type": "student_visible_transition",
++              "source_anchor": null,
++              "highlight": "none"
++            },
++            {
++              "text": "Signal control is a conversion problem in which a defined cue must be detected, converted into intracellular change and translated into altered physiology.",
++              "source_type": "lecture_slide_core",
++              "source_anchor": "fixture_lecture_slides.pdf slides 10-11",
++              "highlight": "none"
++            }
++          ]
++        }
++      ]
++    }
++  ]
++}
