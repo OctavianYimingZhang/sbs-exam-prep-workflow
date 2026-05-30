@@ -17,7 +17,12 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
-from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+from knowledge_only_rendering_rules import (
+    forbidden_advisory_heading_hits,
+    forbidden_advisory_phrase_hits,
+    forbidden_non_knowledge_hits,
+    repeated_template_label_hits,
+)
 
 
 STYLE_LIMITS = {
@@ -44,9 +49,29 @@ FORBIDDEN_TEXT = {
     "past paper year",
     "prediction score",
     "according to slide",
-    "slides say",
+    "english explanations extracted",
     "ppt page",
+    "slide mentions",
+    "slides say",
+    "the final slide",
+    "the first slide",
+    "the next slide",
+    "the second slide",
+    "this slide",
 }
+
+OLD_VISIBLE_SCAFFOLD_HEADINGS = {
+    "How To Answer This Exam",
+    "What This Lecture Is About",
+    "What This Module Explains",
+    "Knowledge Walkthrough",
+    "Key Logic",
+    "Knowledge Points",
+    "Must Master",
+    "Lecture Recap",
+}
+
+SEMANTIC_HEADINGS = {"Knowledge map", "Key distinctions", "Core knowledge points", "Synthesis"}
 
 
 def collect_docx(path: Path) -> list[Path]:
@@ -73,14 +98,18 @@ def build_bad_style_fixture(path: Path) -> None:
     title.paragraph_format.line_spacing = 1.5
     title.add_run("Lecture Knowledge Walkthrough").font.name = "Times New Roman"
     for text in [
-        "How To Answer This Exam",
+        "English explanations extracted from the shared ChatGPT page",
+        "This slide shows the old source-route wrapper.",
         "Lecture: Fixture Lecture",
         "What This Lecture Is About",
         "Module Map",
         "Knowledge Walkthrough",
         "Key Logic",
         "Must Master",
-        "Lecture Recap",
+        "Definition: one",
+        "Definition: two",
+        "Definition: three",
+        "Definition: four",
     ]:
         paragraph = doc.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -103,18 +132,20 @@ def lint_docx(path: Path) -> dict[str, Any]:
         failures.append({"type": "forbidden_advisory_phrase", "phrase": phrase})
     for heading in forbidden_advisory_heading_hits(text):
         failures.append({"type": "forbidden_advisory_heading", "heading": heading})
-
-    required_terms = ["What This Lecture Is About", "Module Map", "Knowledge Walkthrough", "Key Logic", "Knowledge Points", "Lecture Recap"]
-    heading_terms = set(required_terms) | {"Core Logic", "What This Module Explains", "Key Distinctions"}
-    for term in required_terms:
-        if term not in text:
-            failures.append({"type": "missing_required_section", "section": term})
+    for category in forbidden_non_knowledge_hits(text):
+        failures.append({"type": "forbidden_non_knowledge_surface", "category": category})
+    for label in repeated_template_label_hits(text):
+        failures.append({"type": "repeated_rigid_template_label", "label": label})
+    for heading in OLD_VISIBLE_SCAFFOLD_HEADINGS:
+        if re.search(rf"(?im)^\s*{re.escape(heading)}\s*:?\s*$", text):
+            failures.append({"type": "old_visible_scaffold_heading", "heading": heading})
 
     section = doc.sections[0]
     margins_cm = [section.top_margin.cm, section.bottom_margin.cm, section.left_margin.cm, section.right_margin.cm]
     if any(abs(value - STYLE_LIMITS["margin_cm"]) > STYLE_LIMITS["margin_tolerance_cm"] for value in margins_cm):
         failures.append({"type": "margins_not_compact_2_0_cm", "margins_cm": margins_cm})
 
+    heading_terms = set(SEMANTIC_HEADINGS)
     visible_index = 0
     for paragraph in doc.paragraphs:
         if not paragraph.text.strip():
@@ -126,7 +157,7 @@ def lint_docx(path: Path) -> dict[str, Any]:
         if visible_index == 1:
             if paragraph.alignment != WD_ALIGN_PARAGRAPH.CENTER:
                 failures.append({"type": "title_not_centered"})
-        elif paragraph.text in heading_terms or paragraph.text.startswith(("Lecture:", "Module:")):
+        elif paragraph.text in heading_terms or paragraph.text.startswith("Lecture:"):
             if paragraph.alignment != WD_ALIGN_PARAGRAPH.LEFT:
                 failures.append({"type": "heading_not_left", "paragraph": visible_index, "text": paragraph.text[:80]})
         else:
