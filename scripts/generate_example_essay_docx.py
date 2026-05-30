@@ -29,6 +29,9 @@ from citation_rendering_rules import author_led_citation_hits, is_parenthetical_
 
 
 BODY_KIND = {"body", "paragraph", "conclusion", "intro", "introduction", "mechanism", "evidence", "evaluation", "synthesis"}
+CONCLUSION_FUNCTIONS = {"conclusion", "final_synthesis", "synthesis_conclusion"}
+ESSAY_SCOPE_VALUES = {"single_concept", "one_lecture", "multi_lecture", "whole_module", "cross_module"}
+TARGET_RATIO = "0.10-0.15"
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
 GREEN_SOURCE_TYPES = {"citation_original_source", "classic_experiment_source", "extra_reading_paper"}
 MICRO_DETAIL_SOURCE_TYPES = {"extra_reading_book", *GREEN_SOURCE_TYPES}
@@ -44,7 +47,7 @@ PUBLIC_PREAMBLE_PATTERNS = [
 
 
 def safe_filename(text: str, max_len: int = 72) -> str:
-    cleaned = re.sub(r"[\\/:*?\"<>|]+", "", text)
+    cleaned = re.sub(r"[\/:*?\"<>|]+", "", text)
     cleaned = re.sub(r"\s+", "_", cleaned.strip())
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "", cleaned)
     return (cleaned[:max_len].strip("._-") or "example_essay")
@@ -73,6 +76,35 @@ def paragraph_kind(paragraph: dict[str, Any]) -> str:
     if paragraph.get("is_heading"):
         return "heading"
     return "body"
+
+
+def paragraph_text(paragraph: dict[str, Any]) -> str:
+    return "".join(str(run.get("text", "")) for run in paragraph.get("text_runs", []))
+
+
+def paragraph_function(paragraph: dict[str, Any]) -> str:
+    return str(paragraph.get("function") or "").strip().casefold()
+
+
+def is_complete_essay(essay: dict[str, Any]) -> bool:
+    return essay.get("complete_essay") is not False
+
+
+def get_adaptive_budget(essay: dict[str, Any]) -> dict[str, Any] | None:
+    for key in ["essay_adaptive_budget", "adaptive_budget", "EssayAdaptiveBudget"]:
+        value = essay.get(key)
+        if isinstance(value, dict):
+            return value
+    return None
+
+
+def has_conclusion(essay: dict[str, Any]) -> bool:
+    for paragraph in essay.get("paragraphs", []):
+        if not isinstance(paragraph, dict) or paragraph_kind(paragraph) != "body":
+            continue
+        if paragraph.get("is_conclusion") is True or paragraph_function(paragraph) in CONCLUSION_FUNCTIONS:
+            return bool(paragraph_text(paragraph).strip())
+    return False
 
 
 def source_was_read(run: dict[str, Any]) -> bool:
@@ -141,10 +173,38 @@ def add_text_run(paragraph, run_data: dict[str, Any]) -> None:
         run.font.highlight_color = WD_COLOR_INDEX.BRIGHT_GREEN
 
 
+def validate_adaptive_budget(essay: dict[str, Any], errors: list[str]) -> None:
+    if not is_complete_essay(essay):
+        return
+    budget = get_adaptive_budget(essay)
+    if not isinstance(budget, dict):
+        errors.append("complete_essay_missing_essay_adaptive_budget")
+        return
+    scope = budget.get("lecture_scope") or budget.get("scope")
+    if isinstance(scope, list):
+        if not any(str(item) in ESSAY_SCOPE_VALUES for item in scope):
+            errors.append("essay_adaptive_budget_missing_valid_scope")
+    elif str(scope or "") not in ESSAY_SCOPE_VALUES:
+        errors.append("essay_adaptive_budget_missing_valid_scope")
+    if budget.get("mechanism_detail_target_ratio") != TARGET_RATIO:
+        errors.append("essay_adaptive_budget_mechanism_detail_ratio_must_be_0.10-0.15")
+    if budget.get("extra_reading_target_ratio") != TARGET_RATIO:
+        errors.append("essay_adaptive_budget_extra_reading_ratio_must_be_0.10-0.15")
+    if budget.get("conclusion_required") is not True:
+        errors.append("essay_adaptive_budget_must_require_conclusion")
+    if budget.get("hard_word_count_floor_or_ceiling") is True:
+        errors.append("essay_adaptive_budget_must_not_use_hard_word_count_floor_or_ceiling")
+    if budget.get("compression_policy") not in {"expression_efficiency_not_fixed_count", None}:
+        errors.append("essay_adaptive_budget_bad_compression_policy")
+
+
 def validate_plan(essay: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     if not essay.get("lecture_anchors"):
         errors.append("essay_requires_lecture_anchors")
+    validate_adaptive_budget(essay, errors)
+    if is_complete_essay(essay) and not has_conclusion(essay):
+        errors.append("complete_essay_requires_conclusion")
     compression_budget = essay.get("compression_budget")
     if isinstance(compression_budget, dict):
         protected_source_skeleton = compression_budget.get("protected_source_skeleton") or []
@@ -166,11 +226,11 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
         kind = paragraph_kind(paragraph)
         if kind == "body" and not paragraph.get("lecture_anchors"):
             errors.append(f"paragraph_{idx}_missing_lecture_anchor")
-        paragraph_text = "".join(str(run.get("text", "")) for run in paragraph.get("text_runs", []))
-        for hit in public_preamble_hits(paragraph_text):
+        paragraph_text_value = paragraph_text(paragraph)
+        for hit in public_preamble_hits(paragraph_text_value):
             errors.append(f"paragraph_{idx}_public_preamble_leak:{hit}")
         if kind == "body":
-            for hit in author_led_citation_hits(paragraph_text):
+            for hit in author_led_citation_hits(paragraph_text_value):
                 errors.append(f"paragraph_{idx}_author_led_citation_prose:{hit}")
         for run_idx, run in enumerate(paragraph.get("text_runs", []), start=1):
             source_type = run.get("source_type")
@@ -230,6 +290,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
         "target_group_key": essay.get("target_group_key"),
         "lecture_anchors": essay.get("lecture_anchors", []),
         "extra_reading_status": essay.get("extra_reading_status", "not_supplied"),
+        "essay_adaptive_budget": get_adaptive_budget(essay),
         "compression_budget": essay.get("compression_budget"),
         "paragraphs": [],
         "qa_flags": qa_flags,
@@ -238,6 +299,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
     total_body_words = 0
     yellow_words = 0
     green_words = 0
+    micro_detail_words = 0
     micro_detail_enhancements: list[dict[str, Any]] = []
 
     for p_idx, paragraph_data in enumerate(essay.get("paragraphs", []), start=1):
@@ -273,6 +335,8 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
                     yellow_words += wc
                 if run_data.get("highlight") == "green":
                     green_words += wc
+                if run_data.get("micro_detail_insert") is True:
+                    micro_detail_words += wc
             run_map = {
                 "run_index": r_idx,
                 "source_type": run_data.get("source_type"),
@@ -310,7 +374,10 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
         "extra_reading_yellow_words": yellow_words,
         "citation_original_green_words": green_words,
         "green_source_words": green_words,
+        "micro_detail_words": micro_detail_words,
         "extra_reading_ratio": (yellow_words / total_body_words) if total_body_words else 0.0,
+        "green_source_ratio": (green_words / total_body_words) if total_body_words else 0.0,
+        "micro_detail_ratio": (micro_detail_words / total_body_words) if total_body_words else 0.0,
     }
     source_map["micro_detail_enhancements"] = micro_detail_enhancements
 
