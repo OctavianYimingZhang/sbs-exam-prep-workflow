@@ -18,7 +18,12 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
-from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+from knowledge_only_rendering_rules import (
+    forbidden_advisory_heading_hits,
+    forbidden_advisory_phrase_hits,
+    forbidden_non_knowledge_hits,
+    repeated_template_label_hits,
+)
 
 
 KNOWLEDGE_WALKTHROUGH_STYLE = {
@@ -66,16 +71,34 @@ FORBIDDEN_TEXT = {
     "past paper year",
     "prediction score",
     "according to slide",
-    "slides say",
+    "english explanations extracted",
     "ppt page",
+    "slide mentions",
+    "slides say",
+    "the final slide",
+    "the first slide",
+    "the next slide",
+    "the second slide",
+    "this slide",
+}
+
+
+GENERIC_SCAFFOLD_HEADINGS = {
+    "What This Lecture Is About",
+    "What This Module Explains",
+    "Knowledge Walkthrough",
+    "Key Logic",
+    "Knowledge Points",
+    "Must Master",
+    "Lecture Recap",
 }
 
 
 def safe_filename(text: str, max_len: int = 72) -> str:
-    cleaned = re.sub(r"[\\/:*?\"<>|]+", "", text)
+    cleaned = re.sub(r"[\/:*?\"<>|]+", "", text)
     cleaned = re.sub(r"\s+", "_", cleaned.strip())
     cleaned = re.sub(r"[^A-Za-z0-9._-]+", "", cleaned)
-    return (cleaned[:max_len].strip("._-") or "knowledge_walkthrough")
+    return cleaned[:max_len].strip("._-") or "knowledge_walkthrough"
 
 
 def load_plan(path: Path) -> dict[str, Any]:
@@ -113,10 +136,7 @@ def normalize_paragraph(paragraph, kind: str, plan: dict[str, Any]) -> None:
     paragraph.paragraph_format.line_spacing = float(style_value(plan, "line_spacing"))
     paragraph.paragraph_format.space_before = Pt(0)
     paragraph.paragraph_format.space_after = Pt(2)
-    if kind == "title":
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    else:
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER if kind == "title" else WD_ALIGN_PARAGRAPH.LEFT
     size = paragraph_size(plan, kind)
     for run in paragraph.runs:
         normalize_run(run, size)
@@ -172,6 +192,37 @@ def add_paragraph(doc: Document, text: str, plan: dict[str, Any], kind: str = "b
     return paragraph
 
 
+def add_optional_body(doc: Document, plan: dict[str, Any], value: Any) -> None:
+    if value in (None, "", [], {}):
+        return
+    if isinstance(value, list):
+        for item in value:
+            text = str(item).strip()
+            if text:
+                add_paragraph(doc, text, plan, "body")
+        return
+    text = str(value).strip()
+    if text:
+        add_paragraph(doc, text, plan, "body")
+
+
+def add_optional_list(doc: Document, plan: dict[str, Any], values: Any) -> None:
+    if not values:
+        return
+    if not isinstance(values, list):
+        add_optional_body(doc, plan, values)
+        return
+    for item in values:
+        text = str(item).strip()
+        if text:
+            add_paragraph(doc, f"- {text}", plan, "body")
+
+
+def star_prefix(value: Any) -> str:
+    priority = str(value or "").strip()
+    return f"{priority} " if priority in {"★★★", "★★", "★"} else ""
+
+
 def walk_values(value: Any) -> list[tuple[str, Any]]:
     found: list[tuple[str, Any]] = []
     if isinstance(value, dict):
@@ -182,6 +233,32 @@ def walk_values(value: Any) -> list[tuple[str, Any]]:
         for child in value:
             found.extend(walk_values(child))
     return found
+
+
+def visible_strings(plan: dict[str, Any]) -> list[str]:
+    parts: list[str] = [str(plan.get("title") or "")]
+    for lecture in plan.get("lectures", []):
+        if not isinstance(lecture, dict):
+            continue
+        parts.extend(str(lecture.get(key) or "") for key in ["lecture_title", "lecture_overview", "core_logic"])
+        for item in lecture.get("module_map", []) or []:
+            if isinstance(item, dict):
+                parts.extend(str(item.get(key) or "") for key in ["module_title", "one_sentence"])
+            else:
+                parts.append(str(item))
+        for module in lecture.get("modules", []) or []:
+            if isinstance(module, dict):
+                parts.extend(
+                    str(module.get(key) or "")
+                    for key in ["module_title", "module_overview", "knowledge_walkthrough", "key_logic"]
+                )
+                for item in module.get("common_confusions", []) or []:
+                    parts.append(str(item))
+                for item in module.get("must_master", []) or []:
+                    parts.append(str(item))
+        for item in lecture.get("lecture_recap", []) or []:
+            parts.append(str(item))
+    return [part for part in parts if part.strip()]
 
 
 def validate_plan(plan: dict[str, Any]) -> list[str]:
@@ -220,13 +297,17 @@ def validate_plan(plan: dict[str, Any]) -> list[str]:
                 errors.append(f"forbidden_advisory_phrase_in_plan:{phrase}")
             for heading in forbidden_advisory_heading_hits(value):
                 errors.append(f"forbidden_advisory_heading_in_plan:{heading}")
+            for category in forbidden_non_knowledge_hits(value):
+                errors.append(f"forbidden_non_knowledge_surface_in_plan:{category}")
+    combined_visible_text = "\n".join(visible_strings(plan))
+    for label in repeated_template_label_hits(combined_visible_text):
+        errors.append(f"repeated_rigid_template_label:{label}")
+    for heading in GENERIC_SCAFFOLD_HEADINGS:
+        if re.search(rf"(?im)^\s*{re.escape(heading)}\s*:?\s*$", combined_visible_text):
+            errors.append(f"generic_scaffold_heading_visible:{heading}")
     for lecture in plan.get("lectures", []):
-        if not lecture.get("module_map"):
-            errors.append(f"lecture_missing_module_map:{lecture.get('lecture_id', 'unknown')}")
         if not lecture.get("modules"):
             errors.append(f"lecture_missing_modules:{lecture.get('lecture_id', 'unknown')}")
-        if not lecture.get("lecture_recap"):
-            errors.append(f"lecture_missing_recap:{lecture.get('lecture_id', 'unknown')}")
     return sorted(set(errors))
 
 
@@ -253,38 +334,41 @@ def write_docx(plan: dict[str, Any], output_dir: Path, qa_dir: Path, strict: boo
             doc.add_page_break()
         lecture_title = lecture.get("lecture_title", "Lecture")
         add_paragraph(doc, f"Lecture: {lecture_title}", plan, "lecture")
-        add_paragraph(doc, "What This Lecture Is About", plan, "subheading")
-        add_paragraph(doc, str(lecture.get("lecture_overview", "")), plan, "body")
-        if lecture.get("core_logic"):
-            add_paragraph(doc, "Core Logic", plan, "subheading")
-            add_paragraph(doc, str(lecture["core_logic"]), plan, "body")
+        add_optional_body(doc, plan, lecture.get("lecture_overview"))
+        add_optional_body(doc, plan, lecture.get("core_logic"))
 
-        add_paragraph(doc, "Module Map", plan, "subheading")
-        for item in lecture.get("module_map", []):
-            add_paragraph(doc, f"{item.get('module_title', 'Module')}: {item.get('one_sentence', '')}", plan, "body")
+        module_map = lecture.get("module_map") or []
+        if module_map:
+            add_paragraph(doc, "Knowledge map", plan, "subheading")
+            for item in module_map:
+                if isinstance(item, dict):
+                    title_text = str(item.get("module_title") or "Knowledge area").strip()
+                    summary = str(item.get("one_sentence") or "").strip()
+                    add_paragraph(doc, f"{title_text}: {summary}" if summary else title_text, plan, "body")
+                else:
+                    add_paragraph(doc, str(item), plan, "body")
 
         lecture_manifest = {"lecture_id": lecture.get("lecture_id"), "lecture_title": lecture_title, "modules": []}
         for module in lecture.get("modules", []):
-            add_paragraph(doc, f"Module: {module.get('module_title', 'Module')}", plan, "subheading")
-            add_paragraph(doc, "What This Module Explains", plan, "subheading")
-            add_paragraph(doc, str(module.get("module_overview", "")), plan, "body")
-            add_paragraph(doc, "Knowledge Walkthrough", plan, "subheading")
-            add_paragraph(doc, str(module.get("knowledge_walkthrough", "")), plan, "body")
-            add_paragraph(doc, "Key Logic", plan, "subheading")
-            add_paragraph(doc, str(module.get("key_logic", "")), plan, "body")
+            module_title = str(module.get("module_title") or "Knowledge module").strip()
+            add_paragraph(doc, f"{star_prefix(module.get('priority'))}{module_title}", plan, "subheading")
+            add_optional_body(doc, plan, module.get("module_overview"))
+            add_optional_body(doc, plan, module.get("knowledge_walkthrough"))
+            add_optional_body(doc, plan, module.get("key_logic"))
             common_confusions = module.get("common_confusions", [])
             if common_confusions:
-                add_paragraph(doc, "Key Distinctions", plan, "subheading")
-                for item in common_confusions:
-                    add_paragraph(doc, str(item), plan, "body")
-            add_paragraph(doc, "Knowledge Points", plan, "subheading")
-            for item in module.get("must_master", []):
-                add_paragraph(doc, str(item), plan, "body")
+                add_paragraph(doc, "Key distinctions", plan, "subheading")
+                add_optional_list(doc, plan, common_confusions)
+            must_master = module.get("must_master", [])
+            if must_master:
+                add_paragraph(doc, "Core knowledge points", plan, "subheading")
+                add_optional_list(doc, plan, must_master)
             lecture_manifest["modules"].append({"module_id": module.get("module_id"), "module_title": module.get("module_title")})
 
-        add_paragraph(doc, "Lecture Recap", plan, "subheading")
-        for item in lecture.get("lecture_recap", []):
-            add_paragraph(doc, str(item), plan, "body")
+        lecture_recap = lecture.get("lecture_recap", [])
+        if lecture_recap:
+            add_paragraph(doc, "Synthesis", plan, "subheading")
+            add_optional_list(doc, plan, lecture_recap)
         manifest["lectures"].append(lecture_manifest)
 
     output_dir.mkdir(parents=True, exist_ok=True)
