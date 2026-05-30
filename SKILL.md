@@ -10,7 +10,7 @@ Use this Skill to turn a student's supplied exam materials into evidence-grounde
 The first-principles chain is:
 
 ```text
-inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> public output points -> exam overlay -> preparation output
+inputs -> source authority -> course reconstruction -> atomic knowledge ledger -> source-first baseline notes -> coverage QA -> knowledge-only public view -> knowledge surface contract -> public output points -> exam overlay -> preparation output
 ```
 
 ## Purpose And Trigger Boundary
@@ -89,16 +89,20 @@ Evidence hierarchy:
 
 Use the operational ontology in `ontology/ontology.json` and `references/operational_ontology_protocol.md` when multiple source roles, past-paper prediction, Example Essay source audits, or public artifacts require support-link validation.
 
+Use `references/knowledge_surface_protocol.md` as the final public-rendering ontology for every student-facing DOCX. It sits between internal planning and visible prose: build a `KnowledgeSurfaceContract`, run the `NonKnowledgeGate`, make `SurfaceLabelDecision` records for visible labels, then render only knowledge-bearing content.
+
 Student-facing output filter:
 
 - Public prose must be directly usable revision content, not an audit trace.
 - Ordinary Academic Exam-Ready Notes are knowledge documents, not exam-format audits. Do not expose assessment percentages, exam timing, mark splits, Section A/Section B administrative rules, historical-paper comparability notes, no-mark-scheme notes, coverage notes, source-quality caveats, ELM-check warnings, provenance text, or extraction-quality warnings in the public DOCX.
 - Do not expose source anchors, confidence bands, recurrence counts, lecture centrality, examiner-operation labels, task verbs, discriminator axes, reference expansion, evidence limits, internal priority scores, source maps, QA JSON, run manifests, lineage files, citation logs, or rendered previews unless the user explicitly asks for an audit package.
+- Do not expose AI process/provenance, generation evidence, extraction narration, source-route narration, or slide-order narration in public notes. Forbidden visible forms include `This slide shows...`, `The first slide shows...`, `The notes say...`, `English explanations extracted from...`, and equivalent wording.
 - Visible priority labels are only `★★★`, `★★`, and `★`.
 - Use `Course Knowledge Map` as the public top matter for ordinary notes. Do not use `Course-Level Exam Map` in public notes.
 - Ordinary Academic Exam-Ready Notes render compact `PublicOutputPoint` blocks by lecture. Do not expose internal headings named `Exam Specificity`, `Core Exam Claim`, `Exam Use`, `Common Error / Trap`, or `Must Master`.
 - Ordinary Academic Exam-Ready Notes must pass a public-point consistency gate: every visible KnowledgeCard maps to a public point, every public point references valid source cards, block-level atomic coverage is visible, and coverage bindings match the public point coverage.
 - Ordinary notes and compatibility walkthroughs must pass a knowledge-only rendering gate: public output may contain source-backed definitions, mechanisms, criteria, calculations, graph/data rules, method workflows, examples, comparisons, limitations, and factual knowledge points only. Do not render generic answer advice, recommended approaches, integrated-reasoning sections, `How To Answer`, `How To Use`, `A strong answer should`, `Use this module`, or question-type reliability commentary unless the user explicitly requests a question-type add-on.
+- Ordinary notes and compatibility walkthroughs must use semantic-sparse labels. Do not mechanically render every point as `Definition`, `Principle`, `Mechanism`, `Application`, `Limitation`, `Graph logic`, or `Interpretation`. Keep a label only when it prevents ambiguity, especially for equations, worked examples, diagnostic patterns, controls, tables, or comparisons; otherwise merge the label into a concept-specific heading or sentence.
 - When academic paper content is used as Extra Reading, a lecture-cited original, or a classic-source fallback, keep author names out of the sentence grammar. Write the claim as prose and place verified author-year attribution only in a parenthetical in-text citation, unless the user explicitly asks for literature-history narration or author attribution.
 - Skill package files, fixtures, and protocol text are authored in English. This is a package-authoring convention, not a restriction on user-requested outputs.
 - Select an `OutputLanguageProfile` only to honor an explicit user language request or to keep default English labels. Do not infer or force multilingual output from mixed-language sources; if the user wants multilingual output, they must request it.
@@ -117,15 +121,18 @@ Example Essay hard gates:
 
 - Trigger complete Example Essay mode only when the user asks for essay preparation, model essays, full essay-style answers, or complete essay documents.
 - For complete essay planning or assessed-style drafting, follow `references/essay_tutor_workflow_protocol.md` before drafting: collect essay constraints, run DeepResearch, produce a subtitle-level plan, and use the plan-approval gate unless the user explicitly asks for direct generation.
-- Follow `references/essay_generation_protocol.md` and `references/example_essay_docx_output_protocol.md`.
+- Follow `references/essay_generation_protocol.md`, `references/example_essay_docx_output_protocol.md`, and `references/knowledge_surface_protocol.md`.
 - Use lecture/PPT/source logic as the skeleton; Extra Reading is a precision layer, not a replacement.
 - Do not pad Example Essays to increase Extra Reading, citation, or molecular-detail volume; add external detail only when it replaces vague wording or sharpens an existing lecture/source mechanism slot.
-- Add molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent source mechanism slot and preserves claim level, scope, and exam function.
-- Run citation/Extra Reading integration before final compression; estimate a safe compression budget and preserve protected source skeleton, evidence, named academic details, and analytic limitations.
+- Use `EssayAdaptiveBudget` instead of fixed 500-1000 word limits. Estimate length from question scope, lecture/source coverage, command verb, and evidence density. For complete essays, include a conclusion unless the user explicitly asks for a fragment.
+- Add molecular, cellular, channel, receptor, pathway, assay, circuit, gene, morphogen, method, or case detail only when it sharpens a parent source mechanism slot and preserves claim level, scope, and exam function. Treat 10-15% mechanism detail as a target band, not padding.
+- Add Extra Reading or academic-paper detail only when verified, source-anchored, question-relevant, and analytically interpreted. Treat 10-15% Extra Reading as a target band, not padding.
+- Run citation/Extra Reading integration before final compression; estimate a safe compression budget and preserve protected source skeleton, evidence, named academic details, analytic limitations, and conclusion.
 - Example Essay DOCX output must use 0 pt paragraph spacing; the main title is centered, while the essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
 - Final Example Essay DOCX output must not include public preambles, source-basis disclaimers, `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` labels, or standalone `Example essay` labels.
 - Distinguish Citation / Extra Reading Papers from Extra Reading Books: verified paper-derived content is green with parenthetical author-year citation; uploaded book/chapter content is yellow with chapter/section anchoring. Do not yellow-highlight papers.
-- Run language lint, DOCX formatting lint, source audit, and render/structural QA where scripts exist.
+- Fail essay QA if academic-paper content is not green-highlighted, uploaded book/chapter Extra Reading content is not yellow-highlighted, green-highlighted content lacks parenthetical author-year citation, or a complete essay lacks a conclusion.
+- Run language lint, DOCX formatting lint, source audit, knowledge-surface lint, and render/structural QA where scripts exist.
 
 ## Reference Map
 
@@ -149,6 +156,7 @@ Evidence, ontology, and pattern analysis:
 Student-facing outputs:
 
 - `references/student_facing_output_policy.md`: visible output filters and final report contracts.
+- `references/knowledge_surface_protocol.md`: final public-rendering ontology, `KnowledgeSurfaceContract`, `NonKnowledgeGate`, semantic-sparse label decisions, essay adaptive budget, and highlight surface rules.
 - `references/exam_prep_notes_protocol.md`: default Academic Exam-Ready Notes route, source-authority rules, exam-emphasis mapping, question-type add-ons, and definition policy.
 - `references/knowledge_walkthrough_docx_protocol.md`: lecture-first walkthrough route and DOCX structure.
 - `references/question_type_protocol.md`: MCQ, short-answer, essay, and long-answer routing.
@@ -214,9 +222,11 @@ Before delivery, fail or rewrite outputs that contain:
 
 - unsupported factual claims, invented citations, fake precision, or unverified official answers;
 - slide/page/source-route narration inside answer prose;
+- AI process/provenance, extraction evidence, or generation-method text inside public notes;
 - how-to-write instructions inside the answer body;
+- mechanically repeated template bucket labels when semantic headings or prose would be clearer;
 - public exposure of internal source anchors, confidence, task verbs, discriminator axes, source maps, QA JSON, manifests, or lineage files;
-- Example Essay content that replaces lecture logic with Extra Reading, overstates citation strength, leaks process language, or loses protected source skeleton during compression;
+- Example Essay content that replaces lecture logic with Extra Reading, overstates citation strength, leaks process language, loses protected source skeleton during compression, misses required source-class highlights, or lacks a conclusion when complete-essay mode is active;
 - benchmark/example factual leakage into production content.
 - promoted example-derived rules that lack good/bad analysis, non-transferable content, an anti-overfit rule, a destination, and a validation check.
 
@@ -227,6 +237,7 @@ python3 scripts/no_identity_trigger_linter.py --forbid-legacy-label
 python3 scripts/validate_workflow_planning_contract.py
 python3 scripts/validate_interaction_contract.py
 python3 scripts/validate_student_output_contract.py
+python3 scripts/knowledge_surface_linter.py --self-test
 python3 scripts/example_transfer_linter.py tests/fixtures/example_learning/valid_example_review_ledger.json
 python3 scripts/example_essay_language_linter.py --fixture benchmarks/example_essay_language_linter_fixtures.json
 ```
