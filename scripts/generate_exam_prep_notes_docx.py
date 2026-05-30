@@ -18,7 +18,12 @@ try:
 except Exception as exc:  # pragma: no cover
     raise SystemExit(f"python-docx is required: {exc}")
 
-from knowledge_only_rendering_rules import forbidden_advisory_heading_hits, forbidden_advisory_phrase_hits
+from knowledge_only_rendering_rules import (
+    forbidden_advisory_heading_hits,
+    forbidden_advisory_phrase_hits,
+    forbidden_non_knowledge_hits,
+    repeated_template_label_hits,
+)
 
 
 FORBIDDEN_PUBLIC_PHRASES = [
@@ -68,7 +73,13 @@ BLOCK_LABELS = {
     "comparison": "Comparison",
     "example": "Example",
     "limitation": "Limitation",
+    "worked_example": "Worked Example",
+    "diagnostic_pattern": "Diagnostic Pattern",
+    "control": "Control",
 }
+
+ESSENTIAL_LABEL_TYPES = {"equation", "worked_example", "diagnostic_pattern", "control", "comparison"}
+ESSENTIAL_LABEL_TEXT = {"equation", "worked example", "diagnostic pattern", "control", "comparison", "table"}
 
 
 def load_plan(path: Path) -> dict[str, Any]:
@@ -151,24 +162,52 @@ def add_paragraph(doc: Document, text: str, plan: dict[str, Any], kind: str = "b
     return paragraph
 
 
-def public_labels_enabled(plan: dict[str, Any]) -> bool:
+def label_policy_mode(plan: dict[str, Any]) -> str:
+    for key in ["knowledge_surface_contract", "surface_contract"]:
+        contract = plan.get(key)
+        if isinstance(contract, dict):
+            policy = contract.get("label_policy")
+            if isinstance(policy, dict) and policy.get("mode"):
+                return str(policy["mode"])
     language_profile = plan.get("output_language_profile")
-    if not isinstance(language_profile, dict):
+    if isinstance(language_profile, dict):
+        policies = set(str(item) for item in language_profile.get("public_label_policy", []))
+        if "explicit_user_requested" in policies:
+            return "explicit_user_requested"
+        if "suppress_nonessential_labels" in policies or "semantic_sparse" in policies:
+            return "semantic_sparse"
+    return "semantic_sparse"
+
+
+def public_labels_enabled(plan: dict[str, Any]) -> bool:
+    return label_policy_mode(plan) != "semantic_sparse"
+
+
+def label_is_semantically_essential(block: dict[str, Any], label: str | None) -> bool:
+    if block.get("force_label") is True or block.get("label_decision") == "keep":
         return True
-    policies = set(language_profile.get("public_label_policy", []))
-    return "suppress_nonessential_labels" not in policies
+    block_type = str(block.get("block_type") or "").strip().casefold()
+    if block_type in ESSENTIAL_LABEL_TYPES:
+        return True
+    normalized_label = str(label or "").strip().casefold()
+    return normalized_label in ESSENTIAL_LABEL_TEXT
 
 
 def block_label(block: dict[str, Any], plan: dict[str, Any]) -> str | None:
-    label = block.get("label")
-    if label is not None and str(label).strip():
-        return str(label).strip().rstrip(":")
-    if not public_labels_enabled(plan):
+    explicit = block.get("label")
+    label = str(explicit).strip().rstrip(":") if explicit is not None and str(explicit).strip() else None
+    block_type = str(block.get("block_type") or "")
+    if label_policy_mode(plan) == "semantic_sparse" and not label_is_semantically_essential(block, label):
+        return None
+    if label:
+        return label
+    if not public_labels_enabled(plan) and block_type not in ESSENTIAL_LABEL_TYPES:
         return None
     requested_language = str((plan.get("output_language_profile") or {}).get("requested_language") or "").strip().lower()
     if requested_language and requested_language not in {"english", "en", "en-gb", "en-us"}:
         return None
-    return BLOCK_LABELS.get(str(block.get("block_type") or ""))
+    generated_label = BLOCK_LABELS.get(block_type)
+    return generated_label if label_is_semantically_essential(block, generated_label) or public_labels_enabled(plan) else None
 
 
 def add_label_block(doc: Document, plan: dict[str, Any], label: str | None, value: Any) -> None:
@@ -210,15 +249,15 @@ def derive_public_points(plan: dict[str, Any]) -> list[dict[str, Any]]:
             continue
         blocks: list[dict[str, Any]] = []
         block_specs = [
-            ("key_definitions", "definitions", "Definitions"),
-            ("criteria_components_steps", "criteria", "Criteria"),
-            ("mechanism_or_process_logic", "mechanism", "Mechanism"),
-            ("canonical_example", "example", "Example"),
+            ("key_definitions", "definitions"),
+            ("criteria_components_steps", "criteria"),
+            ("mechanism_or_process_logic", "mechanism"),
+            ("canonical_example", "example"),
         ]
-        for source_field, block_type, label in block_specs:
+        for source_field, block_type in block_specs:
             value = card.get(source_field)
             if value:
-                blocks.append({"block_type": block_type, "label": label, "content": value, "covered_atomic_units": []})
+                blocks.append({"block_type": block_type, "label": None, "content": value, "covered_atomic_units": []})
         main_text = " ".join(
             str(card.get(field) or "").strip()
             for field in ["core_exam_claim", "exam_ready_knowledge_synthesis"]
@@ -292,6 +331,10 @@ def validate_plan(plan: dict[str, Any]) -> list[str]:
         failures.append(f"forbidden_advisory_phrase:{phrase}")
     for heading in forbidden_advisory_heading_hits(visible_text):
         failures.append(f"forbidden_advisory_heading:{heading}")
+    for category in forbidden_non_knowledge_hits(visible_text):
+        failures.append(f"forbidden_non_knowledge_surface:{category}")
+    for label in repeated_template_label_hits(visible_text):
+        failures.append(f"repeated_rigid_template_label:{label}")
     return sorted(set(failures))
 
 
@@ -310,7 +353,7 @@ def write_docx(plan: dict[str, Any], output_dir: Path, qa_dir: Path, strict: boo
     if course_map:
         add_paragraph(doc, str(course_map), plan, "body")
     else:
-        add_paragraph(doc, "The notes are organised by lecture and source-backed knowledge points.", plan, "body")
+        add_paragraph(doc, "Core topics are grouped by concepts, mechanisms, method workflows, calculations and interpretation rules.", plan, "body")
 
     lectures = [lecture for lecture in plan.get("lecture_mapping", []) if isinstance(lecture, dict)]
     lecture_by_id = {str(lecture.get("lecture_session_id")): lecture for lecture in lectures}
