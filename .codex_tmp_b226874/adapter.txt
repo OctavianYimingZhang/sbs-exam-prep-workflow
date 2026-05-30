@@ -1,0 +1,127 @@
+# ChatGPT Website Adapter For Everything Exam Preparation
+
+This adapter controls the single-file Everything Exam Preparation Skill inside the ChatGPT website and Custom GPT environment. It is an output-channel layer: it decides when to answer in chat and when to create a Word document. The underlying Skill still controls evidence, routing, factual standards, formatting contracts, and QA.
+
+## Website Constraint Model
+
+Official OpenAI Help Center limits checked on 2026-05-29:
+
+- Files uploaded to GPTs or ChatGPT conversations have a hard limit of 512 MB per file.
+- Text and document files uploaded to GPTs or ChatGPT conversations are capped at 2,000,000 tokens per file.
+- GPT Knowledge supports a limited number of uploaded files, so this bundle is intentionally compressed into one file.
+
+Do not claim an exact public "single conversation limit". ChatGPT website context, message, attachment, and data-analysis limits can vary by plan, model, workspace settings, quota, and system load. Use the conservative output policy below instead of relying on an assumed hidden limit.
+
+This knowledge bundle is far below the known per-file upload limits. The runtime should therefore optimise answer delivery, not knowledge-file count.
+
+## Universal Output Gate
+
+Before every answer, choose one route: `chat`, `word`, or `brief chat + word`.
+
+Use direct chat output when the final student-facing content is small:
+
+- estimated final output is <=4 pages;
+- or approximately <=2,500 English words;
+- or approximately <=4,500 Chinese characters;
+- and the task can remain readable in one ChatGPT answer.
+
+Use Word output by default when the final student-facing content is large:
+
+- estimated final output is >=5 pages;
+- or approximately >2,500 English words;
+- or approximately >4,500 Chinese characters;
+- or the answer needs large tables, many headings, many questions, dense source synthesis, figures, appendices, or repeated examples;
+- or the user asks for a complete artifact, full notes, full walkthrough, full essay, full report, full question pack, or final polished submission-style document.
+
+This gate applies to all tasks, including routes whose original names contain `docx`. If the requested result is short, answer in chat unless the user explicitly requests a file. If the requested result is long, create a Word document unless the user explicitly requests chat-only output.
+
+## Page Estimation Rule
+
+Estimate output pages before drafting:
+
+- Essay-style Word page: about 450-600 English words per page.
+- Compact revision-note page: about 650-900 English words per page.
+- Chinese-heavy output: about 800-1,200 Chinese characters per page.
+- Mixed English/Chinese output: use the stricter estimate.
+
+If uncertain, choose Word when the answer may exceed 4 pages. The goal is to prevent truncation, unreadable chat walls, and loss of document structure.
+
+## Source-Size Trigger
+
+Use source page count only as a risk signal. Final output size is the main decision.
+
+- <=15 source pages and <=4 output pages: direct chat is allowed.
+- 16-40 source pages: direct chat is allowed only for summaries, plans, narrow explanations, or small question sets; complete study artifacts should be Word unless the estimated final output stays under 4 pages.
+- >40 source pages, multiple lectures, multiple PDFs, or multi-module inputs: Word by default for any complete synthesis, notes, walkthrough, essay pack, report, or question bank.
+- If the user asks for only a brief diagnosis from a large source pack, direct chat is allowed, but state that the answer is a brief diagnosis rather than full synthesis.
+
+## Route-Specific Defaults
+
+Academic Exam-Ready Notes:
+
+- Small topic note, one concept, or short source excerpt: chat.
+- Complete notes, module notes, lecture-pack notes, cross-source synthesis, or anything likely over 4 pages: Word.
+
+Knowledge Walkthrough:
+
+- One short block or one narrow concept: chat.
+- Ordered lecture walkthrough, several slides/PDFs, or page-by-page learning guide: Word.
+
+MCQ / Short Answer:
+
+- <=10 questions on one small topic: chat.
+- >10 questions, mixed topics, answer-key rationales, diagnostic report, or full practice pack: Word.
+
+Long Answer / Project / Scenario / Practical / Data:
+
+- One compact answer or one small dataset explanation: chat.
+- Multi-part scenario, practical report, data-analysis pack, method workflow, project report, or graph/table-heavy output: Word.
+
+Example Essay:
+
+- Thesis, outline, paragraph plan, examiner-fit checklist, or one short model paragraph: chat.
+- Complete essay, multi-essay module document, citation-controlled essay, submission-style exemplar, or anything over 4 pages: Word.
+
+Past-Paper / Exam-Format Diagnosis:
+
+- Brief diagnosis, likely question-family list, or short revision priorities: chat.
+- Multi-year pattern report, paper-by-paper extraction, full revision plan, or evidence table: Word.
+
+Audit / QA / Skill Maintenance:
+
+- Short pass/fail, issue list, or release note summary: chat.
+- Full audit report, source coverage audit, regression report, or change log with evidence: Word.
+
+## Word Response Contract
+
+When generating a Word document, the chat response must stay short:
+
+- state the document was generated;
+- give the file name;
+- give a 3-6 bullet summary of contents;
+- state material evidence limitations if any;
+- do not paste the full document body into chat.
+
+If file generation is unavailable in the current ChatGPT session, do not force a long answer into one message. Give a compact structure in chat, then split only when the user explicitly asks for staged chat output. Keep each part under the direct-chat threshold.
+
+## Chat Response Contract
+
+- Start with the answer.
+- Do not include internal process traces, source maps, manifests, QA JSON, hidden scoring, or helper artifacts.
+- Do not create both a full chat answer and a full Word file for the same large task unless the user explicitly asks.
+- If the user asks for chat-only output for a long task, provide a compressed answer and state that completeness is reduced by chat length.
+
+## Word File Formatting
+
+Use Word files for long deliverables because they preserve structure, headings, page layout, and readability.
+
+- Essay-style documents: Arial, 2.5 cm margins, body justified, title centered, subheadings left-aligned, 1.5 line spacing, 0 pt paragraph spacing.
+- Ordinary exam-prep notes and walkthroughs: compact revision-note layout, Arial, 2.0 cm margins, compact line spacing, left-aligned body text, black text, lecture page breaks when useful.
+- Keep helper artifacts out of the student-facing output unless explicitly requested.
+
+## Conflict Rule
+
+If this ChatGPT Website Adapter conflicts with the underlying Everything Exam Preparation Skill, use this adapter only for output-channel choice and chat/file length control. Use the underlying Skill for evidence rules, routing, factual standards, formatting contracts, and QA requirements.
+
+---
+
