@@ -77,6 +77,22 @@ Structure:
 - Body paragraphs written as continuous essay prose.
 - Figure captions only if figures are explicitly included or requested.
 
+## No Public Preamble In Final DOCX
+
+The final Essay DOCX must begin with the title, optional exact question/topic subtitle, then essay content. Do not insert a public preamble, disclaimer, source-basis note, diagnostic label, or task label into the Word document.
+
+Forbidden visible DOCX text includes:
+
+- `Model answer built from...`
+- `This is not a predicted exam question`
+- `Exam-style question`
+- `Question:` before the subtitle;
+- `Essay Topic:` before the subtitle;
+- standalone `Example essay` / `Example Essay` labels;
+- source-basis or confidence disclaimers that belong in the chat response or internal QA.
+
+If a source-basis note is useful, put it in the short chat response or internal audit artefact, not inside the student-facing essay DOCX.
+
 ## Essay Language Contract
 
 Every generated essay must pass the shared prose-quality rules in `language_quality_contract.md` and the orchestration checks in `essay_generation_protocol.md`.
@@ -112,19 +128,21 @@ Use Word highlight, not font colour.
 Highlight mapping:
 
 - Extra Reading Books content: yellow highlight.
+- Citation / Extra Reading Papers content: green highlight.
 - Lecture-slide citation original-source content: green highlight.
 - Verified classic-experiment fallback content: green highlight.
 
 Implementation mapping:
 
 - Extra Reading Books: `WD_COLOR_INDEX.YELLOW`
-- Cited original papers / theories / experiments from lecture-slide citations, plus verified classic-experiment fallback sources: `WD_COLOR_INDEX.BRIGHT_GREEN`
+- Citation / Extra Reading Papers, cited original papers / theories / experiments from lecture-slide citations, plus verified classic-experiment fallback sources: `WD_COLOR_INDEX.BRIGHT_GREEN`
 
 Rules:
 
 - Yellow highlight is applied only to content derived from Extra Reading Books or chapters uploaded by the user.
-- Green highlight is applied only to content derived from original citation sources identified from lecture slides and then read or verified, or from verified classic-experiment fallback sources used because lecture slides contained no usable citations.
+- Green highlight is applied only to content derived from verified Citation / Extra Reading Papers, original citation sources identified from lecture slides and then read or verified, or verified classic-experiment fallback sources used because lecture slides contained no usable citations.
 - If a sentence uses a lecture-slide cited original source, include an author-year in-text citation and highlight the full cited-source-derived clause or sentence green, including the citation.
+- If a sentence uses a Citation / Extra Reading Paper, include an author-year in-text citation and highlight the paper-derived phrase, clause, or sentence green, including the citation.
 - Citation-source clauses must use parenthetical author-year attribution. Do not render author-led prose such as `Author et al. showed...` as the public sentence shape unless the user explicitly requests discovery history or literature attribution.
 - If a sentence uses Extra Reading Books, highlight the extra-reading-derived phrase or sentence yellow.
 - If a paragraph contains both lecture content and extra-reading content, highlight only the extra-reading portion yellow.
@@ -132,9 +150,11 @@ Rules:
 - Do not highlight ordinary lecture-slide content.
 - If content could belong to both Extra Reading and cited original-source categories, prefer the more specific mapping:
   - source from lecture-slide cited original paper = green;
+  - source from verified Citation / Extra Reading Paper = green;
   - source from uploaded Extra Reading Book = yellow.
 - Do not use green highlight for citations copied from secondary sources unless the original cited source was read.
 - Do not use yellow highlight for generic textbook knowledge unless it came from the uploaded Extra Reading material.
+- Do not use yellow highlight for academic papers, even if the user calls them extra reading. Verified papers are citation sources and must use green.
 
 ## Highlight Relevance Gate
 
@@ -279,8 +299,9 @@ Essay content must be built in this order:
 3. Formal exam question wording or predicted practice question prompt.
 4. Lecture-slide cited original sources, only after reading them.
 5. Verified classic experiments found because no usable lecture-slide citation exists.
-6. Uploaded Extra Reading Books, only relevant chapters/sections.
-7. Other peer-reviewed or textbook sources only if explicitly allowed or needed for citation resolution.
+6. Citation / Extra Reading Papers, only after metadata and relevant claims are verified.
+7. Uploaded Extra Reading Books, only relevant chapters/sections.
+8. Other peer-reviewed or textbook sources only if explicitly allowed or needed for citation resolution.
 
 Extra Reading and citation-source content must enrich the lecture answer, not replace it.
 
@@ -311,8 +332,10 @@ Fail DOCX generation or mark the essay as non-compliant if:
 
 - no relevant lecture slides were read;
 - a body paragraph has no lecture-slide or official course anchor;
+- public preamble, source-basis disclaimers, `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, `Question:`, `Essay Topic:`, or standalone `Example essay` labels appear in the visible DOCX;
 - Extra Reading content exceeds 15% without user instruction;
 - yellow-highlighted content lacks an Extra Reading source anchor;
+- an academic paper or Citation / Extra Reading Paper is yellow-highlighted instead of green-highlighted;
 - green-highlighted content lacks an in-text citation;
 - green-highlighted content is not linked to a read original citation source;
 - classic-experiment fallback content was used without verification or without direct relevance to the paragraph claim;

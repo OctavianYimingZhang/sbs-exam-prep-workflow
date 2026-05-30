@@ -33,12 +33,29 @@ except Exception:  # pragma: no cover
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)?")
 QUESTION_SUBTITLE_RE = re.compile(r"^\s*(explain|discuss|compare|evaluate|describe|how|why|what|to what extent)\b", re.I)
+GREEN_SOURCE_TYPES = {"citation_original_source", "classic_experiment_source", "extra_reading_paper"}
+PUBLIC_PREAMBLE_PATTERNS = [
+    ("model_answer_built_from", re.compile(r"\bModel answer built from\b", re.I)),
+    ("not_predicted_exam_question", re.compile(r"\bThis is not a predicted exam question\b", re.I)),
+    ("exam_style_question", re.compile(r"\bExam[- ]style question\b", re.I)),
+    ("decorative_question_label", re.compile(r"^\s*Question\s*:", re.I)),
+    ("decorative_essay_topic_label", re.compile(r"^\s*Essay Topic\s*:", re.I)),
+    ("standalone_example_essay_label", re.compile(r"^\s*Example\s+essay\s*:?\s*$", re.I)),
+]
 CM_TOL = 0.08
 PT_TOL = 0.25
 
 
 def words(text: str) -> list[str]:
     return WORD_RE.findall(text)
+
+
+def public_preamble_hits(text: str) -> list[str]:
+    return [name for name, pattern in PUBLIC_PREAMBLE_PATTERNS if pattern.search(text)]
+
+
+def source_was_read(source_run: dict[str, Any]) -> bool:
+    return source_run.get("citation_original_read") is True or source_run.get("source_read") is True
 
 
 def emu_to_cm(value) -> float:
@@ -116,6 +133,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         "subtitles_left": True,
         "question_subtitle_plain": True,
         "no_empty_spacer_paragraphs": True,
+        "no_public_preamble": True,
     }
     if not format_checks["margins_2_5_cm"]:
         failures.append({"type": "margins_not_2_5_cm"})
@@ -129,6 +147,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
     yellow_runs_missing_extra_reading_anchor = []
     unexpected_highlights = []
     micro_detail_failures = []
+    public_preamble_leaks = []
 
     source_paragraphs = source_map.get("paragraphs", []) if source_map else []
     allowed_author_years = set()
@@ -148,6 +167,10 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         visible_paragraph_index += 1
         kind = paragraph_kind_from_map(source_map, visible_paragraph_index, paragraph.text)
         source_para = source_paragraphs[visible_paragraph_index - 1] if visible_paragraph_index - 1 < len(source_paragraphs) else {}
+        preamble_hits = public_preamble_hits(paragraph.text)
+        if preamble_hits:
+            format_checks["no_public_preamble"] = False
+            public_preamble_leaks.append({"paragraph": visible_paragraph_index, "hits": preamble_hits, "text": paragraph.text[:160]})
 
         if paragraph.paragraph_format.line_spacing != 1.5:
             format_checks["line_spacing_1_5"] = False
@@ -204,7 +227,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
             source_run = source_runs[r_idx - 1] if r_idx - 1 < len(source_runs) else {}
             wc = len(words(run.text))
             if source_run.get("micro_detail_insert"):
-                if source_run.get("source_type") not in {"extra_reading_book", "citation_original_source", "classic_experiment_source"}:
+                if source_run.get("source_type") not in {"extra_reading_book", *GREEN_SOURCE_TYPES}:
                     micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_requires_verified_extra_source"})
                 if not source_run.get("parent_ppt_or_source_slot"):
                     micro_detail_failures.append({"paragraph": visible_paragraph_index, "run": r_idx, "type": "micro_detail_parent_slot_missing"})
@@ -226,7 +249,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
                 citation = source_run.get("in_text_citation")
                 if not citation and not AUTHOR_YEAR_RE.search(run.text):
                     green_runs_missing_citation.append({"paragraph": visible_paragraph_index, "run": r_idx, "text": run.text[:120]})
-                if source_run.get("source_type") not in {"citation_original_source", "classic_experiment_source"} or source_run.get("citation_original_read") is not True:
+                if source_run.get("source_type") not in GREEN_SOURCE_TYPES or not source_was_read(source_run):
                     green_runs_missing_read_source.append({"paragraph": visible_paragraph_index, "run": r_idx, "text": run.text[:120]})
             elif highlight is not None:
                 unexpected_highlights.append({"paragraph": visible_paragraph_index, "run": r_idx, "highlight": str(highlight)})
@@ -243,6 +266,8 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
         warnings.append({"type": "unexpected_highlight_colour", "runs": unexpected_highlights})
     if micro_detail_failures:
         failures.append({"type": "micro_detail_source_map_failures", "runs": micro_detail_failures})
+    if public_preamble_leaks:
+        failures.append({"type": "public_preamble_leak", "paragraphs": public_preamble_leaks})
 
     extra_reading_ratio = yellow_words / total_body_words if total_body_words else 0.0
     extra_status = (source_map or {}).get("extra_reading_status")
@@ -265,6 +290,7 @@ def lint_docx(docx_path: Path, source_map_path: Path | None = None) -> dict[str,
             "yellow_runs_missing_extra_reading_anchor": yellow_runs_missing_extra_reading_anchor,
             "green_runs_missing_read_original_source": green_runs_missing_read_source,
             "micro_detail_failures": micro_detail_failures,
+            "public_preamble_leaks": public_preamble_leaks,
             "extra_reading_ratio": round(extra_reading_ratio, 4),
             "total_body_words": total_body_words,
             "yellow_words": yellow_words,

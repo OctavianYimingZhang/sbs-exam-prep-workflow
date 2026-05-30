@@ -14,6 +14,10 @@ Question-type routes are add-ons to those base notes: MCQ Exam Analysis Report, 
 
 The invariant is that process helper files stay separate. Public outputs may include any requested student-facing artifact, but run manifests, source maps, QA JSON, lineage files, citation logs, rendered previews, and other internal validation files must not be mixed into the student-facing folder unless the user explicitly requests an audit package.
 
+## Custom GPT Knowledge Bundle
+
+`custom_gpt_knowledge/Everything-Exam-Preparation-Knowledge-Combined.md` is the single-file Custom GPT upload bundle. It preserves the ChatGPT website adapter layer and combines the public Skill knowledge files so the GPT builder can upload one file instead of a folder.
+
 ## Evidence, Output, And Quality Boundaries
 
 The workflow is course-agnostic and evidence-bound. It routes from the uploaded source pack, verified reading, and requested exam format rather than hard-coded course, lecture, or example names. It can identify examinable themes, question archetypes, and likely emphasis, but prediction language stays probabilistic and source-qualified.
@@ -500,13 +504,17 @@ Essay language is controlled by the shared language contract:
 
 DOCX output uses Arial, 2.5 cm margins, justified body text, centered title, left-aligned headings, 1.5 line spacing, and 0 pt paragraph spacing. The essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
 
+Final Essay DOCX files must not contain public preambles or diagnostic labels such as `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` labels, or standalone `Example essay` labels. Source-basis notes belong in the short chat response or internal audit artefacts, not in the student-facing Word document.
+
 Highlighting rules:
 
 | Highlight | Meaning |
 | --- | --- |
-| Green | Original citation source or verified classic experiment, after it has been resolved and read. |
+| Green | Verified Citation / Extra Reading Paper, original citation source, or verified classic experiment, after it has been resolved and read. |
 | Yellow | Uploaded Extra Reading Book content matched to the relevant chapter or section. |
 | No highlight | Ordinary lecture-slide or official-source content. |
+
+Academic papers are citation sources even when the user calls them extra reading: they require parenthetical author-year citation and green highlight. Yellow is reserved for uploaded Extra Reading Books with chapter/section anchors.
 
 ## Academic Integrity Boundary
 

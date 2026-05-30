@@ -197,8 +197,11 @@ Use citations for:
 
 - original papers cited by lecture slides and actually read;
 - verified classic experiments or landmark primary studies found because relevant lecture slides contain no usable citations;
-- extra-reading material matched to a chapter or section;
+- Citation / Extra Reading Papers with verified metadata and relevant claim support;
+- Extra Reading Books matched to a chapter or section;
 - online academic sources verified by DOI, PubMed, publisher page, textbook, or equivalent academic source.
+
+Academic paper details require parenthetical author-year citation and green highlight in Example Essay DOCX output. Uploaded Extra Reading Book details require chapter/section anchoring and yellow highlight. Public source-basis preambles, prediction disclaimers, and decorative question labels are not essay prose and must be removed from final Word output.
 
 ## Completion Standard
 

@@ -72,6 +72,7 @@
                       "highlight": { "enum": ["none", "yellow", "green"] },
                       "in_text_citation": { "type": ["string", "null"] },
                       "citation_original_read": { "type": ["boolean", "null"] },
+                      "source_read": { "type": ["boolean", "null"] },
                       "micro_detail_insert": { "type": "boolean" },
                       "original_phrase": { "type": ["string", "null"] },
                       "inserted_phrase": { "type": ["string", "null"] },

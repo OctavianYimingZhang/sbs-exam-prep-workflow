@@ -47,7 +47,7 @@ Hard rules:
 
 ```text
 Lecture slides control the answer logic.
-Extra Reading Books may refine the answer but must not displace the lecture sequence.
+Citation / Extra Reading Papers and Extra Reading Books may refine the answer but must not displace the lecture sequence.
 A citation printed on a slide is not enough. The cited original source must be resolved and read before any content from that source is inserted into the essay.
 Do not copy author-year citations from slides into the essay unless the cited source has been resolved and the relevant claim verified.
 In public essay prose, academic paper author names belong in parenthetical author-year citations, not as the subject of the explanatory sentence, unless the user explicitly requests literature-history narration.
@@ -55,6 +55,8 @@ If a cited source cannot be read, omit source-derived details and flag the unres
 If the user supplies no citations for an Example Essay, actively mine lecture slides for citations before searching externally.
 If relevant lecture slides contain no usable citations, find several verified classic experiments or landmark primary studies through academic search. Use them only when they directly support the lecture-grounded paragraph claim.
 If Extra Reading Books are uploaded, locate the relevant chapter/section before using them. Do not cite or highlight a whole book vaguely.
+If Extra Reading Papers are supplied or discovered, treat them as citation sources: verify metadata and relevant claims, use parenthetical author-year citation, and green-highlight only the paper-derived phrase, clause, or sentence.
+Do not yellow-highlight academic papers. Yellow is reserved for uploaded Extra Reading Book chapter/section content.
 Formatting reference PDFs are layout/style evidence only and must not supply biological claims.
 During essay planning, unverified external sources are candidate sources only. Do not place them in the final draft, reference list, DOCX, or highlight map until metadata and claim relevance are verified.
 ```
@@ -100,7 +102,7 @@ Extra reading may be inserted into essays only as:
 - one comparison point that sharpens the lecture argument;
 - one evidence-based example that strengthens the lecture mechanism.
 
-Use a separate enrichment paragraph only when the essay question requires it and the paragraph still advances the lecture-derived argument. It must not replace lecture content, exceed 15% of the essay, introduce an unrelated mechanism, contradict slides without explanation, or appear without verified source anchoring. In explicit Example Essay Mode, uploaded Extra Reading Book content should normally be a compact 5-10% precision layer when relevant chapter/section evidence is found; 10-15% is allowed only when the question genuinely benefits from that detail. Those words must be yellow-highlighted.
+Use a separate enrichment paragraph only when the essay question requires it and the paragraph still advances the lecture-derived argument. It must not replace lecture content, exceed 15% of the essay, introduce an unrelated mechanism, contradict slides without explanation, or appear without verified source anchoring. In explicit Example Essay Mode, uploaded Extra Reading Book content should normally be a compact 5-10% precision layer when relevant chapter/section evidence is found; 10-15% is allowed only when the question genuinely benefits from that detail. Those book-derived words must be yellow-highlighted. Verified paper-derived words are citation content, not book content, and must be green-highlighted with parenthetical author-year citation.
 
 For sentence-level micro-detail insertions, the source rule is stricter: the inserted phrase must be directly supported by a verified chapter, section, original paper, or classic source. Keep the addition compact enough that it remains a phrase or short clause inside the original sentence. Highlight only the inserted phrase. Reject the insertion if it changes the claim, starts a new topic, duplicates nearby detail, requires a new explanatory sentence, or makes the extra-reading detail dominate the lecture-derived claim.
 

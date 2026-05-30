@@ -123,6 +123,8 @@ Example Essay hard gates:
 - Add molecular, cellular, channel, receptor, pathway, assay, circuit, gene, method, or case detail only when it sharpens a parent source mechanism slot and preserves claim level, scope, and exam function.
 - Run citation/Extra Reading integration before final compression; estimate a safe compression budget and preserve protected source skeleton, evidence, named academic details, and analytic limitations.
 - Example Essay DOCX output must use 0 pt paragraph spacing; the main title is centered, while the essay-question/topic subtitle is plain, left-aligned, not bold, not italic, and not enlarged.
+- Final Example Essay DOCX output must not include public preambles, source-basis disclaimers, `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` labels, or standalone `Example essay` labels.
+- Distinguish Citation / Extra Reading Papers from Extra Reading Books: verified paper-derived content is green with parenthetical author-year citation; uploaded book/chapter content is yellow with chapter/section anchoring. Do not yellow-highlight papers.
 - Run language lint, DOCX formatting lint, source audit, and render/structural QA where scripts exist.
 
 ## Reference Map

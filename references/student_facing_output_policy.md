@@ -62,6 +62,14 @@ must_master
 
 These may appear only in internal QA or an explicit audit package requested by the user.
 
+## Example Essay Visible Boundary
+
+Final Example Essay DOCX files are student-facing essay documents, not audit reports. They must not contain public preambles, source-basis disclaimers, prediction disclaimers, confidence notes, or diagnostic task labels.
+
+Forbidden visible text in final Example Essay DOCX output includes `Model answer built from...`, `This is not a predicted exam question`, `Exam-style question`, decorative `Question:` / `Essay Topic:` subtitle labels, and standalone `Example essay` labels. The document may have a centered title and an optional subtitle containing only the exact essay question or user-approved topic wording.
+
+If source-basis, prediction status, or evidence limitations need to be stated, put them in the chat response or internal QA artefact, not in the Word document.
+
 ## Allowed Priority Labels
 
 Use only these visible priority labels when priority is useful:

@@ -30,8 +30,17 @@ from citation_rendering_rules import author_led_citation_hits, is_parenthetical_
 
 BODY_KIND = {"body", "paragraph", "conclusion", "intro", "introduction", "mechanism", "evidence", "evaluation", "synthesis"}
 AUTHOR_YEAR_RE = re.compile(r"\([A-Z][A-Za-z'’-]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z'’-]+)?(?:,\s*|\s+)(?:19|20)\d{2}[a-z]?\)")
-MICRO_DETAIL_SOURCE_TYPES = {"extra_reading_book", "citation_original_source", "classic_experiment_source"}
+GREEN_SOURCE_TYPES = {"citation_original_source", "classic_experiment_source", "extra_reading_paper"}
+MICRO_DETAIL_SOURCE_TYPES = {"extra_reading_book", *GREEN_SOURCE_TYPES}
 MICRO_DETAIL_ALLOWED_CLAIM_DELTAS = {None, "", "precision_only", "none"}
+PUBLIC_PREAMBLE_PATTERNS = [
+    ("model_answer_built_from", re.compile(r"\bModel answer built from\b", re.I)),
+    ("not_predicted_exam_question", re.compile(r"\bThis is not a predicted exam question\b", re.I)),
+    ("exam_style_question", re.compile(r"\bExam[- ]style question\b", re.I)),
+    ("decorative_question_label", re.compile(r"^\s*Question\s*:", re.I)),
+    ("decorative_essay_topic_label", re.compile(r"^\s*Essay Topic\s*:", re.I)),
+    ("standalone_example_essay_label", re.compile(r"^\s*Example\s+essay\s*:?\s*$", re.I)),
+]
 
 
 def safe_filename(text: str, max_len: int = 72) -> str:
@@ -64,6 +73,14 @@ def paragraph_kind(paragraph: dict[str, Any]) -> str:
     if paragraph.get("is_heading"):
         return "heading"
     return "body"
+
+
+def source_was_read(run: dict[str, Any]) -> bool:
+    return run.get("citation_original_read") is True or run.get("source_read") is True
+
+
+def public_preamble_hits(text: str) -> list[str]:
+    return [name for name, pattern in PUBLIC_PREAMBLE_PATTERNS if pattern.search(text)]
 
 
 def normalize_paragraph(paragraph, kind: str) -> None:
@@ -150,6 +167,8 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
         if kind == "body" and not paragraph.get("lecture_anchors"):
             errors.append(f"paragraph_{idx}_missing_lecture_anchor")
         paragraph_text = "".join(str(run.get("text", "")) for run in paragraph.get("text_runs", []))
+        for hit in public_preamble_hits(paragraph_text):
+            errors.append(f"paragraph_{idx}_public_preamble_leak:{hit}")
         if kind == "body":
             for hit in author_led_citation_hits(paragraph_text):
                 errors.append(f"paragraph_{idx}_author_led_citation_prose:{hit}")
@@ -160,19 +179,19 @@ def validate_plan(essay: dict[str, Any]) -> list[str]:
             in_text_citation = run.get("in_text_citation")
             if in_text_citation and not is_parenthetical_author_year(in_text_citation):
                 errors.append(f"paragraph_{idx}_run_{run_idx}_citation_must_be_parenthetical_author_year")
-            if source_type in {"citation_original_source", "classic_experiment_source"}:
+            if source_type in GREEN_SOURCE_TYPES:
                 if highlight != "green":
                     errors.append(f"paragraph_{idx}_run_{run_idx}_{source_type}_requires_green")
                 if not parenthetical_author_year_hits(run_text):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_green_run_missing_author_year")
-                if run.get("citation_original_read") is not True:
+                if not source_was_read(run):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_{source_type}_not_read")
             if source_type == "extra_reading_book":
                 if highlight != "yellow":
                     errors.append(f"paragraph_{idx}_run_{run_idx}_extra_reading_requires_yellow")
                 if not run.get("source_anchor"):
                     errors.append(f"paragraph_{idx}_run_{run_idx}_extra_reading_missing_chapter_anchor")
-            if highlight == "green" and source_type not in {"citation_original_source", "classic_experiment_source"}:
+            if highlight == "green" and source_type not in GREEN_SOURCE_TYPES:
                 errors.append(f"paragraph_{idx}_run_{run_idx}_green_wrong_source_type")
             if highlight == "yellow" and source_type != "extra_reading_book":
                 errors.append(f"paragraph_{idx}_run_{run_idx}_yellow_wrong_source_type")
@@ -261,6 +280,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
                 "highlight": run_data.get("highlight", "none"),
                 "in_text_citation": run_data.get("in_text_citation"),
                 "citation_original_read": run_data.get("citation_original_read"),
+                "source_read": run_data.get("source_read"),
                 "word_count": word_count(str(run_data.get("text", ""))),
                 "micro_detail_insert": run_data.get("micro_detail_insert", False),
                 "original_phrase": run_data.get("original_phrase"),
@@ -289,6 +309,7 @@ def write_essay(essay: dict[str, Any], out_dir: Path, qa_dir: Path, index: int) 
         "total_body_words": total_body_words,
         "extra_reading_yellow_words": yellow_words,
         "citation_original_green_words": green_words,
+        "green_source_words": green_words,
         "extra_reading_ratio": (yellow_words / total_body_words) if total_body_words else 0.0,
     }
     source_map["micro_detail_enhancements"] = micro_detail_enhancements

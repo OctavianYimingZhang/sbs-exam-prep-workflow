@@ -252,6 +252,17 @@ For Extra Reading Books:
 - map chapters to lecture KPs using lecture terms, pathway names, diseases, methods, model systems, and essay question terms;
 - read only relevant chapters/sections before inserting yellow-highlighted content into Example Essays.
 
+### Extra Reading Paper Extraction
+
+For Extra Reading Papers:
+
+- extract title, authors, year, DOI, PMID, journal or publisher record where available;
+- verify the paper from DOI, PubMed, publisher, Google Scholar, or another reliable academic locator before using it;
+- map the paper to the exact lecture mechanism, method, model, evidence point, limitation, comparison, or essay question function it can sharpen;
+- classify verified/read paper-derived content as `extra_reading_paper`;
+- insert paper-derived content only with parenthetical author-year citation and green highlight;
+- do not treat papers as Extra Reading Books and do not yellow-highlight them.
+
 ### Lecture-Slide Citation Extraction
 
 For lecture-slide citations:

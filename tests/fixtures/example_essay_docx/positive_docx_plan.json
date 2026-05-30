@@ -117,6 +117,14 @@
               "in_text_citation": null
             },
             {
+              "text": "A verified paper refines the same lecture slot by linking response thresholds to pathway occupancy kinetics (Reader et al., 2025). ",
+              "source_type": "extra_reading_paper",
+              "source_anchor": "Reader et al. 2025 extra reading paper, read Results section",
+              "highlight": "green",
+              "in_text_citation": "(Reader et al., 2025)",
+              "source_read": true
+            },
+            {
               "text": "Control is therefore best explained as a sequence from detection to mechanism to consequence.",
               "source_type": "lecture_slide_core",
               "source_anchor": "fixture_lecture_slides.pdf slide 11",

@@ -180,7 +180,7 @@ Slide/source order informs the storyline, but paragraph order is determined by q
 
 ## PPT-Anchored Detail Control
 
-Example Essays must be lecture-first and PPT/source-anchored. Extra Reading, recommended books, lecture-cited originals, and academic papers may sharpen only a mechanism, evidence point, comparison, limitation, or interpretation slot that is already present in the relevant lecture/source logic.
+Example Essays must be lecture-first and PPT/source-anchored. Citation / Extra Reading Papers, recommended books, lecture-cited originals, and academic papers may sharpen only a mechanism, evidence point, comparison, limitation, or interpretation slot that is already present in the relevant lecture/source logic.
 
 Do not add a named molecular, cellular, channel, receptor, pathway, assay, circuit, gene, material, equation, or method detail merely because it is true or academically impressive. A detail is admissible only if it passes all five tests:
 
@@ -216,6 +216,7 @@ DetailAdmissionMatrix:
   source_class:
     - lecture
     - recommended_book
+    - extra_reading_paper
     - lecture_cited_original_paper
     - verified_classic_source
     - rejected
@@ -502,7 +503,7 @@ MicroExtraReadingInsertion:
   inserted_phrase:
   parent_ppt_or_source_slot:
   question_function:
-  source_class: recommended_book | citation_original_source | classic_experiment_source
+  source_class: recommended_book | extra_reading_paper | citation_original_source | classic_experiment_source
   source_anchor:
   highlight_colour: yellow | green
   word_count_delta:
@@ -534,6 +535,7 @@ generic readout -> named assay marker, flux, compartment, or experimental endpoi
 Highlight and source mapping are mechanical:
 
 - uploaded recommended book or textbook chapter = yellow;
+- verified Citation / Extra Reading Paper = green;
 - verified lecture-cited original paper or verified classic source = green;
 - ordinary lecture or official-source material = no highlight;
 - exemplar-only or remembered detail = reject.
@@ -699,6 +701,8 @@ Match claim strength to source strength. A study, review, or textbook section ma
 
 Use parenthetical-only academic attribution in normal essay prose. Do not write the paper's authors as the sentence subject when the paragraph's purpose is to explain course content. Render the mechanism, evidence, limitation, or comparison first, then place the verified author-year citation in parentheses. Author-led narration is allowed only when the user explicitly asks for literature history, discovery chronology, or named-author attribution.
 
+Keep public source-basis notes out of the essay body. Any phrase explaining that the answer is a model answer, not a predicted question, built from supplied documents, or based on a particular source set belongs in the chat response or internal QA, not in the final Essay DOCX.
+
 ### Citation Fallback When The User Supplies No Citation List
 
 When the user asks for a complete Example Essay but does not provide citations:
@@ -716,6 +720,12 @@ Never cite a source just because it is famous. It must support the exact paragra
 ## Extra Reading
 
 Use extra reading only if it directly improves the answer to this exact question.
+
+Separate Extra Reading Papers from Extra Reading Books:
+
+- Citation / Extra Reading Papers are citation-bearing academic sources. Use parenthetical author-year attribution, green highlight, and a verified read/source anchor.
+- Extra Reading Books are uploaded recommended books or textbook chapters. Use yellow highlight only for the book-derived phrase or clause, with chapter/section anchoring.
+- Do not yellow-highlight papers. Do not green-highlight book material unless it is being used as a verified citation source with explicit citation metadata and claim verification.
 
 Allowed use:
 
@@ -742,7 +752,7 @@ For DOCX output:
 
 - ordinary lecture/source content is not highlighted;
 - uploaded extra-reading book content is yellow-highlighted;
-- read original sources cited by lecture material are green-highlighted and include author-year citations;
+- verified Citation / Extra Reading Papers and read original sources cited by lecture material are green-highlighted and include author-year citations;
 - every highlighted run must map to a source anchor in the source map JSON.
 - academic paper attribution is parenthetical author-year only in public prose unless an explicit literature-history request makes author-led narration necessary.
 
