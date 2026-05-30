@@ -15,13 +15,16 @@ REQUIRED_FILES = [
     "references/student_facing_output_policy.md",
     "references/exam_prep_notes_protocol.md",
     "references/knowledge_walkthrough_docx_protocol.md",
+    "references/knowledge_surface_protocol.md",
     "schemas/student_output_contract.schema.json",
     "schemas/knowledge_walkthrough_plan.schema.json",
+    "schemas/knowledge_surface_contract.schema.json",
     "schemas/atomic_knowledge_ledger.schema.json",
     "scripts/generate_exam_prep_notes_docx.py",
     "scripts/exam_prep_docx_style_linter.py",
     "scripts/generate_knowledge_walkthrough_docx.py",
     "scripts/knowledge_walkthrough_linter.py",
+    "scripts/knowledge_surface_linter.py",
 ]
 
 REQUIRED_PRESETS = {"knowledge_walkthrough_docx", "exam_prep_notes_docx"}
@@ -78,7 +81,8 @@ def validate(root: Path) -> dict[str, Any]:
     policy = read(root / "references/student_facing_output_policy.md")
     exam_prep_notes = read(root / "references/exam_prep_notes_protocol.md")
     walkthrough = read(root / "references/knowledge_walkthrough_docx_protocol.md")
-    combined = policy + "\n" + exam_prep_notes + "\n" + walkthrough
+    knowledge_surface = read(root / "references/knowledge_surface_protocol.md")
+    combined = policy + "\n" + exam_prep_notes + "\n" + walkthrough + "\n" + knowledge_surface
     for term in [
         "ExamPrepNotesStudentContract",
         "Academic Exam-Ready Notes",
@@ -97,6 +101,15 @@ def validate(root: Path) -> dict[str, Any]:
         "★★★",
         "RouteDocxStyleProfile",
         "compact lecture-note formatting contract",
+        "KnowledgeSurfaceContract",
+        "NonKnowledgeGate",
+        "SurfaceLabelDecision",
+        "LabelDecision",
+        "semantic_sparse",
+        "source_route_narration",
+        "ai_process_or_provenance",
+        "rigid_template_bucket",
+        "EssayAdaptiveBudget",
     ]:
         if term not in combined:
             failures.append({"type": "student_policy_missing_term", "term": term})
@@ -105,6 +118,7 @@ def validate(root: Path) -> dict[str, Any]:
             failures.append({"type": "student_policy_missing_forbidden_field", "field": field})
 
     contract = load_json(root / "schemas/student_output_contract.schema.json")
+    surface_schema = load_json(root / "schemas/knowledge_surface_contract.schema.json")
     walkthrough_schema = load_json(root / "schemas/knowledge_walkthrough_plan.schema.json")
     if "route_docx_style_profile" not in walkthrough_schema.get("required", []):
         failures.append({"type": "knowledge_walkthrough_schema_missing_route_style_profile"})
@@ -113,6 +127,23 @@ def validate(root: Path) -> dict[str, Any]:
         failures.append({"type": "knowledge_walkthrough_schema_bad_style_route"})
     if style_profile.get("properties", {}).get("body_alignment", {}).get("const") != "left":
         failures.append({"type": "knowledge_walkthrough_schema_body_not_left"})
+    if surface_schema.get("title") != "KnowledgeSurfaceContract":
+        failures.append({"type": "knowledge_surface_schema_bad_title"})
+    surface_text = json.dumps(surface_schema, ensure_ascii=False)
+    for term in [
+        "allowed_public_functions",
+        "forbidden_public_functions",
+        "label_policy",
+        "density_policy",
+        "surface_label_decisions",
+        "source_route_narration",
+        "ai_process_or_provenance",
+        "rigid_template_bucket",
+        "mechanism_detail_target_ratio",
+        "extra_reading_target_ratio",
+    ]:
+        if term not in surface_text:
+            failures.append({"type": "knowledge_surface_schema_missing_term", "term": term})
     contract_text = json.dumps(contract, ensure_ascii=False)
     for legacy in ["必备", "重点", "补充"]:
         if legacy in policy + exam_prep_notes + contract_text:
