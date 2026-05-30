@@ -40,17 +40,17 @@
         "SKILL.md",
         "references/protected_source_coverage_protocol.md",
         "references/exam_prep_notes_protocol.md",
-        "schemas/atomic_knowledge_ledger.schema.json"
+        "schemas/atomic_knowledge_ledger.schema.json",
+        "scripts/zero_mention_lint.py"
       ],
       "validation_gates": [
         "python3 scripts/skill_architecture_linter.py --self-test",
+        "python3 scripts/zero_mention_lint.py --self-test",
         "python3 scripts/validate_exam_prep_notes_plan.py tests/fixtures/exam_prep_notes/valid_exam_prep_notes_plan.json"
       ],
-      "status": "implemented_with_gap",
-      "remaining_gaps": [
-        "A dedicated route-level zero-mention linter for arbitrary generated DOCX/source pairs is still needed; current enforcement is protocol/schema/plan-level rather than full end-to-end source-DOCX diffing."
-      ],
-      "next_action": "Add a deterministic zero_mention_lint fixture that compares a protected source-unit list against rendered public DOCX text."
+      "status": "implemented",
+      "remaining_gaps": [],
+      "next_action": "Use zero_mention_lint with protected source-unit fixtures whenever a real generated notes regression is reviewed."
     },
     {
       "improvement_id": "knowledge_only_public_surface",
